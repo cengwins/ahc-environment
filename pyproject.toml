@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "bitiriyoruz"
+version = "0.1.0"
+description = ""
+authors = ["CENK ARDA YILMAZ <e2310670@ceng.metu.edu.tr>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "^3.2.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
