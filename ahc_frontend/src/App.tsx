@@ -1,13 +1,12 @@
 import './App.css';
 import { MainStoreProvider } from './app/MainStoreContext';
 
-function App() {
-  return (
-    <MainStoreProvider>
-      <div className="App">
-      </div>
-    </MainStoreProvider>
-  );
-}
+const App = () => (
+  <MainStoreProvider>
+    <div className="App">
+      Initial
+    </div>
+  </MainStoreProvider>
+);
 
 export default App;
