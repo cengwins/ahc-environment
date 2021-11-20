@@ -1,0 +1,29 @@
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "myproject.settings"
+
+[tool.poetry]
+name = "bitiriyoruz"
+version = "0.1.0"
+description = ""
+authors = ["CENK ARDA YILMAZ <e2310670@ceng.metu.edu.tr>", "DENIZ KOLUACIK <e2310274@ceng.metu.edu.tr"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "^3.2.9"
+mypy = "^0.910"
+django-stubs = "^1.9.0"
+
+[tool.poetry.dev-dependencies]
+black = "^21.10b0"
+pylint = "^2.11.1"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
