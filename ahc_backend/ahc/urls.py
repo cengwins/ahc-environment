@@ -16,6 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from ahc_users.views import LoginAPIView, RegisterAPIView, GetUserProfileAPIView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+
+    path("api/auth/login/", LoginAPIView.as_view()),
+    path("api/auth/register/", RegisterAPIView.as_view()),
+    path("api/auth/profile/", GetUserProfileAPIView.as_view()),
 ]
