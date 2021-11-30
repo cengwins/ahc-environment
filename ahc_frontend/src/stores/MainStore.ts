@@ -1,10 +1,18 @@
-/* eslint-disable */
-export class MainStore {
-  constructor() {}
+import { createContext, useContext } from 'react';
+import UserStore from './UserStore';
 
-  async init() {}
-
-  async terminate() {}
-
-  async reset() {}
+export interface MainStoreInterface {
+  userStore: UserStore;
 }
+
+export default class MainStore {
+  userStore: UserStore;
+
+  constructor() {
+    this.userStore = new UserStore(this);
+  }
+}
+
+const StoresContext = createContext(new MainStore());
+
+export const useStores = () => useContext(StoresContext);
