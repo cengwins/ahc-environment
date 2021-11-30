@@ -1,4 +1,4 @@
-  AHC Backend Do this in `ahc_backend/` dir.
+AHC Backend
 ==========
 
 ## How to develop with `Poetry`?
