@@ -126,3 +126,8 @@ STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_HOST = 'smtp.eu.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'postmaster@ahc.oznakn.com'
+EMAIL_HOST_PASSWORD = '9c42388d89280d0e13737fae8809d854-7b8c9ba8-7bda684b'

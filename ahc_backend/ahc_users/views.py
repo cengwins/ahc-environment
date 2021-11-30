@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.utils import timezone
+from django.core.mail import send_mail
 
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +9,7 @@ from rest_framework.authtoken.models import Token
 
 from ahc_utils.helpers import check_fields, bad_request, unauthorized
 
-from .models import User, UserProfile
+from .models import User, UserProfile, UserConfirmationCode
 from .serializers import UserProfileSerializer
 
 REGISTER_API_REQ_FIELDS = [
@@ -37,12 +38,26 @@ class RegisterAPIView(APIView):
             password=request.data['password'],
         )
 
-        auth_token = Token.objects.create(user=user)
+        user_profile = UserProfile.objects.create(
+            user=user,
+            is_email_confirmed=True # TODO: disable later, just for testing purposes
+        )
+        user_confirmation_code = UserConfirmationCode.objects.create(user=user)
 
-        # TODO: user confirmation
+        send_mail(
+            'Welcome to AHC!',
+            f'Welcome to AHC! Please visit ahc.ceng.metu.edu.tr for further details. Confirmation code = {user_confirmation_code.code}',
+            'noreply@ahc.oznakn.com',
+            [user.email],
+            fail_silently=False,
+        )
 
         return Response({
-            'token': auth_token.key,
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
         })
 
 
@@ -55,7 +70,7 @@ class LoginAPIView(APIView):
     def post(self, request):
         check_fields(request.data, LOGIN_API_REQ_FIELDS)
 
-        profile = UserProfile.objects.filter(user__is_active=True, is_mail_confirmed=True).filter(
+        profile = UserProfile.objects.filter(user__is_active=True, is_email_confirmed=True).filter(
             Q(user__username__iexact=request.data['username']) | Q(user__email__iexact=request.data['username'])
         ).first()
 
