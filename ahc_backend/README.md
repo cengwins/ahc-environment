@@ -20,10 +20,10 @@
     - `python manage.py runserver` for starting the server
     - `python manage.py migrate` if django complains about migrations
     - See django documentation for other cases.
-4. `exit` or `^D` to exit the virtual environment shellld.
+4. `exit` or `^D` to exit the virtual environment shell.
 
 ### Extras
-1. To add new dependencies use `poetry add [package name]` **do not use `poetry install`
+1. To add new dependencies use `poetry add [package name]` **do not use `poetry install`**.
     - For development dependencies use `poetry add -D [package name]` instead (black, pylint etc.).
     - Do not forget to commit changes to `pyproject.toml` and `poetry.lock`
 
