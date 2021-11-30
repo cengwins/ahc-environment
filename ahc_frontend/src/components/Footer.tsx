@@ -13,8 +13,6 @@ const Footer = () => (
     <ul className="list-inline">
       <FooterItem link="/" text="Home" />
       <FooterItem link="/team" text="Team" />
-      <FooterItem link="/dashboard" text="Dashboard" />
-      <FooterItem link="/login" text="Log In" />
     </ul>
     <p className="copyright">bitiriyoruz © 2021</p>
   </div>
