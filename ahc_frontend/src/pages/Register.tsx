@@ -1,3 +1,4 @@
+import { useObserver } from 'mobx-react';
 import { useState } from 'react';
 import {
   Container, Form, Button, Col, Row,
@@ -8,22 +9,21 @@ import { useStores } from '../stores/MainStore';
 
 const Register = () => {
   const { userStore } = useStores();
-
-  console.log(userStore);
-
   const [mail, setMail] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [password, setPassword] = useState('');
 
-  return (
+  return useObserver(() => (
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="my-5">
         <Row className="text-start">
           <Col />
           <Col sm={4}>
-            <h1 className="mt-5">Register</h1>
+            <h1 className="mt-5">
+              Register
+            </h1>
             <Form
               className="mt-5"
               onSubmit={(e) => {
@@ -60,6 +60,6 @@ const Register = () => {
       </Container>
       <Footer />
     </div>
-  );
+  ));
 };
 export default Register;

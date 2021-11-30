@@ -18,14 +18,18 @@ export default class UserStore implements UserStoreInterface {
     this.mainStore = mainStore;
   }
 
-  login() {
-    const response = (new RequestHandler()).axiosInstance.get('login');
+  login(mail: string, password: string) {
+    const response = (new RequestHandler()).axiosInstance.post('/login/', {
+      mail, password,
+    });
     console.log(response);
     console.log(this.username);
   }
 
   register(mail: string, name: string, surname: string, password: string) {
-    const response = (new RequestHandler()).axiosInstance.get('register');
+    const response = (new RequestHandler()).axiosInstance.post('/register/', {
+      mail, name, surname, password,
+    });
     console.log(mail, name, surname, password);
     console.log(response);
     console.log(this.username);

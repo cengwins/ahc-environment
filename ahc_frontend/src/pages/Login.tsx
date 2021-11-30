@@ -1,21 +1,15 @@
+import { useState } from 'react';
 import {
   Container, Form, Button, Col, Row,
 } from 'react-bootstrap';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useStores } from '../stores/MainStore';
-import Register from './Register';
 
 const Login = () => {
   const { userStore } = useStores();
-
-  console.log(userStore);
-  const { username } = userStore;
-  if (!username) {
-    return (
-      <Register />
-    );
-  }
+  const [mail, setMail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -24,16 +18,24 @@ const Login = () => {
         <Row className="text-start">
           <Col />
           <Col sm={4}>
-            {/** Placeholder login form */}
-            <Form className="mt-5">
+            <h1 className="mt-5">
+              Log in
+            </h1>
+            <Form
+              className="mt-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                userStore.login(mail, password);
+              }}
+            >
               <Form.Group className="mb-3" controlId="email">
                 <Form.Label>Email Address</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" />
+                <Form.Control type="email" placeholder="Enter email" onChange={(e) => setMail(e.target.value)} />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="password">
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" />
+                <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
               </Form.Group>
               <Button variant="primary" type="submit">
                 Log In

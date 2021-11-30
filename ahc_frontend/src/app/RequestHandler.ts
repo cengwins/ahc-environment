@@ -5,7 +5,7 @@ export default class RequestHandler {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'https://localhost:8000/api/',
+      baseURL: 'http://localhost:8000/api/',
       timeout: 1000,
       headers: { },
     });
