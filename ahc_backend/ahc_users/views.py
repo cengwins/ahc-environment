@@ -35,8 +35,9 @@ class RegisterAPIView(APIView):
             email=request.data['email'],
             first_name=request.data['first_name'],
             last_name=request.data['last_name'],
-            password=request.data['password'],
         )
+        user.set_password(request.data['password'])
+        user.save()
 
         user_profile = UserProfile.objects.create(
             user=user,
