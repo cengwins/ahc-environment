@@ -9,10 +9,12 @@ import { useStores } from '../stores/MainStore';
 
 const Register = () => {
   const { userStore } = useStores();
-  const [mail, setMail] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setMail] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [password, setPassword] = useState('');
+  const [waitingResponse, setWaitingResponse] = useState(false);
 
   return useObserver(() => (
     <div className="d-flex flex-column min-vh-100">
@@ -28,9 +30,22 @@ const Register = () => {
               className="mt-5"
               onSubmit={(e) => {
                 e.preventDefault();
-                userStore.register(mail, name, surname, password);
+                setWaitingResponse(true);
+                userStore.register({
+                  username, email, first_name: name, last_name: surname, password,
+                }).then(() => {
+                  alert('Registered!');
+                }).catch((result) => {
+                  alert(`Failed to register: ${result}`);
+                }).finally(() => {
+                  setWaitingResponse(false);
+                });
               }}
             >
+              <Form.Group className="mb-3" controlId="username">
+                <Form.Label>Username</Form.Label>
+                <Form.Control type="username" placeholder="Enter username" onChange={(e) => setUsername(e.target.value)} />
+              </Form.Group>
               <Form.Group className="mb-3" controlId="email">
                 <Form.Label>Email Address</Form.Label>
                 <Form.Control type="email" placeholder="Enter email" onChange={(e) => setMail(e.target.value)} />
@@ -50,7 +65,7 @@ const Register = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
               </Form.Group>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" disabled={waitingResponse}>
                 Register
               </Button>
             </Form>

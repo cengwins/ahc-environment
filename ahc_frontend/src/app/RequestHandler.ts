@@ -10,4 +10,11 @@ export default class RequestHandler {
       headers: { },
     });
   }
+
+  async post(url: string, data: any) {
+    const result = await this.axiosInstance.post(url, data);
+    if (result.status === 200) return result.data;
+
+    throw Error(result.data);
+  }
 }
