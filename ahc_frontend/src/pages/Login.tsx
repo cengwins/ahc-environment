@@ -8,8 +8,9 @@ import { useStores } from '../stores/MainStore';
 
 const Login = () => {
   const { userStore } = useStores();
-  const [mail, setMail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [waitingResponse, setWaitingResponse] = useState(false);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -25,19 +26,26 @@ const Login = () => {
               className="mt-5"
               onSubmit={(e) => {
                 e.preventDefault();
-                userStore.login(mail, password);
+                setWaitingResponse(true);
+                userStore.login({ username, password }).then(() => {
+                  alert('Logged in!');
+                }).catch((result) => {
+                  alert(`Failed to log in: ${result}`);
+                }).finally(() => {
+                  setWaitingResponse(false);
+                });
               }}
             >
               <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email Address</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" onChange={(e) => setMail(e.target.value)} />
+                <Form.Label>Username</Form.Label>
+                <Form.Control type="text" placeholder="Enter user name" onChange={(e) => setUsername(e.target.value)} />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="password">
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
               </Form.Group>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" disabled={waitingResponse}>
                 Log In
               </Button>
             </Form>
