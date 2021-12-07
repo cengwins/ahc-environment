@@ -20,7 +20,8 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }],  
+        "camelcase": [0],
+        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }],
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error"],
         "react/react-in-jsx-scope": "off",
