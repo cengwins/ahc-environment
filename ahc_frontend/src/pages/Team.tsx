@@ -66,7 +66,7 @@ const Team = () => {
           <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
           <Row>
             {members.map((member, i) => (
-              <Col sm={6}>
+              <Col sm={6} key={member.name}>
                 <div className={`${i % 2 ? 'me-1' : 'ms-1'} mb-4`}>
                   <MemberCard member={{ ...member, role: 'member' }} />
                 </div>
