@@ -37,7 +37,7 @@ const Home = () => {
             <h2 className="mb-3">Objectives</h2>
             <ListGroup as="ol" numbered variant="flush" className="text-start">
               {objectives.map((objective) => (
-                <ListGroup.Item as="li">
+                <ListGroup.Item as="li" key={objective}>
                   <span className="ms-4">{objective}</span>
                 </ListGroup.Item>
               ))}
