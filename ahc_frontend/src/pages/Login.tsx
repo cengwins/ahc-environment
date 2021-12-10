@@ -2,15 +2,17 @@ import { useState } from 'react';
 import {
   Container, Form, Button, Col, Row,
 } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useStores } from '../stores/MainStore';
 
 const Login = () => {
-  const { userStore } = useStores();
+  const { userStore, notificationStore } = useStores();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -28,9 +30,10 @@ const Login = () => {
                 e.preventDefault();
                 setWaitingResponse(true);
                 userStore.login({ username, password }).then(() => {
-                  alert('Logged in!');
+                  notificationStore.set('success', '', 'Logged in!');
+                  navigate('/');
                 }).catch((result) => {
-                  alert(`Failed to log in: ${result}`);
+                  notificationStore.set('danger', '', result.message);
                 }).finally(() => {
                   setWaitingResponse(false);
                 });
