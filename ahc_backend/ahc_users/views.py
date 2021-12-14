@@ -88,13 +88,16 @@ class LoginAPIView(APIView):
         # profile.user.last_login = timezone.now()
         # profile.user.save(update_fields=['last_login'])
 
-        auth_token = Token.objects.create(
+        old_tokens = Token.objects.filter(user=profile.user)
+        old_tokens.delete()
+
+        new_token = Token.objects.create(
             user=profile.user,
         )
 
         return Response(
             {
-                "token": auth_token.key,
+                "token": new_token.key,
             }
         )
 
