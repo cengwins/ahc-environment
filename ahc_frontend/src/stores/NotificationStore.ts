@@ -41,7 +41,6 @@ export default class NotificationStore implements NotificationStoreInterface {
   }
 
   clear(notificationId: number) {
-    console.log('helloo');
     delete this.notifications[notificationId];
   }
 }

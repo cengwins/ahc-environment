@@ -1,4 +1,3 @@
-import { useObserver } from 'mobx-react';
 import { useState } from 'react';
 import {
   Container, Form, Button, Col, Row,
@@ -18,7 +17,7 @@ const Register = () => {
   const [waitingResponse, setWaitingResponse] = useState(false);
   const navigate = useNavigate();
 
-  return useObserver(() => (
+  return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="my-5">
@@ -78,6 +77,6 @@ const Register = () => {
       </Container>
       <Footer />
     </div>
-  ));
+  );
 };
 export default Register;

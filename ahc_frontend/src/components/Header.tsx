@@ -1,4 +1,3 @@
-import { useObserver } from 'mobx-react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
@@ -20,7 +19,7 @@ const Header = () => {
     navigate('/');
   };
 
-  return useObserver(() => (
+  return (
     <>
       <Navbar bg="light" expand="lg" fixed="top">
         <Container>
@@ -45,7 +44,7 @@ const Header = () => {
       </Navbar>
       {notifications && <Notification />}
     </>
-  ));
+  );
 };
 
 export default Header;

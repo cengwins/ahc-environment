@@ -1,4 +1,4 @@
-import { observer, useObserver } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Alert } from 'react-bootstrap';
 import { useStores } from '../stores/MainStore';
 import { NotificationInterface } from '../stores/NotificationStore';
@@ -8,7 +8,7 @@ const Notification = observer(() => {
 
   const { notifications } = notificationStore;
 
-  return useObserver(() => (
+  return (
     <div style={{
       position: 'fixed',
       zIndex: 2000,
@@ -35,7 +35,7 @@ const Notification = observer(() => {
         );
       })}
     </div>
-  ));
+  );
 });
 
 export default Notification;
