@@ -8,6 +8,8 @@ import { useStores } from '../stores/MainStore';
 const Profile = () => {
   const { userStore } = useStores();
 
+  userStore.getProfile();
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
