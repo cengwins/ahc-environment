@@ -1,17 +1,25 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from .models import User, UserProfile
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = "__all__"
+class UserSerializer(ModelSerializer):
+    profile_image = SerializerMethodField()
 
+    def get_profile_image(self, obj):
+        if obj.profile.profile_image:
+            return obj.profile.profile_image
 
-class UserSerializer(serializers.ModelSerializer):
-    user_profile = UserProfileSerializer(read_only=True, source="profile")
+        return None
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ("id", "username", "first_name", "last_name", "email", "profile_image")
+
+
+class UserProfileSerializer(ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ("profile_image", "user")
