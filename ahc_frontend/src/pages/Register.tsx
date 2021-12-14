@@ -1,22 +1,23 @@
-import { useObserver } from 'mobx-react';
 import { useState } from 'react';
 import {
   Container, Form, Button, Col, Row,
 } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useStores } from '../stores/MainStore';
 
 const Register = () => {
-  const { userStore } = useStores();
+  const { userStore, notificationStore } = useStores();
   const [username, setUsername] = useState('');
   const [email, setMail] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [password, setPassword] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
+  const navigate = useNavigate();
 
-  return useObserver(() => (
+  return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="my-5">
@@ -34,9 +35,10 @@ const Register = () => {
                 userStore.register({
                   username, email, first_name: name, last_name: surname, password,
                 }).then(() => {
-                  alert('Registered!');
+                  notificationStore.set('success', '', 'Registered!');
+                  navigate('/');
                 }).catch((result) => {
-                  alert(`Failed to register: ${result}`);
+                  notificationStore.set('danger', '', result.message);
                 }).finally(() => {
                   setWaitingResponse(false);
                 });
@@ -75,6 +77,6 @@ const Register = () => {
       </Container>
       <Footer />
     </div>
-  ));
+  );
 };
 export default Register;

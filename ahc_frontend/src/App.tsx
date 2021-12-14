@@ -1,9 +1,5 @@
-import { useObserver } from 'mobx-react';
-import {
-  BrowserRouter,
-  Routes, // instead of "Switch"
-  Route,
-} from 'react-router-dom';
+import { observer } from 'mobx-react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
@@ -14,23 +10,23 @@ import Register from './pages/Register';
 import Team from './pages/Team';
 import { useStores } from './stores/MainStore';
 
-const App = () => {
+const App = observer(() => {
   const { userStore } = useStores();
-  const { username } = userStore;
+  const { token } = userStore;
 
-  return useObserver(() => (
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/team" element={<Team />} />
-        {!username && <Route path="/login" element={<Login />} />}
-        {!username && <Route path="/register" element={<Register />} />}
-        {username && <Route path="/profile" element={<Profile />} />}
-        {username && <Route path="/dashboard" element={<Dashboard />} />}
+        {!token && <Route path="/login" element={<Login />} />}
+        {!token && <Route path="/register" element={<Register />} />}
+        {token && <Route path="/profile" element={<Profile />} />}
+        {token && <Route path="/dashboard" element={<Dashboard />} />}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
-  ));
-};
+  );
+});
 
 export default App;
