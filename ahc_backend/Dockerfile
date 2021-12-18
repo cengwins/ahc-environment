@@ -34,7 +34,7 @@ RUN cd /usr/local/bin && \
 
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi --no-dev
 
 COPY . .
 
