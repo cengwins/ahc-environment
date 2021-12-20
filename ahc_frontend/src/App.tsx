@@ -22,7 +22,7 @@ const App = observer(() => {
         {!token && <Route path="/login" element={<Login />} />}
         {!token && <Route path="/register" element={<Register />} />}
         {token && <Route path="/profile" element={<Profile />} />}
-        {token && <Route path="/dashboard" element={<Dashboard />} />}
+        {token && <Route path="/dashboard/*" element={<Dashboard />} />}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
