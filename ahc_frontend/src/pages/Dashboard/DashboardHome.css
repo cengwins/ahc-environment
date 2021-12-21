@@ -1,0 +1,8 @@
+.project-item {
+  padding: 12px 6px;
+  cursor: pointer;
+}
+
+.project-item:hover {
+  background-color: #eee;
+}
