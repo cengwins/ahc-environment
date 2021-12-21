@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
