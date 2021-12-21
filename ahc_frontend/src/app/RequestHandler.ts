@@ -30,8 +30,6 @@ export default class RequestHandler {
         throw Error('Undefined requestType');
     }
 
-    console.log(result);
-
     if (result.status === 200) return result.data;
 
     throw Error(result.data);
