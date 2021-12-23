@@ -1,15 +1,15 @@
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 
 export default class RequestHandler {
   public axiosInstance;
 
   constructor() {
+    const headers = localStorage.getItem('token') ? { Authorization: localStorage.getItem('token') } : {};
+
     this.axiosInstance = axios.create({
       baseURL: 'http://localhost:8000/api/',
       timeout: 5000,
-      headers: {
-        Authorization: `Token ${localStorage.getItem('token')}`,
-      },
+      headers: headers as AxiosRequestHeaders,
     });
   }
 

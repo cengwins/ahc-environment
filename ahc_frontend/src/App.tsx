@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import PageNotFound from './pages/PageNotFound';
@@ -22,7 +22,7 @@ const App = observer(() => {
         {!token && <Route path="/login" element={<Login />} />}
         {!token && <Route path="/register" element={<Register />} />}
         {token && <Route path="/profile" element={<Profile />} />}
-        {token && <Route path="/dashboard" element={<Dashboard />} />}
+        {token && <Route path="/dashboard/*" element={<Dashboard />} />}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
