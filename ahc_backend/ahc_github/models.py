@@ -26,3 +26,6 @@ class GithubProfile(models.Model):
     def get_branch(self, repo_name: str, branch_name: str) -> Branch:
         g = Github(self.access_token)
         return g.get_repo(full_name_or_id=repo_name).get_branch(branch_name)
+
+    def get_hash_of_last_commit(self, repo_name: str, branch_name: str) -> str:
+        return self.get_branch(repo_name, branch_name).commit.sha
