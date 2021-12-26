@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "ahc_users",
     "ahc_github",
+    "ahc_repositories",
 ]
 
 MIDDLEWARE = [
