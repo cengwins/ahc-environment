@@ -1,6 +1,6 @@
-import { Button, Nav } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import {
-  Route, Routes, useLocation, useNavigate,
+  useLocation, useNavigate,
 } from 'react-router-dom';
 import ProjectHistory from './ProjectHistory';
 import ProjectHome from './ProjectHome';
@@ -34,20 +34,10 @@ const Project = () => {
       </div>
 
       <div>
-        <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
-          <Nav.Item>
-            <Nav.Link href="/dashboard/project">Overview</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/dashboard/project/history">History</Nav.Link>
-          </Nav.Item>
-        </Nav>
 
-        <Routes>
-          <Route path="" element={<ProjectHome />} />
-          <Route path="/history" element={<ProjectHistory />} />
-          <Route path="/simulation" element={<Simulation />} />
-        </Routes>
+        {location.pathname === '/dashboard/project/history' && <ProjectHistory />}
+        {location.pathname === '/dashboard/project' && <ProjectHome />}
+        {location.pathname === '/dashboard/simulation' && <Simulation />}
       </div>
     </div>
   );
