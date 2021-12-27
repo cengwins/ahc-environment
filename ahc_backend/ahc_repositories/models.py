@@ -23,3 +23,16 @@ class RepositoryUser(models.Model):
     type = models.TextField()
     created_at = models.DateTimeField(null=True)
     updated_at = models.DateTimeField(null=True)
+
+
+class RepositoryEnvVariable(models.Model):
+    """
+    Model for storing environment variables for repositories of the users.
+    """
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    name = models.TextField()
+    value = models.TextField()
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(null=True)
