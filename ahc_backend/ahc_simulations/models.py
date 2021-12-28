@@ -3,7 +3,7 @@ import re
 from django.core.validators import RegexValidator
 from django.db import models
 
-from ahc_backend.ahc_repositories.models import Repository
+from ahc_repositories.models import Repository
 
 
 class Simulation(models.Model):
@@ -22,7 +22,8 @@ class Simulation(models.Model):
     sequence_id = models.PositiveIntegerField()
     # Git commits are exactly 40-digit hexadecimal values
     commit = models.CharField(
-        validators=[RegexValidator(regex=re.compile("^[0-9a-zA-Z]{40}$"))]
+        validators=[RegexValidator(regex=re.compile("^[0-9a-zA-Z]{40}$"))],
+        max_length=40,
     )
     reference = models.CharField(max_length=80)
     reference_type = models.CharField(max_length=1, choices=REFERENCE_TYPES)
