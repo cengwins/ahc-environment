@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "ahc_users",
-    "ahc_simulations"
+    "ahc_github",
+    "ahc_repositories",
+    "ahc_simulations",
 ]
 
 MIDDLEWARE = [

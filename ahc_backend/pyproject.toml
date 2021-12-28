@@ -22,6 +22,7 @@ djangorestframework = "^3.12.4"
 djangorestframework-stubs = "^1.4.0"
 Pillow = "^8.4.0"
 django-cors-headers = "^3.10.0"
+PyGithub = "^1.55"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
