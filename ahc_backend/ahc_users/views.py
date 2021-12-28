@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 
 from ahc_utils.helpers import check_fields, bad_request, unauthorized
 
-from .models import User, UserProfile, UserConfirmationCode
+from .models import *
 from .serializers import UserSerializer
 
 REGISTER_API_REQ_FIELDS = [
@@ -107,3 +107,34 @@ class GetUserProfileAPIView(APIView):
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+
+PASSWORD_RESET_REQ_FIELDS = [
+    "email",
+]
+
+
+class PasswordResetAPIView(APIView):
+    def post(self, request):
+        check_fields(request.data, PASSWORD_RESET_REQ_FIELDS)
+
+        user = User.objects.filter(email=request.data["email"]).first()
+
+        if user is None:
+            return unauthorized("user_ne")
+
+        password_reset = UserPasswordReset.objects.create(user=user)
+
+        send_mail(
+            "Password Reset Request for AHC!",
+            f"Please click here to reset your password. Password reset code = {password_reset.code}",
+            "noreply@ahc.oznakn.com",
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response(
+            {
+                "success": True,
+            }
+        )
