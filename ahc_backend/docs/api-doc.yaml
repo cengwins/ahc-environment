@@ -10,6 +10,10 @@ servers:
 tags:
 - name: auth
   description: User authenticate, register, login, and user info.
+- name: repositories
+  description: Github repository integration endpoints.
+- name: simulations
+  description: Simulation endpoints
 paths:
   /auth/login:
     post:
@@ -90,9 +94,357 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
       security:
       - IsAuthenticated: []
+  /github/profile:
+    post:
+      tags:
+      - github auth
+      summary: Create github profile with personal acces token.
+      operationId: createGithubProfile
+      requestBody:
+        description: object with Github personal access token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_profile_body'
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: No valid access token were provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400_1'
+      security:
+      - IsAuthenticated: []
+  /github/repositories:
+    get:
+      tags:
+      - github
+      summary: Fetch repositories that the authenticated user can access
+      operationId: getGithubRepositories
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: Github Token not provided beforehand.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403_1'
+      security:
+      - IsAuthenticated: []
+  /github/repositories/{ownerName}/{repoName}/branches:
+    get:
+      tags:
+      - github
+      summary: Fetch the branches of the repository that the authenticated user can access operationId getGithubBranches
+      parameters:
+      - name: ownerName
+        in: path
+        description: repo owner
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: repoName
+        in: path
+        description: repo name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: No Github Token or no access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403_2'
+      security:
+      - IsAuthenticated: []
+  /repositories:
+    get:
+      tags:
+      - repositories
+      summary: Fetch the repositories of the user.
+      operationId: getRepositories
+      parameters:
+      - name: page
+        in: query
+        description: 1-based page number
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: List of repositories for the given user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryInfoList'
+        "403":
+          description: Github Token not provided beforehand.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403_1'
+      security:
+      - IsAuthenticated: []
+  /repositories/{id}:
+    get:
+      tags:
+      - repositories
+      summary: Fetch the repository with given id (subject to user's permissions).
+      parameters:
+      - name: id
+        in: path
+        description: id of the repo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: No Github Token or no access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403_2'
+      security:
+      - IsAuthenticated: []
+    delete:
+      tags:
+      - repositories
+      summary: Delete the user repository.
+      parameters:
+      - name: id
+        in: path
+        description: id of the repo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+  /repositories/{id}/members:
+    get:
+      tags:
+      - repositories
+      summary: Fetch the authorized members of a repo
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: List of members
+      security:
+      - IsAuthenticated: []
+    post:
+      tags:
+      - repositories
+      summary: Authorize a user for a repo
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "403":
+          description: Unauthorized
+      security:
+      - IsAuthenticated: []
+  /repositories/{id}/members/{memberId}:
+    delete:
+      tags:
+      - repositories
+      summary: Unauthorize a member from a repo
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: memberId
+        in: path
+        description: member id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Bad request
+        "403":
+          description: Unauthorized
+      security:
+      - IsAuthenticated: []
+  /repositories/{id}/simulations:
+    get:
+      tags:
+      - simulations
+      summary: List configured simulations of the project
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 1-based page number
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+      security:
+      - IsAuthenticated: []
+    post:
+      tags:
+      - simulations
+      summary: List configured simulations of the project
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - IsAuthenticated: []
+  /repositories/{id}/simulations/{simulationId}:
+    get:
+      tags:
+      - simulations
+      summary: Fetch the simulation with the given ID from the repo with the given ID
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: simulationId
+        in: path
+        description: simulation id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      security:
+      - IsAuthenticated: []
+  /repositories/{id}/simulations/{simulationId}/runs:
+    get:
+      tags:
+      - simulations
+      summary: Fetch the runs of a simulation.
+      parameters:
+      - name: id
+        in: path
+        description: repo id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: simulationId
+        in: path
+        description: simulation id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: 1-based page number
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+      security:
+      - IsAuthenticated: []
 components:
   schemas:
     UserRegiterInfo:
+      required:
+      - username email first_name password
       type: object
       properties:
         username:
@@ -106,6 +458,8 @@ components:
           type: string
           format: password
     UserLogin:
+      required:
+      - username password
       type: object
       properties:
         username:
@@ -115,6 +469,8 @@ components:
           type: string
           format: string
     UserProfile:
+      required:
+      - id username first_name last_name email profile_image
       type: object
       properties:
         id:
@@ -133,7 +489,26 @@ components:
           type: string
           format: uri
           nullable: true
+    RepositoryInfo:
+      required:
+      - slug name
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        upstream:
+          type: string
+        upstream_type:
+          type: string
+    RepositoryInfoList:
+      type: array
+      items:
+        $ref: '#/components/schemas/RepositoryInfo'
     MissingFieldError:
+      required:
+      - code field
       type: object
       properties:
         code:
@@ -149,6 +524,8 @@ components:
           - last_name
           - password
     AlreadyExistsError:
+      required:
+      - code field
       type: object
       properties:
         code:
@@ -161,6 +538,8 @@ components:
           - username_exists
           - email_exists
     Token:
+      required:
+      - token
       type: object
       properties:
         token:
@@ -176,6 +555,35 @@ components:
       oneOf:
       - $ref: '#/components/schemas/AlreadyExistsError'
       - $ref: '#/components/schemas/MissingFieldError'
+    github_profile_body:
+      required:
+      - token
+      type: object
+      properties:
+        token:
+          type: string
+    inline_response_400_1:
+      type: object
+      properties:
+        detail:
+          type: string
+          enum:
+          - No valid access token were provided
+    inline_response_403_1:
+      type: object
+      properties:
+        detail:
+          type: string
+          enum:
+          - No valid Github token found
+    inline_response_403_2:
+      type: object
+      properties:
+        detail:
+          type: string
+          enum:
+          - No valid Github token found
+          - No such repo that can be accessed
   responses:
     BadRequestMissingField:
       description: Bad Request
@@ -200,6 +608,25 @@ components:
                 type: string
                 enum:
                 - Authentication credentials were not provided.
+  parameters:
+    PageSize:
+      name: limit
+      in: query
+      description: Number of records to return
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    PageNumber:
+      name: page
+      in: query
+      description: 1-based page number
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
   examples:
     Token:
       summary: Token example
