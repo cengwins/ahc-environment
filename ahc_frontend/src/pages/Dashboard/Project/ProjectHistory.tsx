@@ -1,8 +1,10 @@
 import { ListGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useStores } from '../../../stores/MainStore';
 
 const simulations = [
   {
+    simulationId: 'id1',
     lastSimulationCommit: 'Implemented error detection and correction mechanism',
     lastSimulationDate: new Date(),
     simulationProgress: 'Success',
@@ -11,6 +13,7 @@ const simulations = [
     },
   },
   {
+    simulationId: 'id2',
     lastSimulationCommit: 'Fixed bug on connecting nodes',
     lastSimulationDate: new Date(),
     simulationProgress: 'In Progress',
@@ -19,6 +22,7 @@ const simulations = [
     },
   },
   {
+    simulationId: 'id3',
     lastSimulationCommit: 'Refactored connections on initial nodes',
     lastSimulationDate: new Date(),
     simulationProgress: 'Queueing',
@@ -27,6 +31,11 @@ const simulations = [
 
 const ProjectHistory = () => {
   const navigate = useNavigate();
+  const { projectId } = useParams();
+  const { dashboardNavigationStore } = useStores();
+
+  if (projectId) dashboardNavigationStore.setProjectId(projectId);
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <ListGroup as="ol" variant="flush" className="text-start">
@@ -34,7 +43,7 @@ const ProjectHistory = () => {
           <ListGroup.Item
             as="li"
             key={simulation.lastSimulationCommit}
-            onClick={() => { navigate('/dashboard/project/simulation'); }}
+            onClick={() => { navigate(`/dashboard/${projectId}/${simulation.simulationId}`); }}
             className="project-item text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

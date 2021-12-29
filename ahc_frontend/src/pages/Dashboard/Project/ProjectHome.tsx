@@ -1,3 +1,5 @@
+import { useParams } from 'react-router-dom';
+import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
 
 const project = {
@@ -11,24 +13,31 @@ const project = {
   lastSimulationDate: new Date(),
 };
 
-const ProjectHome = () => (
-  <div className="d-flex flex-column min-vh-100">
-    <div>
-      <h4>
-        Last Simulation
-        {' '}
-        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{project.lastSimulationCommit.hash}</span>
-      </h4>
+const ProjectHome = () => {
+  const { projectId } = useParams();
+  const { dashboardNavigationStore } = useStores();
+
+  if (projectId) dashboardNavigationStore.setProjectId(projectId);
+
+  return (
+    <div className="d-flex flex-column min-vh-100">
       <div>
-        <span>Date: </span>
-        <span>{`${project.lastSimulationDate.toLocaleDateString('tr-TR')}`}</span>
-      </div>
-      <div>
-        <span>Message: </span>
-        <span>{project.lastSimulationCommit.message}</span>
+        <h4>
+          Last Simulation
+          {' '}
+          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{project.lastSimulationCommit.hash}</span>
+        </h4>
+        <div>
+          <span>Date: </span>
+          <span>{`${project.lastSimulationDate.toLocaleDateString('tr-TR')}`}</span>
+        </div>
+        <div>
+          <span>Message: </span>
+          <span>{project.lastSimulationCommit.message}</span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ProjectHome;

@@ -5,6 +5,7 @@ import './DashboardHome.css';
 
 const objectives = [
   {
+    projectId: 'id1',
     projectName: 'Project 1',
     githubPath: 'ucanyiit/532',
     branch: 'main',
@@ -12,6 +13,7 @@ const objectives = [
     lastSimulationDate: new Date(),
   },
   {
+    projectId: 'id2',
     projectName: 'Project 2',
     githubPath: 'ucanyiit/project-connect',
     branch: 'dev',
@@ -46,7 +48,7 @@ const DashboardHome = () => {
             <ListGroup.Item
               as="li"
               key={objective.githubPath}
-              onClick={() => { navigate('/dashboard/project'); }}
+              onClick={() => { navigate(`/dashboard/${objective.projectId}`); }}
               className="project-item text-start"
             >
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

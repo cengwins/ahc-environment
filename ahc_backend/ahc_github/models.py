@@ -7,6 +7,7 @@ class GithubProfile(models.Model):
     """
     Model for storing GitHub profiles of users.
     """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.TextField()
 
@@ -29,3 +30,18 @@ class GithubProfile(models.Model):
 
     def get_hash_of_last_commit(self, repo_name: str, branch_name: str) -> str:
         return self.get_branch(repo_name, branch_name).commit.sha
+
+
+class GithubRepositoryDeployToken(models.Model):
+    """
+    Model for storing deploy key informations
+    """
+
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    github_repository_id = models.TextField()
+    owner_name = models.TextField()
+    repository_name = models.TextField()
+    private_key = models.TextField()
+    public_key = models.TextField()
+    key_signature = models.TextField()
+    github_key_id = models.TextField()
