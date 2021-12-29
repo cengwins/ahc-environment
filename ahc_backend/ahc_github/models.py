@@ -7,6 +7,7 @@ class GithubProfile(models.Model):
     """
     Model for storing GitHub profiles of users.
     """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.TextField()
 
@@ -35,6 +36,7 @@ class GithubRepositoryDeployToken(models.Model):
     """
     Model for storing deploy key informations
     """
+
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     github_repository_id = models.TextField()
     owner_name = models.TextField()
