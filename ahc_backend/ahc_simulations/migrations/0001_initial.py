@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('ahc_repositories', '0002_auto_20211228_1954'),
+        ('ahc_repositories', '0001_initial'),
     ]
 
     operations = [
