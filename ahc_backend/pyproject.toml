@@ -4,20 +4,23 @@ version = "0.1.0"
 description = ""
 # TODO: Add others here
 authors = [
-    "CENK ARDA YILMAZ <e2310670@ceng.metu.edu.tr>",
-    "DENIZ KOLUACIK <e2310274@ceng.metu.edu.tr"
-  ]
+  "CENK ARDA YILMAZ <e2310670@ceng.metu.edu.tr>",
+  "DENIZ KOLUACIK <e2310274@ceng.metu.edu.tr>",
+  "OZAN AKIN <ozan.akin@ceng.metu.edu.tr>",
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-Django = "^3.2.9"
-mypy = "^0.910"
+Django = "4.0"
+mypy = "^0.930"
 django-stubs = "^1.9.0"
-djangorestframework = "^3.12.4"
+djangorestframework = "^3.13.1"
 djangorestframework-stubs = "^1.4.0"
 Pillow = "^8.4.0"
-django-cors-headers = "^3.10.0"
+django-cors-headers = "^3.10.1"
 PyGithub = "^1.55"
+celery = {version = "^5.2.3", extras = ["redis"]}
+django-celery-results = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
