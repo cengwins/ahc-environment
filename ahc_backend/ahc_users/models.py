@@ -31,8 +31,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         User, unique=True, related_name="profile", on_delete=models.CASCADE
     )
-    profile_image = models.ImageField(blank=True, null=True)
+    profile_image = models.ImageField(null=True, blank=True)
 
+    last_login = models.DateTimeField(null=True, blank=True)
     is_email_confirmed = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
