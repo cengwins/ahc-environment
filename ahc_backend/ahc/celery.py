@@ -2,7 +2,7 @@ import os
 
 from celery import Celery
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ahc.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ahc.settings.dev")
 
 app = Celery("ahc")
 app.config_from_object("django.conf:settings", namespace="CELERY")
