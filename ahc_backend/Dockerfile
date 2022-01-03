@@ -1,19 +1,25 @@
 FROM python:3-alpine
 
-WORKDIR /usr/local/src/app
+WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV LIBRARY_PATH=/lib:/usr/lib
-ENV PATH="${PATH}:/root/.poetry/bin"
+ENV LIBRARY_PATH="/lib:/usr/lib" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_HOME="/opt/poetry" \
+    PATH="/opt/poetry/bin:$PATH"
 
-RUN apk add --no-update --update \
+RUN apk add --no-cache --update \
     build-base \
     libffi-dev \
     postgresql-dev \
-    libmemcached-dev \
     jpeg-dev \
     zlib-dev \
+    curl \
     zip \
     unzip \
     git
@@ -26,12 +32,9 @@ RUN cd /usr/local/bin && \
     rm -rf docker-scripts && \
     chmod a+x backup-data.sh restore-data.sh docker-wait-for-it.sh
 
-RUN pip install gunicorn
-
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi
 
 COPY . .
 
