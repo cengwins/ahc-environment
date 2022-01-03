@@ -23,10 +23,11 @@ CACHES = {
     },
     "celery-cache": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://localhost/1",
+        "LOCATION": "redis://localhost/3",
     },
 }
 
+CELERY_BROKER_URL = ("redis://localhost/1",)
 
 CELERY_RESULT_BACKEND = "redis://localhost/2"
 CELERY_CACHE_BACKEND = "celery-cache"
