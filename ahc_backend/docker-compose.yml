@@ -18,6 +18,8 @@ services:
     image: postgres:13-alpine
     volumes:
       - /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: ahc
       POSTGRES_USER: root
@@ -26,6 +28,8 @@ services:
 
   redis:
     image: redis:6-alpine
+    ports:
+      - "6379:6379"
     restart: always
 
 volumes:
