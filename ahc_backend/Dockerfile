@@ -14,12 +14,9 @@ RUN apk add --no-update --update \
     libmemcached-dev \
     jpeg-dev \
     zlib-dev \
-    bash \
     zip \
     unzip \
-    git \
-    nano \
-    vim
+    git
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -
 
@@ -31,7 +28,7 @@ RUN cd /usr/local/bin && \
 
 RUN pip install gunicorn
 
-COPY poetry.lock pyproject.toml .
+COPY poetry.lock pyproject.toml ./
 
 RUN poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi
