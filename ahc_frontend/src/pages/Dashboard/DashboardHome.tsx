@@ -33,14 +33,14 @@ const DashboardHome = () => {
     <>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>New Project</Modal.Title>
+          <Modal.Title>Add Repository</Modal.Title>
         </Modal.Header>
         <Modal.Body>Lorem impsum</Modal.Body>
       </Modal>
 
       <div className="d-flex flex-column min-vh-100">
         <Button className="align-self-end" onClick={handleShow}>
-          New Project
+          Add Repository
         </Button>
 
         <ListGroup as="ol" variant="flush" className="text-start mt-3">
@@ -49,7 +49,7 @@ const DashboardHome = () => {
               as="li"
               key={objective.slug}
               onClick={() => { navigate(`/dashboard/${objective.id}`); }}
-              className="project-item text-start"
+              className="repository-item text-start"
             >
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <h2>{objective.name}</h2>

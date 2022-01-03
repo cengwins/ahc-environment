@@ -1,8 +1,8 @@
-.project-item {
+.repository-item {
   padding: 12px 6px;
   cursor: pointer;
 }
 
-.project-item:hover {
+.repository-item:hover {
   background-color: #eee;
 }

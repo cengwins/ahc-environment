@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
 
-const project = {
-  projectName: 'Project 1',
+const repository = {
+  name: 'Project 1',
   githubPath: 'ucanyiit/532',
   branch: 'main',
   lastSimulationCommit: {
@@ -60,10 +60,10 @@ const SimulationField = (title: string, value: string) => (
 );
 
 const Simulation = () => {
-  const { projectId, simulationId } = useParams();
+  const { repositoryId, simulationId } = useParams();
   const { dashboardNavigationStore } = useStores();
 
-  if (projectId) dashboardNavigationStore.setProjectId(projectId);
+  if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
   if (simulationId) dashboardNavigationStore.setSimulationId(simulationId);
 
   return (
@@ -71,7 +71,7 @@ const Simulation = () => {
       <h4>
         Simulation
         {' '}
-        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{project.lastSimulationCommit.hash}</span>
+        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.lastSimulationCommit.hash}</span>
       </h4>
       {SimulationField('Commit Message', simulation.lastSimulationCommit)}
       {SimulationField('Start Time', `${simulation.started_at.toLocaleDateString('tr-TR')}`)}
