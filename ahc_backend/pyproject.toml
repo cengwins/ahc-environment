@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "bitiriyoruz"
+name = "ahc"
 version = "0.1.0"
 description = ""
-# TODO: Add others here
 authors = [
   "CENK ARDA YILMAZ <e2310670@ceng.metu.edu.tr>",
   "DENIZ KOLUACIK <e2310274@ceng.metu.edu.tr>",
-  "OZAN AKIN <ozan.akin@ceng.metu.edu.tr>",
+  "OZAN AKIN <e2309599@ceng.metu.edu.tr>",
+  "YIGITCAN UCAN <e2310555@ceng.metu.edu.tr>",
+  "UFUK YAGMUR <e2310597@ceng.metu.edu.tr>",
 ]
 
 [tool.poetry.dependencies]
