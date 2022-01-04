@@ -65,4 +65,3 @@ runner-deploy-dev:
     - docker push $DOCKER_IMAGE:$DOCKER_TAG
   only:
     - development
-    - feat/docker-py-integration # TODO: remove before MR migration
