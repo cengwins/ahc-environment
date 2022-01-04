@@ -6,33 +6,64 @@ class Repository(models.Model):
     """
     Model for storing repository data of users.
     """
-    slug = models.TextField()
-    name = models.TextField()
-    upstream = models.TextField(null=True)
-    upstream_type = models.TextField(null=True)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
+
+    REPOSITORY_UPSTREAM_TYPES = [
+        ("G", "Git"),
+    ]
+
+    slug = models.CharField(max_length=40)
+    name = models.TextField(max_length=100)
+
+    upstream = models.CharField(max_length=150)
+    upstream_type = models.CharField(max_length=1, choices=REPOSITORY_UPSTREAM_TYPES)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.slug
 
 
 class RepositoryUser(models.Model):
     """
     Model for storing repository users.
     """
-    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
+
+    REPOSITORY_USER_TYPES = [
+        ("O", "Owner"),
+        ("C", "Collaborator"),
+    ]
+
+    repository = models.ForeignKey(
+        Repository, related_name="users", on_delete=models.CASCADE
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    type = models.TextField()
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
+
+    type = models.CharField(max_length=1, choices=REPOSITORY_USER_TYPES)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.repository.slug} - {self.user.get_full_name()}"
 
 
 class RepositoryEnvVariable(models.Model):
     """
     Model for storing environment variables for repositories of the users.
     """
-    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
-    name = models.TextField()
-    value = models.TextField()
+
+    repository = models.ForeignKey(
+        Repository, related_name="env_variables", on_delete=models.CASCADE
+    )
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False)
-    created_at = models.DateTimeField(null=True)
-    updated_at = models.DateTimeField(null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.repository.slug} - {self.name}"

@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+admin.site.register(Simulation)
+admin.site.register(SimulationRun)
+admin.site.register(SimulationRunMetric)
