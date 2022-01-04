@@ -1,7 +1,11 @@
 import { Button, Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
+import LogExample from './LogExample';
 
 const repository = {
   name: 'Project 1',
@@ -79,7 +83,8 @@ const Simulation = () => {
       {SimulationField('Exit Code', simulation.exit_code.toString())}
       {SimulationField('Result Status', simulation.result_status)}
 
-      <Table striped hover className="mt-4">
+      <h4 className="mt-4 mb-2">Metrics</h4>
+      <Table striped hover>
         <thead>
           <tr>
             <th>Metric Name</th>
@@ -90,7 +95,7 @@ const Simulation = () => {
         </thead>
         <tbody>
           {simulation.metrics.map(({ name, value, type }) => (
-            <tr>
+            <tr key={name}>
               <td>{name}</td>
               <td>{value}</td>
               <td>{type}</td>
@@ -99,9 +104,18 @@ const Simulation = () => {
           ))}
         </tbody>
       </Table>
-
       <Button>
         Download .csv
+      </Button>
+
+      <h4 className="mt-4 mb-2">Logs</h4>
+      <div className="mb-3">
+        <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+          {LogExample}
+        </SyntaxHighlighter>
+      </div>
+      <Button>
+        Download logs
       </Button>
     </div>
   );
