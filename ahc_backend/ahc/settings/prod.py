@@ -23,6 +23,10 @@ DATABASES = {
 }
 
 
+STATIC_URL = os.environ.get("STATIC_URL", "static/")
+MEDIA_URL = os.environ.get("MEDIA_URL", "media/")
+
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

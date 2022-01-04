@@ -41,4 +41,6 @@ COPY . .
 
 ENV DJANGO_SETTINGS_MODULE ahc.settings.docker
 
+EXPOSE 8000
+
 CMD /bin/sh -c "gunicorn --bind 0.0.0.0 ahc.wsgi --capture-output --log-level debug"

@@ -22,8 +22,16 @@ from ahc_users.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("media/<path:path>", static_serve, {"document_root": settings.MEDIA_ROOT}),
-    path("static/<path:path>", static_serve, {"document_root": settings.STATIC_ROOT}),
+    path(
+        f"{settings.MEDIA_URL[1:]}<path:path>",
+        static_serve,
+        {"document_root": settings.MEDIA_ROOT},
+    ),
+    path(
+        f"{settings.STATIC_URL[1:]}<path:path>",
+        static_serve,
+        {"document_root": settings.STATIC_ROOT},
+    ),
     path("api/auth/login/", LoginAPIView.as_view()),
     path("api/auth/register/", RegisterAPIView.as_view()),
     path("api/auth/profile/", GetUserProfileAPIView.as_view()),
