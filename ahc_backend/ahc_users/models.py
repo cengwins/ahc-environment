@@ -5,6 +5,7 @@ from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.db import models
+from stdimage import StdImageField
 
 
 def generate_uuid():
@@ -31,7 +32,16 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         User, unique=True, related_name="profile", on_delete=models.CASCADE
     )
-    profile_image = models.ImageField(null=True, blank=True)
+    profile_image = StdImageField(
+        null=True,
+        blank=True,
+        variations={
+            "thumbnail_40": {"width": 40, "height": 40},
+            "thumbnail_32": {"width": 32, "height": 32},
+            "large": {"width": 400, "height": 400},
+        },
+        delete_orphans=True,
+    )
 
     last_login = models.DateTimeField(null=True, blank=True)
     is_email_confirmed = models.BooleanField(default=False)
