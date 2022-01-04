@@ -14,12 +14,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.views.static import serve as static_serve
 from django.urls import path
+from django.conf import settings
 
 from ahc_users.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("media/<path:path>", static_serve, {"document_root": settings.MEDIA_ROOT}),
+    path("static/<path:path>", static_serve, {"document_root": settings.STATIC_ROOT}),
     path("api/auth/login/", LoginAPIView.as_view()),
     path("api/auth/register/", RegisterAPIView.as_view()),
     path("api/auth/profile/", GetUserProfileAPIView.as_view()),
