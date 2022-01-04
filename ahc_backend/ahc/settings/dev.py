@@ -27,6 +27,6 @@ CACHES = {
     },
 }
 
-
-CELERY_RESULT_BACKEND = "redis://localhost/2"
 CELERY_CACHE_BACKEND = "celery-cache"
+CELERY_BROKER_URL = "redis://localhost/2"
+CELERY_RESULT_BACKEND = "redis://localhost/3"

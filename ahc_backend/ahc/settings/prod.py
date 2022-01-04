@@ -6,11 +6,13 @@ DEBUG = False
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "glx_fpdnw5jenca*1-8ygabfpdnw5jenc4k")
 
-ALLOWED_HOSTS = list(map(lambda s: s.strip(), os.environ.get("ALLOWED_HOSTS").split(",")))
+ALLOWED_HOSTS = list(
+    map(lambda s: s.strip(), os.environ.get("ALLOWED_HOSTS", "").split(","))
+)
 
-CORS_ALLOWED_ORIGINS = list(map(
-    lambda s: s.strip(), os.environ.get("CORS_ALLOWED_ORIGINS").split(",")
-))
+CORS_ALLOWED_ORIGINS = list(
+    map(lambda s: s.strip(), os.environ.get("CORS_ALLOWED_ORIGINS", "").split(","))
+)
 
 DATABASES = {
     "default": {
@@ -34,10 +36,10 @@ CACHES = {
     },
     "celery-cache": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": os.environ.get("REDIS_URL", "redis://localhost/1"),
+        "LOCATION": os.environ.get("CELERY_CACHE_URL", "redis://localhost/1"),
     },
 }
 
-
 CELERY_CACHE_BACKEND = "celery-cache"
-CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost/2")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost/2")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_URL", "redis://localhost/3")
