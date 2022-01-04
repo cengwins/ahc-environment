@@ -29,12 +29,12 @@ const simulations = [
   },
 ];
 
-const ProjectHistory = () => {
+const RepositorySimulations = () => {
   const navigate = useNavigate();
-  const { projectId } = useParams();
+  const { repositoryId } = useParams();
   const { dashboardNavigationStore } = useStores();
 
-  if (projectId) dashboardNavigationStore.setProjectId(projectId);
+  if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -43,8 +43,8 @@ const ProjectHistory = () => {
           <ListGroup.Item
             as="li"
             key={simulation.lastSimulationCommit}
-            onClick={() => { navigate(`/dashboard/${projectId}/${simulation.simulationId}`); }}
-            className="project-item text-start"
+            onClick={() => { navigate(`/dashboard/${repositoryId}/${simulation.simulationId}`); }}
+            className="repository-item text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <span className="small">{`(${simulation.lastSimulationDate.toLocaleDateString('tr-TR')})`}</span>
@@ -64,4 +64,4 @@ const ProjectHistory = () => {
   );
 };
 
-export default ProjectHistory;
+export default RepositorySimulations;
