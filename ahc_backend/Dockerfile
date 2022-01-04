@@ -20,6 +20,7 @@ RUN apk add --no-cache --update \
     jpeg-dev \
     zlib-dev \
     curl \
+    bash \
     zip \
     unzip \
     git

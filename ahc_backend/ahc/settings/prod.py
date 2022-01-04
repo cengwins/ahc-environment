@@ -6,11 +6,11 @@ DEBUG = False
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "glx_fpdnw5jenca*1-8ygabfpdnw5jenc4k")
 
-ALLOWED_HOSTS = map(lambda s: s.strip(), os.environ.get("ALLOWED_HOSTS").split(","))
+ALLOWED_HOSTS = list(map(lambda s: s.strip(), os.environ.get("ALLOWED_HOSTS").split(",")))
 
-CORS_ALLOWED_ORIGINS = map(
+CORS_ALLOWED_ORIGINS = list(map(
     lambda s: s.strip(), os.environ.get("CORS_ALLOWED_ORIGINS").split(",")
-)
+))
 
 DATABASES = {
     "default": {
