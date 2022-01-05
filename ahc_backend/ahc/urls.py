@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from ahc_users.views import *
+from ahc_github.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,4 +26,7 @@ urlpatterns = [
     path("api/auth/profile/", GetUserProfileAPIView.as_view()),
     path("api/user/password_reset/", PasswordResetAPIView.as_view()),
     path("api/user/activate/", ActivateUserAPIView.as_view()),
+    path("api/github/repositories/", GetRepositoriesAPIView.as_view()),
+    path("api/github/repositories/<str:owner>/<str:repo>/branches", GetBranchesOfTheRepositoryAPIView.as_view()),
+    path("api/github/profile", CreateGithubProfileAPIView.as_view()),
 ]
