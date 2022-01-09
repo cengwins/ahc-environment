@@ -40,4 +40,6 @@ urlpatterns = [
     path("api/user/activate/", ActivateUserAPIView.as_view()),
     path("api/repositories", GetRepositoriesAPIView.as_view()),
     path("api/repositories/<int:id>", GetOrDeleteRepositoryAPIView.as_view()),
+    path("api/repositories/<int:id>/members", AuthMembersOfRepositoryAPIView.as_view()),
+    path("api/repositories/<int:id>/members/<int:memberID>", AuthMemberOfRepositoryAPIView.as_view()),
 ]
