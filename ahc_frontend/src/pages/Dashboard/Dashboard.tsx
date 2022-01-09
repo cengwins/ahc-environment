@@ -10,9 +10,9 @@ import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import DashboardSettings from './DashboardSettings';
 import DashboardHome from './DashboardHome';
-import ProjectHistory from './Project/ProjectHistory';
-import Simulation from './Project/Simulation';
-import ProjectHome from './Project/ProjectHome';
+import RepositorySimulations from './Repository/RepositorySimulations';
+import Simulation from './Repository/Simulation';
+import RepositoryHome from './Repository/RepositoryHome';
 import { useStores } from '../../stores/MainStore';
 
 const Dashboard = observer(() => {
@@ -38,20 +38,20 @@ const Dashboard = observer(() => {
       Component: <DashboardSettings />,
     },
     {
-      path: '/:projectId',
-      currentPath: `/${dashboardNavigationStore.projectId}`,
-      name: `Project: ${dashboardNavigationStore.projectId}`,
-      Component: <ProjectHome />,
+      path: '/:repositoryId',
+      currentPath: `/${dashboardNavigationStore.repositoryId}`,
+      name: `Repository: ${dashboardNavigationStore.repositoryId}`,
+      Component: <RepositoryHome />,
     },
     {
-      path: '/:projectId/history',
-      currentPath: `/${dashboardNavigationStore.projectId}/history`,
-      name: 'History',
-      Component: <ProjectHistory />,
+      path: '/:repositoryId/simulations',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/simulations`,
+      name: 'Simulations',
+      Component: <RepositorySimulations />,
     },
     {
-      path: '/:projectId/:simulationId',
-      currentPath: `/${dashboardNavigationStore.projectId}/${dashboardNavigationStore.simulationId}`,
+      path: '/:repositoryId/:simulationId',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.simulationId}`,
       name: `Simulation: ${dashboardNavigationStore.simulationId}`,
       Component: <Simulation />,
     },
@@ -78,10 +78,10 @@ const Dashboard = observer(() => {
               ))}
 
             </Breadcrumb>
-            {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.projectId}`) && (
+            {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
               <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
                 <Nav.Item>
-                  <Nav.Link href="/dashboard">Projects</Nav.Link>
+                  <Nav.Link href="/dashboard">Repositories</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link href="/dashboard/settings">Settings</Nav.Link>
@@ -89,13 +89,13 @@ const Dashboard = observer(() => {
               </Nav>
             )}
 
-            {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.projectId}`) && (
+            {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
             <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
               <Nav.Item>
-                <Nav.Link href={`/dashboard/${dashboardNavigationStore.projectId}`}>Overview</Nav.Link>
+                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}`}>Overview</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href={`/dashboard/${dashboardNavigationStore.projectId}/history`}>History</Nav.Link>
+                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}/simulations`}>Simulations</Nav.Link>
               </Nav.Item>
             </Nav>
             )}

@@ -1,23 +1,12 @@
 version: "3"
 
 services:
-  app:
-    build: .
-    command: |
-      /bin/sh -c "
-        ./docker-wait-for-it.sh -h postgres -t 0 -p 5432 &&
-        python manage.py migrate &&
-        python manage.py runserver 0.0.0.0:8000"
-    ports:
-      - "8000:8000"
-    volumes:
-      - mediafiles:/app/media
-    restart: always
-
   postgres:
     image: postgres:13-alpine
     volumes:
       - /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: ahc
       POSTGRES_USER: root
@@ -26,7 +15,6 @@ services:
 
   redis:
     image: redis:6-alpine
+    ports:
+      - "6379:6379"
     restart: always
-
-volumes:
-  mediafiles: {}

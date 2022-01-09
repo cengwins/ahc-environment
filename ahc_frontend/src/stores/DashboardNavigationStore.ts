@@ -2,14 +2,14 @@ import { makeAutoObservable } from 'mobx';
 import MainStore from './MainStore';
 
 export interface DashboardNavigationInterface {
-  projectId?: string;
+  repositoryId?: string;
   simulationId?: string;
 }
 
 export default class DashboardNavigationStore implements DashboardNavigationInterface {
   private mainStore: MainStore;
 
-  projectId?: string | undefined;
+  repositoryId?: string | undefined;
 
   simulationId?: string | undefined;
 
@@ -18,8 +18,8 @@ export default class DashboardNavigationStore implements DashboardNavigationInte
     this.mainStore = mainStore;
   }
 
-  setProjectId(projectId: string) {
-    this.projectId = projectId;
+  setRepositoryId(repositoryId: string) {
+    this.repositoryId = repositoryId;
   }
 
   setSimulationId(simulationId: string) {
