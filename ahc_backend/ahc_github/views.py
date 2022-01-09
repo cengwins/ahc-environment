@@ -2,7 +2,7 @@ import github.GithubException
 from github import Github
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import RepositorySerializer
+from .serializers import GithubRepositorySerializer
 import requests
 from .models import GithubProfile
 
@@ -76,7 +76,9 @@ class CreateGithubProfileAPIView(APIView):
         try:
             github_profile.save()
         except Exception:
-            return Response(status=403, data={"detail": "You have already a GithubProfile."})
+            return Response(
+                status=403, data={"detail": "You have already a GithubProfile."}
+            )
 
         return Response(
             {
