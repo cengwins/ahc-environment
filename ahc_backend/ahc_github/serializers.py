@@ -3,7 +3,7 @@ from .models import GithubProfile
 from github import AuthenticatedUser, Github, PaginatedList, Repository, Branch
 
 
-class RepositorySerializer(serializers.Serializer):
+class GithubRepositorySerializer(serializers.Serializer):
     id = serializers.CharField(max_length=100)
     name = serializers.StringRelatedField()
     full_name = serializers.CharField(max_length=100)
