@@ -297,6 +297,21 @@ python-versions = ">=3.6"
 Django = ">=2.2"
 
 [[package]]
+name = "django-stdimage"
+version = "5.3.0"
+description = "Django Standarized Image Field"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Django = ">=2.2"
+pillow = ">=2.5"
+
+[package.extras]
+progressbar = ["progressbar2 (>=3.0.0)"]
+
+[[package]]
 name = "django-stubs"
 version = "1.9.0"
 description = "Mypy stubs for Django"
@@ -820,7 +835,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "5e01a16eb314634d4221e6bb44baa993cfec8606aee20edd8c66c58249db1804"
+content-hash = "e47d369f24a79b7a9629817ef2da090a776e1aeca018fded325205a56e0494d6"
 
 [metadata.files]
 amqp = [
@@ -968,6 +983,10 @@ django-celery-results = [
 django-cors-headers = [
     {file = "django-cors-headers-3.10.1.tar.gz", hash = "sha256:b5a874b492bcad99f544bb76ef679472259eb41ee5644ca62d1a94ddb26b7f6e"},
     {file = "django_cors_headers-3.10.1-py3-none-any.whl", hash = "sha256:1390b5846e9835b0911e2574409788af87cd9154246aafbdc8ec546c93698fe6"},
+]
+django-stdimage = [
+    {file = "django-stdimage-5.3.0.tar.gz", hash = "sha256:95f2897f5a520f18e0d0097cc8cb1380db9127ead1abe66a5e048cd7bd4a2295"},
+    {file = "django_stdimage-5.3.0-py2.py3-none-any.whl", hash = "sha256:fb9d6bf86664873194fcc378193d81405aa4989eceadb4bcce6bb52588801934"},
 ]
 django-stubs = [
     {file = "django-stubs-1.9.0.tar.gz", hash = "sha256:664843091636a917faf5256d028476559dc360fdef9050b6df87ab61b21607bf"},
