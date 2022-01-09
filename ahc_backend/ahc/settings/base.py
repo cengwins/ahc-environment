@@ -129,7 +129,8 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.eu.mailgun.org")

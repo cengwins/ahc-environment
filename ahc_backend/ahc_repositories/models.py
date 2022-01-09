@@ -37,7 +37,7 @@ class RepositoryUser(models.Model):
     repository = models.ForeignKey(
         Repository, related_name="users", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="repository_users", on_delete=models.CASCADE)
 
     type = models.CharField(max_length=1, choices=REPOSITORY_USER_TYPES)
 

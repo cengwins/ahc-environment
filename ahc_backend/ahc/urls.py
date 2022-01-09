@@ -19,6 +19,7 @@ from django.urls import path
 from django.conf import settings
 
 from ahc_users.views import *
+from ahc_repositories.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -37,4 +38,8 @@ urlpatterns = [
     path("api/auth/profile/", GetUserProfileAPIView.as_view()),
     path("api/user/password_reset/", PasswordResetAPIView.as_view()),
     path("api/user/activate/", ActivateUserAPIView.as_view()),
+    path("api/repositories", GetRepositoriesAPIView.as_view()),
+    path("api/repositories/<int:id>", GetOrDeleteRepositoryAPIView.as_view()),
+    path("api/repositories/<int:id>/members", AuthMembersOfRepositoryAPIView.as_view()),
+    path("api/repositories/<int:id>/members/<int:memberID>", AuthMemberOfRepositoryAPIView.as_view()),
 ]
