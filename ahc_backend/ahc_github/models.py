@@ -42,6 +42,11 @@ class GithubProfile(models.Model):
     def get_hash_of_last_commit(self, repo_name: str, branch_name: str) -> str:
         return self.get_branch(repo_name, branch_name).commit.sha
 
+    def search_repos(self, search: str) -> PaginatedList:
+        return self.github_client.search_repositories(
+            f"user:{self.get_authenticated_user().login} {search} in:name"
+        )
+
     def __str__(self):
         return self.user.get_full_name()
 
