@@ -130,7 +130,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "EXCEPTION_HANDLER": "ahc.error_handlers.custom_exception_handler",
 }
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.eu.mailgun.org")
