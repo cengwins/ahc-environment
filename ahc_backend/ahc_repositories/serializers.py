@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-
 from ahc_users.serializers import UserSerializer
+
 from .models import Repository, RepositoryUser
 
 

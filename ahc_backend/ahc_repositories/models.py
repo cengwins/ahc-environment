@@ -7,15 +7,16 @@ class Repository(models.Model):
     Model for storing repository data of users.
     """
 
-    REPOSITORY_UPSTREAM_TYPES = [
-        ("G", "Git"),
-    ]
+    class RepositoryUpstreamTypes(models.TextChoices):
+        GIT = "G"
 
     slug = models.CharField(max_length=40)
-    name = models.TextField(max_length=100)
+    name = models.CharField(max_length=100)
 
     upstream = models.CharField(max_length=150)
-    upstream_type = models.CharField(max_length=1, choices=REPOSITORY_UPSTREAM_TYPES)
+    upstream_type = models.CharField(
+        max_length=1, choices=RepositoryUpstreamTypes.choices
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -29,17 +30,18 @@ class RepositoryUser(models.Model):
     Model for storing repository users.
     """
 
-    REPOSITORY_USER_TYPES = [
-        ("O", "Owner"),
-        ("C", "Collaborator"),
-    ]
+    class RepositoryUserTypes(models.TextChoices):
+        OWNER = "O"
+        COLLABORATOR = "C"
 
     repository = models.ForeignKey(
         Repository, related_name="users", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(User, related_name="repository_users", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name="repository_users", on_delete=models.CASCADE
+    )
 
-    type = models.CharField(max_length=1, choices=REPOSITORY_USER_TYPES)
+    type = models.CharField(max_length=1, choices=RepositoryUserTypes.choices)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
