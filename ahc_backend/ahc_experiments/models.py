@@ -107,7 +107,7 @@ class ExperimentRun(models.Model):
     started_at = models.DateTimeField(null=True, blank=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
-    exit_code = models.PositiveIntegerField(null=True, blank=True)
+    exit_code = models.IntegerField(null=True, blank=True)
     log_path = models.CharField(max_length=4096, null=True, blank=True)  # PATH_MAX
 
     created_at = models.DateTimeField(auto_now_add=True)
