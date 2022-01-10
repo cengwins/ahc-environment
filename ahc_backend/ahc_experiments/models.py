@@ -11,11 +11,10 @@ class Experiment(models.Model):
     Model representing a experiment setup.
     """
 
-    REFERENCE_TYPES = [
-        ("T", "Tag"),
-        ("C", "Commit"),
-        ("B", "Branch"),
-    ]
+    class ExperimentReferenceTypes(models.TextChoices):
+        TAG = "TAG"
+        COMMIT = "COMMIT"
+        BRANCH = "BRANCH"
 
     repository = models.ForeignKey(
         Repository, related_name="experiments", on_delete=models.CASCADE
@@ -28,7 +27,9 @@ class Experiment(models.Model):
         max_length=40,
     )
     reference = models.CharField(max_length=80)
-    reference_type = models.CharField(max_length=1, choices=REFERENCE_TYPES)
+    reference_type = models.CharField(
+        max_length=6, choices=ExperimentReferenceTypes.choices
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -86,14 +87,14 @@ class ExperimentMetric(models.Model):
     """
 
     class ExperimentMetricTypes(models.TextChoices):
-        SYSTEM = "S"
-        USER = "U"
+        SYSTEM = "SYSTEM"
+        USER = "USER"
 
     experiment_run = models.ForeignKey(
         ExperimentRun, related_name="metrics", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=40)
-    type = models.CharField(max_length=1, choices=ExperimentMetricTypes.choices)
+    type = models.CharField(max_length=6, choices=ExperimentMetricTypes.choices)
 
     value_float = models.FloatField(null=True, blank=True)
     value_int = models.IntegerField(null=True, blank=True)
