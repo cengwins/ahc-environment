@@ -1,9 +1,13 @@
+import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { Button, ListGroup, Modal } from 'react-bootstrap';
+import {
+  Button, Form, ListGroup, Modal, Spinner,
+} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
 
-const objectives = [
+const repositories = [
   {
     id: 'id1',
     name: 'Project 1',
@@ -22,12 +26,22 @@ const objectives = [
   },
 ];
 
-const DashboardHome = () => {
+const DashboardHome = observer(() => {
+  const { githubStore, repositoriesStore } = useStores();
+  const [searchString, setSearchString] = useState('');
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const handleStringSearch = (e: any) => {
+    setSearchString(e.target.value);
+    if (searchString.length >= 3 && githubStore.currentSearchString !== searchString) {
+      githubStore.getGithubRepos(searchString);
+    }
+    repositoriesStore.getRepositories();
+  };
 
   return (
     <>
@@ -35,7 +49,53 @@ const DashboardHome = () => {
         <Modal.Header closeButton>
           <Modal.Title>Add Repository</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Lorem impsum</Modal.Body>
+        <Modal.Body>
+
+          <Form>
+            <Form.Group className="mb-3" controlId="repository">
+              <Form.Label>Search for repositories:</Form.Label>
+              <Form.Control type="text" placeholder="Repository Name" onChange={handleStringSearch} />
+            </Form.Group>
+          </Form>
+
+          {searchString && searchString.length < 3 && (
+          <span className="small">
+            Please enter at least 3 characters to start searching.
+          </span>
+          )}
+          {githubStore.searching && (
+          <div className="d-flex">
+            <Spinner className="mx-auto my-4" animation="border" />
+          </div>
+          )}
+
+          {!githubStore.searching
+        && (
+          <div>
+            {searchString && searchString.length >= 3 && githubStore.userRepos.length === 0 && (
+              <span>
+                There are no repositories with the given name.
+              </span>
+            )}
+            <ListGroup as="ol" variant="flush" className="text-start mt-3">
+              {githubStore.userRepos.map((repository) => (
+                <ListGroup.Item
+                  as="li"
+                  key={repository.full_name}
+                  className="repository-item text-start"
+                >
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <h2>{repository.name}</h2>
+                  </div>
+                  <a href={repository.html_url} target="_blank" rel="noreferrer">
+                    Go
+                  </a>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </div>
+        )}
+        </Modal.Body>
       </Modal>
 
       <div className="d-flex flex-column min-vh-100">
@@ -44,12 +104,12 @@ const DashboardHome = () => {
         </Button>
 
         <ListGroup as="ol" variant="flush" className="text-start mt-3">
-          {objectives.map((objective) => (
+          {repositories.map((objective) => (
             <ListGroup.Item
               as="li"
               key={objective.slug}
               onClick={() => { navigate(`/dashboard/${objective.id}`); }}
-              className="repository-item text-start"
+              className="repository-item clickable text-start"
             >
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <h2>{objective.name}</h2>
@@ -63,6 +123,6 @@ const DashboardHome = () => {
       </div>
     </>
   );
-};
+});
 
 export default DashboardHome;

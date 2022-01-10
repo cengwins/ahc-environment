@@ -44,7 +44,7 @@ const RepositorySimulations = () => {
             as="li"
             key={simulation.lastSimulationCommit}
             onClick={() => { navigate(`/dashboard/${repositoryId}/${simulation.simulationId}`); }}
-            className="repository-item text-start"
+            className="repository-item clickable text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <span className="small">{`(${simulation.lastSimulationDate.toLocaleDateString('tr-TR')})`}</span>
