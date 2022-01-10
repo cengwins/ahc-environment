@@ -25,7 +25,7 @@ class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
 
     def perform_create(self, serializer) -> User:
-        user: User = super().perform_create(serializer)
+        user: User = serializer.save()
 
         user.is_active = True  # TODO: disable later, just for testing purposes
         user.save()
@@ -56,9 +56,10 @@ class LoginAPIView(APIView):
         profile.last_login = timezone.now()
         profile.save()
 
-        (auth_token, _) = Token.objects.get_or_create(user=profile.user)
-        auth_token.key = None
-        auth_token.save()
+        try:
+            auth_token = Token.objects.get(user=profile.user)
+        except:
+            auth_token = Token.objects.create(user=profile.user)
 
         return Response(AuthTokenSerializer(auth_token).data)
 

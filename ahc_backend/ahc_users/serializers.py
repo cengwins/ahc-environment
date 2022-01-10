@@ -45,8 +45,9 @@ class RegisterRequestSerializer(serializers.ModelSerializer):
         }
 
 
-class LoginRequestSerializer(serializers.ModelSerializer):
+class LoginRequestSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150, required=True, allow_blank=False)
+    password = serializers.CharField(max_length=150, required=True, allow_blank=False)
 
     def validate_password(self, password):
         if len(password) < 6:
@@ -56,15 +57,8 @@ class LoginRequestSerializer(serializers.ModelSerializer):
 
         return password
 
-    def to_representation(self, instance):
-        return AuthTokenSerializer(instance).data
-
     class Meta:
-        model = User
         fields = ("username", "password")
-        extra_kwargs = {
-            "password": {"required": True, "allow_blank": False},
-        }
 
 
 class UserSerializer(serializers.ModelSerializer):
