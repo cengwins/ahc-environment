@@ -39,6 +39,8 @@ RUN poetry install --no-interaction --no-ansi --no-dev
 
 COPY . .
 
+RUN python manage.py collectstatic --no-input --clear
+
 ENV DJANGO_SETTINGS_MODULE ahc.settings.docker
 
 EXPOSE 8000
