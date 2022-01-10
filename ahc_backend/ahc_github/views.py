@@ -48,9 +48,9 @@ class GetBranchesOfTheRepositoryAPIView(APIView):
 
     def get(self, request: Request, owner: str, repo: str):
         github_profile: GithubProfile = request.user.github_profile
-        branch_list = github_profile.get_repo(f"{owner}{repo}").get_branches()
+        branch_list = github_profile.get_repo(f"{owner}/{repo}").get_branches()
 
-        return Response(GithubRepositoryBranchSerializer(branch_list).data)
+        return Response(GithubRepositoryBranchSerializer(branch_list, many=True).data)
 
 
 class GithubProfileAPIView(CreateAPIView):

@@ -16,7 +16,7 @@ urlpatterns = [
     path("api/user/activate/", ActivateUserAPIView.as_view()),
     path("api/github/repositories/", ListGithubRepositoriesAPIView.as_view()),
     path(
-        "api/github/repositories/<str:owner>/<str:repo>/branches",
+        "api/github/repositories/<str:owner>/<str:repo>/branches/",
         GetBranchesOfTheRepositoryAPIView.as_view(),
     ),
     path("api/github/profile/", GithubProfileAPIView.as_view()),

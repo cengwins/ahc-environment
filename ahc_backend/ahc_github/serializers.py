@@ -27,7 +27,7 @@ class GithubRepositorySerializer(serializers.Serializer):
 
 
 class GithubRepositoryBranchSerializer(serializers.Serializer):
-    ## TODO: to be filled
+    name = serializers.CharField()
 
     class Meta:
         fields = "__all__"
