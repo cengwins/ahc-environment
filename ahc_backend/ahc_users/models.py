@@ -55,7 +55,6 @@ class UserProfile(models.Model):
 
     @staticmethod
     def find_username_or_email(alias: str):
-        print(alias)
         return (
             UserProfile.objects.filter(is_email_confirmed=True, user__is_active=True)
             .filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias))
