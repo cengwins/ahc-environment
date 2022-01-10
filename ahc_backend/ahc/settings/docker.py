@@ -19,6 +19,7 @@ DATABASES = {
         "USER": os.environ.get("DB_USER", "ahc"),
         "PASSWORD": os.environ.get("DB_PASS", "ahc"),
         "HOST": os.environ.get("DB_HOST", "postgres"),
+        "ATOMIC_REQUESTS": True,
     }
 }
 
