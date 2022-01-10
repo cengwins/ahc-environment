@@ -1,3 +1,4 @@
+from ahc_experiments.models import Experiment
 from rest_framework import permissions
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -19,5 +20,8 @@ class RepositoryAccessPermission(permissions.BasePermission):
     def has_object_permission(self, request: Request, view: APIView, obj) -> bool:
         if isinstance(obj, Repository):
             return obj.users.filter(user=request.user).exists()
+
+        if isinstance(obj, Experiment):
+            return obj.repository.users.filter(user=request.user).exists()
 
         return False

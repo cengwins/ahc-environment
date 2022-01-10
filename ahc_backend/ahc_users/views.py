@@ -3,7 +3,6 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView
-from rest_framework.request import Request
 
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import IsAuthenticated

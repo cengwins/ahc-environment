@@ -38,6 +38,14 @@ urlpatterns = [
         "api/repositories/<int:repository_id>/experiments/",
         ListCreateExperimentsAPIView.as_view(),
     ),
+    path(
+        "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/",
+        RetrieveExperimentAPIView.as_view(),
+    ),
+    path(
+        "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/",
+        ListExperimentRunsAPIView.as_view(),
+    ),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

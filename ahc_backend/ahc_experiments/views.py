@@ -1,13 +1,18 @@
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+)
 
 from rest_framework.serializers import Serializer
 
 from ahc_repositories.permissions import RepositoryAccessPermission
 from ahc_repositories.models import Repository
 
-from .serializers import ExperimentSerializer
-from .models import Experiment
+from .serializers import ExperimentSerializer, ExperimentRunSerializer
+from .models import Experiment, ExperimentRun
 
 
 class ListCreateExperimentsAPIView(ListCreateAPIView):
@@ -28,3 +33,22 @@ class ListCreateExperimentsAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         return super().get_queryset().filter(repository=self.kwargs["repository_id"])
+
+
+class RetrieveExperimentAPIView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated, RepositoryAccessPermission)
+    queryset = Experiment.objects.all()
+    serializer_class = ExperimentSerializer
+    lookup_url_kwarg = "experiment_id"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(repository=self.kwargs["repository_id"])
+
+
+class ListExperimentRunsAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, RepositoryAccessPermission)
+    queryset = ExperimentRun.objects.all()
+    serializer_class = ExperimentRunSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"])

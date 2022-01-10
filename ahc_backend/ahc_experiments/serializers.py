@@ -36,7 +36,16 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
-        read_only_fields = "__all__"
+        read_only_fields = (
+            "id",
+            "sequence_id",
+            "started_at",
+            "finished_at",
+            "exit_code",
+            "log_path",
+            "created_at",
+            "updated_at",
+        )
 
 
 class ExperimentMetricSerializer(serializers.ModelSerializer):
