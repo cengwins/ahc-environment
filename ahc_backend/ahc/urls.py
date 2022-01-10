@@ -6,6 +6,7 @@ from django.conf import settings
 from ahc_users.views import *
 from ahc_github.views import *
 from ahc_repositories.views import *
+from ahc_experiments.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -32,6 +33,10 @@ urlpatterns = [
     path(
         "api/repositories/<int:repository_id>/members/<int:member_id>/",
         RetrieveDestroyRepositoryUsersAPIView.as_view(),
+    ),
+    path(
+        "api/repositories/<int:repository_id>/experiments/",
+        ListCreateExperimentsAPIView.as_view(),
     ),
 ]
 
