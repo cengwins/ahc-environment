@@ -1,9 +1,30 @@
 import re
+import git
 
 from django.core.validators import RegexValidator
 from django.db import models
 
 from ahc_repositories.models import Repository
+
+
+def fetch_commit_hash(upsteam: str, reference: str, heads=False, tags=False):
+    git_client = git.cmd.Git()
+
+    heads = git_client.ls_remote(
+        upsteam,
+        reference,
+        heads=heads,
+        tags=tags,
+        quiet=True,
+    ).splitlines()
+
+    if len(heads) >= 1:
+        heads = list(map(lambda x: x.split("\t"), heads))
+
+        prefix = "tags" if tags else "heads"
+        for (commit_hash, head_name) in heads:
+            if head_name == f"refs/{prefix}/{reference}":
+                return commit_hash
 
 
 class Experiment(models.Model):
@@ -34,6 +55,29 @@ class Experiment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def fetch_commit_from_reference(self):
+        if self.reference_type == Experiment.ExperimentReferenceTypes.COMMIT:
+            self.commit = self.reference
+            self.save()
+
+        elif self.reference_type == Experiment.ExperimentReferenceTypes.BRANCH:
+            commit_hash = fetch_commit_hash(
+                self.repository.upstream, self.reference, heads=True
+            )
+
+            if commit_hash:
+                self.commit = commit_hash
+                self.save()
+
+        elif self.reference_type == Experiment.ExperimentReferenceTypes.BRANCH:
+            commit_hash = fetch_commit_hash(
+                self.repository.upstream, self.reference, tags=True
+            )
+
+            if commit_hash:
+                self.commit = commit_hash
+                self.save()
+
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.sequence_id = (
@@ -45,7 +89,9 @@ class Experiment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.repository.name} - Experiment #{self.sequence_id}"
+        return (
+            f"{self.repository.name} - Experiment #{self.sequence_id} - {self.commit}"
+        )
 
 
 class ExperimentRun(models.Model):

@@ -4,9 +4,19 @@ from typing import Dict
 
 from celery import shared_task
 
+from ahc_users.models import UserProfile
+
 from .models import *
 
 docker_client = docker.from_env()
+
+
+@shared_task()
+def fetch_commit_by_experiment_reference(experiment_id: int):
+    experiment: Experiment = Experiment.objects.filter(id=experiment_id).first()
+
+    if experiment and not experiment.commit:
+        experiment.fetch_commit_from_reference()
 
 
 @shared_task()
