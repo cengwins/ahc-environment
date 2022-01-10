@@ -56,7 +56,7 @@ class LoginAPIView(APIView):
         profile.last_login = timezone.now()
         profile.save()
 
-        auth_token = Token.objects.get_or_create(user=profile.user)
+        (auth_token, _) = Token.objects.get_or_create(user=profile.user)
         auth_token.key = None
         auth_token.save()
 

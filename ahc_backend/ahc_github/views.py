@@ -71,7 +71,7 @@ class GithubProfileAPIView(CreateAPIView):
         except github.GithubException:
             raise ValidationError({"access_token": "Access token is invalid."})
 
-        github_profile = GithubProfile.objects.update_or_create(
+        (github_profile, _) = GithubProfile.objects.update_or_create(
             access_token=access_token, defaults={"user": self.request.user}
         )
         github_profile.save()
