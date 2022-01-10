@@ -8,14 +8,14 @@ class Repository(models.Model):
     """
 
     class RepositoryUpstreamTypes(models.TextChoices):
-        GIT = "G"
+        GIT = "GIT"
 
     slug = models.CharField(max_length=40)
     name = models.CharField(max_length=100)
 
     upstream = models.CharField(max_length=150)
     upstream_type = models.CharField(
-        max_length=1, choices=RepositoryUpstreamTypes.choices
+        max_length=3, choices=RepositoryUpstreamTypes.choices
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -31,8 +31,8 @@ class RepositoryUser(models.Model):
     """
 
     class RepositoryUserTypes(models.TextChoices):
-        OWNER = "O"
-        COLLABORATOR = "C"
+        OWNER = "OWNER"
+        COLLABORATOR = "COLLABORATOR"
 
     repository = models.ForeignKey(
         Repository, related_name="users", on_delete=models.CASCADE
@@ -41,7 +41,7 @@ class RepositoryUser(models.Model):
         User, related_name="repository_users", on_delete=models.CASCADE
     )
 
-    type = models.CharField(max_length=1, choices=RepositoryUserTypes.choices)
+    type = models.CharField(max_length=12, choices=RepositoryUserTypes.choices)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

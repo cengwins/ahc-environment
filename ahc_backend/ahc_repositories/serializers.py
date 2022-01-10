@@ -1,22 +1,23 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework import serializers
 from ahc_users.serializers import UserSerializer
 
 from .models import Repository, RepositoryUser
 
 
-class RepositorySerializer(ModelSerializer):
+class RepositorySerializer(serializers.ModelSerializer):
+    upstream_type = serializers.ChoiceField(
+        choices=Repository.RepositoryUpstreamTypes.choices
+    )
+
     class Meta:
         model = Repository
         fields = ("id", "slug", "name", "upstream", "upstream_type")
 
 
-class RepositoryUserSerializer(ModelSerializer):
+class RepositoryUserSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    type = SerializerMethodField()
+    type = serializers.ChoiceField(choices=RepositoryUser.RepositoryUserTypes.choices)
 
     class Meta:
         model = RepositoryUser
         fields = ("id", "user", "type")
-
-    def get_type(self, obj):
-        return obj.get_type_display()
