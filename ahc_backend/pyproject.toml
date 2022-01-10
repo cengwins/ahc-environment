@@ -36,7 +36,7 @@ isort = "^5.10.1"
 profile = "black"
 
 [tool.mypy]
-plugins = ["mypy_django_plugin.main"]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 
 [tool.django-stubs]
 django_settings_module = "myproject.settings"
