@@ -1,2 +1,10 @@
 .DS_Store
+
 tmp/
+repo/
+.ahc.yml
+
+.env
+*.env
+
+.venv/
