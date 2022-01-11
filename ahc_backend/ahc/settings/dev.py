@@ -7,6 +7,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

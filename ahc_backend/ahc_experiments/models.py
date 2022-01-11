@@ -93,6 +93,9 @@ class Experiment(models.Model):
             f"{self.repository.name} - Experiment #{self.sequence_id} - {self.commit}"
         )
 
+    class Meta:
+        ordering = ("-sequence_id", "-created_at")
+
 
 class ExperimentRun(models.Model):
     """
@@ -125,6 +128,9 @@ class ExperimentRun(models.Model):
 
     def __str__(self):
         return f"Experiment {self.experiment.id} - Run #{self.sequence_id}"
+
+    class Meta:
+        ordering = ("-sequence_id", "-created_at")
 
 
 class ExperimentMetric(models.Model):
