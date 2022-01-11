@@ -28,6 +28,8 @@ docker = "^5.0.3"
 django-stdimage = "^5.3.0"
 GitPython = "^3.1.26"
 python-slugify = "^5.0.2"
+boto3 = "^1.20.32"
+django-storages = "^1.12.3"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
