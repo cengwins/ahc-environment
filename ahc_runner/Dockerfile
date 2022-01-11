@@ -10,7 +10,8 @@ RUN apk add --no-cache --update \
     build-base \
     curl \
     bash \
-    git
+    git \
+    yq
 
 COPY . .
 
