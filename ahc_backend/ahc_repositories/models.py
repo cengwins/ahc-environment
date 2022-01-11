@@ -33,6 +33,9 @@ class Repository(models.Model):
 
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ("-created_at",)
+
 
 class RepositoryUser(models.Model):
     """
@@ -78,3 +81,6 @@ class RepositoryEnvVariable(models.Model):
 
     def __str__(self):
         return f"{self.repository.slug} - {self.name}"
+
+    class Meta:
+        ordering = ("name",)
