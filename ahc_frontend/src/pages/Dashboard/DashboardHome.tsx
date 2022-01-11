@@ -71,10 +71,10 @@ const DashboardHome = observer(() => {
                 >
                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <h2>{repository.name}</h2>
+                    <a href={repository.html_url} target="_blank" rel="noreferrer">
+                      Go
+                    </a>
                   </div>
-                  <a href={repository.html_url} target="_blank" rel="noreferrer">
-                    Go
-                  </a>
                   <Button onClick={() => {
                     repositoriesStore.createRepository(
                       { name: repository.name, upstream: repository.html_url },
