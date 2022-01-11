@@ -12,6 +12,7 @@ class RepositorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Repository
         fields = ("id", "slug", "name", "upstream", "upstream_type")
+        read_only_fields = ("slug",)
 
 
 class RepositoryUserSerializer(serializers.ModelSerializer):

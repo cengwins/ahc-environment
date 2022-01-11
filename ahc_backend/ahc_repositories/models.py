@@ -1,4 +1,7 @@
+from slugify import slugify
+
 from django.db import models
+
 from ahc_users.models import User
 
 
@@ -23,6 +26,12 @@ class Repository(models.Model):
 
     def __str__(self):
         return self.slug
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
 
 
 class RepositoryUser(models.Model):
