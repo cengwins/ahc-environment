@@ -5,6 +5,7 @@ from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.query_utils import Q
 from stdimage import StdImageField
 
 
@@ -51,6 +52,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    @staticmethod
+    def find_username_or_email(alias: str):
+        return (
+            UserProfile.objects.filter(is_email_confirmed=True, user__is_active=True)
+            .filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias))
+            .first()
+        )
 
 
 class UserPasswordReset(models.Model):

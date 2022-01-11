@@ -1,13 +1,21 @@
 import github.GithubException
 from github import Github
-from rest_framework.views import APIView, Response
+
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import CreateAPIView
+from rest_framework.views import APIView, Request, Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import GithubRepositorySerializer
-import requests
+
+from .serializers import (
+    GithubProfileSerializer,
+    GithubRepositoryBranchSerializer,
+    GithubRepositorySerializer,
+)
+
 from .models import GithubProfile
 
 
-class GetRepositoriesAPIView(APIView):
+class ListGithubRepositoriesAPIView(APIView):
     """
     Retrieves repositories that the authenticated user can access.
     The authenticated user has explicit permission to access repositories they own,
@@ -19,15 +27,15 @@ class GetRepositoriesAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        github_profile = request.user.github_profile
-        search_url = "https://api.github.com/user/repos"
-        headers = {"Authorization": "Token " + github_profile.access_token}
-        response = requests.get(search_url, headers=headers)
+        search = request.query_params.get("search") or ""
 
-        return Response(status=response.status_code, data=response.json())
+        if len(search) < 3:
+            raise ValidationError({"search": "length must be at least 3"})
 
-        # or we can use a custom serializer(RepositorySerializer) and return only necessary fields:
-        # return Response([RepositorySerializer(repo).data for repo in github_profile.get_repos()])
+        github_profile: GithubProfile = request.user.github_profile
+        github_repositories = github_profile.search_repos(search)
+
+        return Response(GithubRepositorySerializer(github_repositories, many=True).data)
 
 
 class GetBranchesOfTheRepositoryAPIView(APIView):
@@ -38,50 +46,39 @@ class GetBranchesOfTheRepositoryAPIView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
-        github_profile = request.user.github_profile
-        owner = kwargs.get("owner", None)
-        repo = kwargs.get("repo", None)
-        search_url = "https://api.github.com/repos/{}/{}/branches".format(owner, repo)
-        headers = {"Authorization": "Token " + github_profile.access_token}
-        response = requests.get(search_url, headers=headers)
+    def get(self, request: Request, owner: str, repo: str):
+        github_profile: GithubProfile = request.user.github_profile
+        branch_list = github_profile.get_repo(f"{owner}/{repo}").get_branches()
 
-        return Response(status=response.status_code, data=response.json())
+        return Response(GithubRepositoryBranchSerializer(branch_list, many=True).data)
 
 
-class CreateGithubProfileAPIView(APIView):
+class GithubProfileAPIView(CreateAPIView):
     """
     Create GithubProfile with personal access token.
     """
 
     permission_classes = (IsAuthenticated,)
+    queryset = GithubProfile.objects.all()
+    serializer_class = GithubProfileSerializer
 
-    def post(self, request, *args, **kwargs):
-        access_token = request.data.get("Token", None)
-        if access_token is None:
-            return Response(
-                status=403, data={"detail": "Access token is not provided."}
-            )
+    def perform_create(self, serializer):
+        access_token = serializer.data["access_token"]
 
         g = Github(access_token)
         try:
-            github_username = g.get_user().login
+            g.get_user()
         except github.GithubException:
-            return Response(status=403, data={"detail": "Access token is invalid."})
+            raise ValidationError({"access_token": "Access token is invalid."})
 
-        github_profile = GithubProfile()
-        github_profile.access_token = access_token
-        github_profile.user = request.user
-
-        try:
-            github_profile.save()
-        except Exception:
-            return Response(
-                status=403, data={"detail": "You have already a GithubProfile."}
-            )
-
-        return Response(
-            {
-                "success": True,
-            }
+        (github_profile, _) = GithubProfile.objects.update_or_create(
+            access_token=access_token, defaults={"user": self.request.user}
         )
+        github_profile.save()
+
+        return github_profile
+
+    def create(self, request, *args, **kwargs) -> Response:
+        super().create(request, *args, **kwargs)
+
+        return Response({"success": True})

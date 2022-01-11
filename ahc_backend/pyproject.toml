@@ -26,6 +26,8 @@ gunicorn = "^20.1.0"
 psycopg2 = "^2.9.3"
 docker = "^5.0.3"
 django-stdimage = "^5.3.0"
+GitPython = "^3.1.26"
+python-slugify = "^5.0.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
@@ -36,7 +38,7 @@ isort = "^5.10.1"
 profile = "black"
 
 [tool.mypy]
-plugins = ["mypy_django_plugin.main"]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 
 [tool.django-stubs]
 django_settings_module = "myproject.settings"

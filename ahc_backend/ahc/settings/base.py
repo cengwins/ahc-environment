@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "ahc_users",
     "ahc_github",
     "ahc_repositories",
-    "ahc_simulations",
+    "ahc_experiments",
 ]
 
 MIDDLEWARE = [
@@ -63,7 +63,7 @@ ROOT_URLCONF = "ahc.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -130,7 +130,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 20,
+    "EXCEPTION_HANDLER": "ahc.error_handlers.custom_exception_handler",
 }
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.eu.mailgun.org")

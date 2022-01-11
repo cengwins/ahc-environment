@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class AhcUsersConfig(AppConfig):
+class AhcExperimentsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "ahc_users"
+    name = "ahc_experiments"
 
     def ready(self) -> None:
         from . import signals
