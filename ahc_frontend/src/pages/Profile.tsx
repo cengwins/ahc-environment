@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import {
   Container,
 } from 'react-bootstrap';
@@ -5,10 +6,12 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useStores } from '../stores/MainStore';
 
-const Profile = () => {
+const Profile = observer(() => {
   const { userStore } = useStores();
 
-  userStore.getProfile();
+  if (!userStore.username) {
+    userStore.getProfile();
+  }
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -19,5 +22,5 @@ const Profile = () => {
       <Footer />
     </div>
   );
-};
+});
 export default Profile;

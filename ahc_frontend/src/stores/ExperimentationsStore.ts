@@ -2,14 +2,26 @@ import { makeAutoObservable } from 'mobx';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
+interface RunInfo {
+  id: string,
+  sequence_id: number,
+  created_at: Date,
+  updated_at: Date,
+  started_at: Date,
+  finished_at: Date,
+  exit_code: number,
+  log_path: string,
+}
+
 interface ExperimentationInfo {
-  id: string;
+  id: string,
   sequence_id: number,
   commit: string,
   reference: string,
   reference_type: string,
   created_at: Date,
   updated_at: Date,
+  runs?: RunInfo[],
 }
 
 export interface ExperimentationsStoreInterface {
