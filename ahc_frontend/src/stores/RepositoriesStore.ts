@@ -6,10 +6,14 @@ import MainStore from './MainStore';
 
 interface RepositoryInfo {
   id: string;
+  slug: string;
+  name: string;
+  upstream: string;
+  upstream_type: string;
 }
 
 export interface RepositoriesStoreInterface {
-  repositories: RepositoryInfo[];
+  repositories: RepositoryInfo[] | undefined;
   currentRepository: RepositoryInfo | undefined;
   currentMembers: string[];
 }
@@ -17,7 +21,7 @@ export interface RepositoriesStoreInterface {
 export default class RepositoriesStore implements RepositoriesStoreInterface {
   private mainStore: MainStore;
 
-  repositories: RepositoryInfo[] = [];
+  repositories: RepositoryInfo[] | undefined = undefined;
 
   currentRepository: RepositoryInfo | undefined = undefined;
 
@@ -30,8 +34,8 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
 
   async getRepositories() {
     const response = await (new RequestHandler()).request('/repositories/', 'get');
-    const { result } = response;
-    this.repositories = result;
+    const { results } = response;
+    this.repositories = results;
   }
 
   async getRepository(id: string) {
@@ -39,9 +43,17 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
     this.currentRepository = response;
   }
 
+  async createRepository(data: {name: string, upstream: string}) {
+    const response = await (new RequestHandler()).request('/repositories/', 'post', { ...data, upstream_type: 'GIT' });
+    if (this.repositories) this.repositories.push(response);
+    else this.repositories = [response];
+  }
+
   async deleteRepository(id: string) {
     await (new RequestHandler()).request(`/repositories/${id}`, 'delete');
-    this.repositories.filter((repository: RepositoryInfo) => repository.id !== id);
+    if (this.repositories) {
+      this.repositories.filter((repository: RepositoryInfo) => repository.id !== id);
+    }
   }
 
   async getMembersOfRepository(id: string) {

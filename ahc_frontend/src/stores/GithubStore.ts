@@ -8,8 +8,6 @@ export interface GithubStoreInterface {
   userRepos: GithubRepo[];
 
   currentSearchString: string;
-
-  searching: boolean;
 }
 
 interface GithubRepo {
@@ -27,8 +25,6 @@ export default class GithubStore implements GithubStoreInterface {
 
   currentSearchString: string = '';
 
-  searching: boolean = false;
-
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
     this.mainStore = mainStore;
@@ -40,12 +36,7 @@ export default class GithubStore implements GithubStoreInterface {
 
   async getGithubRepos(search: string) {
     this.currentSearchString = search;
-    this.searching = true;
-    try {
-      const response = await (new RequestHandler()).request(`/github/repositories?search=${search}`, 'get');
-      this.userRepos = response;
-    } finally {
-      this.searching = false;
-    }
+    const response = await (new RequestHandler()).request(`/github/repositories?search=${search}`, 'get');
+    this.userRepos = response;
   }
 }
