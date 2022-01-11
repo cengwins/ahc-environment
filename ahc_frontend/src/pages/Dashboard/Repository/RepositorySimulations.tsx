@@ -47,7 +47,7 @@ const RepositorySimulations = observer(() => {
         Failed to load the repository. Please try again.
       </div>
       )}
-      <ListGroup as="ol" variant="flush" className="text-start">
+      <ListGroup as="ol" variant="flush" className="text-start mt-3">
         {experimentations && experimentations.map((experimentation) => (
           <ListGroup.Item
             as="li"
@@ -56,6 +56,7 @@ const RepositorySimulations = observer(() => {
             className="repository-item clickable text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <h2>{`Run #${experimentation.sequence_id}`}</h2>
               <span className="small">{`(${new Date(experimentation.updated_at).toLocaleDateString('tr-TR')})`}</span>
             </div>
             <div>

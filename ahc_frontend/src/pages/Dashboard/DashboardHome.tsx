@@ -92,9 +92,14 @@ const DashboardHome = observer(() => {
       </Modal>
 
       <div className="d-flex flex-column min-vh-100">
-        <Button className="align-self-end" onClick={() => setShow(true)}>
-          Add Repository
-        </Button>
+        <div className="d-flex flex-row">
+          <Button variant="danger" className="ms-auto" onClick={() => setShow(true)}>
+            Delete
+          </Button>
+          <Button className="ms-2" onClick={() => setShow(true)}>
+            Add Repository
+          </Button>
+        </div>
 
         <RepositoriesList />
       </div>

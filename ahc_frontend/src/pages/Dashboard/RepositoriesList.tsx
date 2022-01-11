@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { ListGroup, Spinner } from 'react-bootstrap';
+import { Container, ListGroup, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
@@ -37,12 +37,24 @@ const RepositoriesList = observer(() => {
           <ListGroup.Item
             as="li"
             key={repo.id}
-            onClick={() => { navigate(`/dashboard/${repo.id}`); }}
-            className="repository-item clickable text-start"
+            className="repository-item text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <h2>{repo.name}</h2>
-              <a href={`https://github.com/${repo.slug}`} className="ms-auto">{`${repo.slug}`}</a>
+              <input
+                style={{ width: '16px', height: '16px' }}
+                className="align-self-center me-2"
+                type="checkbox"
+                id="vehicle1"
+                name="vehicle1"
+                value="Bike"
+              />
+              <Container
+                className="clickable"
+                onClick={() => { navigate(`/dashboard/${repo.id}`); }}
+              >
+                <h2>{repo.name}</h2>
+                <a href={`https://github.com/${repo.slug}`} className="ms-auto">{`${repo.slug}`}</a>
+              </Container>
             </div>
           </ListGroup.Item>
         ))}

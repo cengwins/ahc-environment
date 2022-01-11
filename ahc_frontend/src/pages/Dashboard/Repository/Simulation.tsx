@@ -8,43 +8,33 @@ import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
 import LogExample from './LogExample';
 
-const simulation = {
-  lastSimulationCommit: 'Fixed bug on connecting nodes',
-  started_at: new Date(),
-  finished_at: new Date(),
-  exit_code: 1,
-  result_status: 'Done',
-  details: {
-    timeTook: 42,
+const metrics = [
+  {
+    name: 'Node count',
+    type: 'int',
+    value: 23,
   },
-  metrics: [
-    {
-      name: 'Node count',
-      type: 'int',
-      value: 23,
-    },
-    {
-      name: 'Throughput',
-      type: 'float',
-      value: 0.23,
-    },
-    {
-      name: 'Metric 3',
-      type: 'float',
-      value: 5325.23,
-    },
-    {
-      name: 'Total Messages',
-      type: 'int',
-      value: 921,
-    },
-    {
-      name: 'Failed Messages',
-      type: 'int',
-      value: 9,
-    },
-  ],
-};
+  {
+    name: 'Throughput',
+    type: 'float',
+    value: 0.23,
+  },
+  {
+    name: 'Metric 3',
+    type: 'float',
+    value: 5325.23,
+  },
+  {
+    name: 'Total Messages',
+    type: 'int',
+    value: 921,
+  },
+  {
+    name: 'Failed Messages',
+    type: 'int',
+    value: 9,
+  },
+];
 
 const SimulationField = (title: string, value: string) => (
   <div>
@@ -80,6 +70,8 @@ const Simulation = () => {
         .finally(() => setLoading(false));
     }
   }
+
+  console.log(experimentation);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -118,7 +110,7 @@ const Simulation = () => {
             </tr>
           </thead>
           <tbody>
-            {simulation.metrics.map(({ name, value, type }) => (
+            {metrics.map(({ name, value, type }) => (
               <tr key={name}>
                 <td>{name}</td>
                 <td>{value}</td>
@@ -135,7 +127,7 @@ const Simulation = () => {
         <h4 className="mt-4 mb-2">Logs</h4>
         <div className="mb-3">
           <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-            {LogExample}
+            {`${experimentation.runs && experimentation.runs[0].log_path}${!(experimentation.runs && experimentation.runs[0]) && LogExample}`}
           </SyntaxHighlighter>
         </div>
         <Button>

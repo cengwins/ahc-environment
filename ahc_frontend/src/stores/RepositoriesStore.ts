@@ -45,7 +45,7 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
 
   async createRepository(data: {name: string, upstream: string}) {
     const response = await (new RequestHandler()).request('/repositories/', 'post', { ...data, upstream_type: 'GIT' });
-    if (this.repositories) this.repositories.push(response);
+    if (this.repositories) this.repositories = [response, ...this.repositories];
     else this.repositories = [response];
   }
 
