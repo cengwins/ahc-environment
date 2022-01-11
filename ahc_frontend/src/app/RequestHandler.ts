@@ -7,7 +7,7 @@ export default class RequestHandler {
     const headers = localStorage.getItem('token') ? { Authorization: `Token ${localStorage.getItem('token')}` } : {};
 
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:8000/api/',
+      baseURL: process.env.REACT_APP_SERVER_URL || 'http://localhost:8000/api/',
       timeout: 5000,
       headers: headers as AxiosRequestHeaders,
     });
