@@ -1,5 +1,7 @@
 FROM node:14-alpine as builder
 
+ARG SERVER_URL=""
+
 WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
@@ -11,6 +13,8 @@ COPY package.json yarn.lock ./
 RUN yarn install --silent --production=false --check-files --non-interactive --no-cache
 
 COPY . .
+
+ENV REACT_APP_SERVER_URL=${SERVER_URL}
 
 RUN yarn run build
 
@@ -30,4 +34,3 @@ RUN echo 'server { \
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-

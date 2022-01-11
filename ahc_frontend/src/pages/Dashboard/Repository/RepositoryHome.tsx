@@ -1,20 +1,9 @@
+import { observer } from 'mobx-react';
+import { useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
-
-const repository = {
-  id: 'id1',
-  name: 'Repository 1',
-  slug: 'ucanyiit/532',
-  created_at: new Date(),
-  updated_at: new Date(),
-  branch: 'main',
-  lastSimulationCommit: {
-    message: 'Implemented error detection and correction mechanism',
-    hash: 'ef9febd0',
-  },
-  lastSimulationDate: new Date(),
-};
 
 const RepositoryField = (title: string, value: string) => (
   <div>
@@ -23,38 +12,53 @@ const RepositoryField = (title: string, value: string) => (
   </div>
 );
 
-const RepositoryHome = () => {
+const RepositoryHome = observer(() => {
   const { repositoryId } = useParams();
-  const { dashboardNavigationStore } = useStores();
+  const { dashboardNavigationStore, repositoriesStore } = useStores();
+  const [loading, setLoading] = useState(false);
+  const [failedToLoad, setFailed] = useState(false);
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
 
+  const { currentRepository: repository } = repositoriesStore;
+
+  if (!loading
+    && !failedToLoad
+    // eslint-disable-next-line eqeqeq
+    && (!repository || repository.id != repositoryId)) {
+    setLoading(true);
+    repositoriesStore.getRepository(repositoryId as string)
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
+  }
+
   return (
     <div className="d-flex flex-column min-vh-100">
+      {loading && (
+      <div className="d-flex">
+        <Spinner className="mx-auto my-4" animation="border" />
+      </div>
+      )}
+      {failedToLoad && (
+        <div>
+          Failed to load the repository. Please try again.
+        </div>
+      )}
+      {repository && (
       <div>
         <h4>
           {repository.name}
           {' '}
           <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
         </h4>
-        {RepositoryField('Created At', repository.created_at.toLocaleDateString('tr-TR'))}
-        {RepositoryField('Updated At', repository.updated_at.toLocaleDateString('tr-TR'))}
-        <h4 className="mt-3">
-          Last Simulation
-          {' '}
-          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.lastSimulationCommit.hash}</span>
-        </h4>
-        <div>
-          <span>Date: </span>
-          <span>{`${repository.lastSimulationDate.toLocaleDateString('tr-TR')}`}</span>
-        </div>
-        <div>
-          <span>Message: </span>
-          <span>{repository.lastSimulationCommit.message}</span>
-        </div>
+        {RepositoryField('id', repository.id)}
+        <a href={repository.upstream} target="_blank" rel="noreferrer">
+          View on GitHub
+        </a>
       </div>
+      )}
     </div>
   );
-};
+});
 
 export default RepositoryHome;

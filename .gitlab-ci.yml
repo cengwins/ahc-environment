@@ -37,6 +37,7 @@ backend-deploy-dev:
 
   only:
     - development
+    - ci-cd
 
 frontend-deploy-dev:
   stage: deploy
@@ -45,12 +46,13 @@ frontend-deploy-dev:
     - export DOCKER_TAG=${CI_COMMIT_SHA::8}-$(date +%s)
     - export DOCKER_IMAGE=$DOCKER_REGISTRY/$DOCKER_REGISTRY_USER/frontend
 
-    - docker build --pull --cache-from $DOCKER_IMAGE:dev --tag $DOCKER_IMAGE:dev ahc_frontend
+    - docker build --pull --cache-from $DOCKER_IMAGE:dev --tag $DOCKER_IMAGE:dev --build-arg SERVER_URL=https://ahc.ceng.metu.edu.tr:8082/api/ ahc_frontend
     - docker tag $DOCKER_IMAGE:dev $DOCKER_IMAGE:$DOCKER_TAG
     - docker push $DOCKER_IMAGE:dev
     - docker push $DOCKER_IMAGE:$DOCKER_TAG
   only:
     - development
+    - ci-cd
 
 runner-deploy-dev:
   stage: deploy
@@ -65,3 +67,4 @@ runner-deploy-dev:
     - docker push $DOCKER_IMAGE:$DOCKER_TAG
   only:
     - development
+    - ci-cd

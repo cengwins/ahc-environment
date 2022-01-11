@@ -1,67 +1,71 @@
-import { ListGroup } from 'react-bootstrap';
+import { observer } from 'mobx-react';
+import { useState } from 'react';
+import { Button, ListGroup, Spinner } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStores } from '../../../stores/MainStore';
 
-const simulations = [
-  {
-    simulationId: 'id1',
-    lastSimulationCommit: 'Implemented error detection and correction mechanism',
-    lastSimulationDate: new Date(),
-    simulationProgress: 'Success',
-    details: {
-      timeTook: 149,
-    },
-  },
-  {
-    simulationId: 'id2',
-    lastSimulationCommit: 'Fixed bug on connecting nodes',
-    lastSimulationDate: new Date(),
-    simulationProgress: 'In Progress',
-    details: {
-      timeTook: 42,
-    },
-  },
-  {
-    simulationId: 'id3',
-    lastSimulationCommit: 'Refactored connections on initial nodes',
-    lastSimulationDate: new Date(),
-    simulationProgress: 'Queueing',
-  },
-];
-
-const RepositorySimulations = () => {
+const RepositorySimulations = observer(() => {
   const navigate = useNavigate();
   const { repositoryId } = useParams();
-  const { dashboardNavigationStore } = useStores();
+  const { dashboardNavigationStore, repositoriesStore, experimentationsStore } = useStores();
+  const [loading, setLoading] = useState(false);
+  const [failedToLoad, setFailed] = useState(false);
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
 
+  const { currentRepository: repository } = repositoriesStore;
+  const { currentExperimentations: experimentations } = experimentationsStore;
+
+  if (!loading
+    && !failedToLoad) {
+    // eslint-disable-next-line eqeqeq
+    if (!repository || repository.id != repositoryId) {
+      setLoading(true);
+      repositoriesStore.getRepository(repositoryId as string)
+        .catch(() => setFailed(true))
+        .finally(() => setLoading(false));
+    } else if (!experimentations) {
+      setLoading(true);
+      experimentationsStore.getExperimentations()
+        .catch(() => setFailed(true))
+        .finally(() => setLoading(false));
+    }
+  }
+
   return (
     <div className="d-flex flex-column min-vh-100">
+      <Button onClick={() => experimentationsStore.createExperiment()}>
+        Run Experiment
+      </Button>
+      {loading && (
+      <div className="d-flex">
+        <Spinner className="mx-auto my-4" animation="border" />
+      </div>
+      )}
+      {failedToLoad && (
+      <div>
+        Failed to load the repository. Please try again.
+      </div>
+      )}
       <ListGroup as="ol" variant="flush" className="text-start">
-        {simulations.map((simulation) => (
+        {experimentations && experimentations.map((experimentation) => (
           <ListGroup.Item
             as="li"
-            key={simulation.lastSimulationCommit}
-            onClick={() => { navigate(`/dashboard/${repositoryId}/${simulation.simulationId}`); }}
-            className="repository-item text-start"
+            key={experimentation.id}
+            onClick={() => { navigate(`/dashboard/${repositoryId}/${experimentation.id}`); }}
+            className="repository-item clickable text-start"
           >
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <span className="small">{`(${simulation.lastSimulationDate.toLocaleDateString('tr-TR')})`}</span>
+              <span className="small">{`(${new Date(experimentation.updated_at).toLocaleDateString('tr-TR')})`}</span>
             </div>
             <div>
-              <span>{simulation.lastSimulationCommit}</span>
-            </div>
-            <div>
-              <span>{simulation.simulationProgress}</span>
-              {(simulation.simulationProgress === 'Success' || simulation.simulationProgress === 'Fail') && <span>{`, took ${simulation.details?.timeTook} seconds`}</span>}
-              {simulation.simulationProgress === 'In Progress' && <span>{`, took ${simulation.details?.timeTook} seconds to date`}</span>}
+              <span>{experimentation.commit}</span>
             </div>
           </ListGroup.Item>
         ))}
       </ListGroup>
     </div>
   );
-};
+});
 
 export default RepositorySimulations;
