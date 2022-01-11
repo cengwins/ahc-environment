@@ -14,6 +14,8 @@ CORS_ALLOWED_ORIGINS = list(
     map(lambda s: s.strip(), os.environ.get("CORS_ALLOWED_ORIGINS", "").split(","))
 )
 
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
