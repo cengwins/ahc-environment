@@ -1,26 +1,6 @@
-from django.db.models import fields
 from rest_framework import serializers
 
 from .models import Experiment, ExperimentRun, ExperimentMetric
-
-
-class ExperimentSerializer(serializers.ModelSerializer):
-    reference_type = serializers.ChoiceField(
-        choices=Experiment.ExperimentReferenceTypes.choices
-    )
-
-    class Meta:
-        model = Experiment
-        fields = (
-            "id",
-            "sequence_id",
-            "commit",
-            "reference",
-            "reference_type",
-            "created_at",
-            "updated_at",
-        )
-        read_only_fields = ("sequence_id", "commit")
 
 
 class ExperimentRunSerializer(serializers.ModelSerializer):
@@ -46,6 +26,27 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class ExperimentSerializer(serializers.ModelSerializer):
+    reference_type = serializers.ChoiceField(
+        choices=Experiment.ExperimentReferenceTypes.choices
+    )
+    runs = ExperimentRunSerializer(many=True, required=False, read_only=True)
+
+    class Meta:
+        model = Experiment
+        fields = (
+            "id",
+            "sequence_id",
+            "commit",
+            "reference",
+            "reference_type",
+            "created_at",
+            "updated_at",
+            "runs",
+        )
+        read_only_fields = ("sequence_id", "commit")
 
 
 class ExperimentMetricSerializer(serializers.ModelSerializer):
