@@ -112,7 +112,13 @@ func runContainer(image string, command string, env []string) error {
 					Source: hostVolumePath,
 					Target: "/app",
 				},
+				{
+					Type:   mounttypes.TypeBind,
+					Source: "/dev/bus/usb",
+					Target: "/dev/bus/usb",
+				},
 			},
+			Privileged: true,
 		},
 		nil,
 		nil,
