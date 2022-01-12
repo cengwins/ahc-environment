@@ -41,7 +41,7 @@ profile = "black"
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 
 [tool.django-stubs]
-django_settings_module = "myproject.settings"
+django_settings_module = "ahc.settings.dev"
 
 [tool.pylint.master]
 # Files or directories to be skipped. They should be base names, not paths.

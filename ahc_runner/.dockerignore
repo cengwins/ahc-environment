@@ -1,2 +1,11 @@
+.git/
 **/.DS_Store
-tmp/
+
+**/tmp/
+**/repo/
+**/.ahc.yml
+
+**/.env
+**/*.env
+
+**/.venv/
