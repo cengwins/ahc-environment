@@ -9,10 +9,13 @@ COPY *.go .
 
 RUN CGO_ENABLED=0 go build -o /ahc_runner
 
+
 FROM gcr.io/distroless/static
 
-COPY --from=builder /ahc_runner /
+ENV AHC_DATA_VOLUME="/data"
 
 VOLUME [ "/data" ]
+
+COPY --from=builder /ahc_runner /
 
 CMD [ "/ahc_runner" ]
