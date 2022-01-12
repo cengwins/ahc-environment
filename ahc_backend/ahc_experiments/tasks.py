@@ -1,8 +1,8 @@
 import docker
-
-from typing import Dict
+import uuid
 
 from celery import shared_task
+from django.utils import timezone
 
 from .models import *
 
@@ -10,40 +10,44 @@ docker_client = None
 
 
 @shared_task()
-def fetch_commit_by_experiment_reference(experiment_id: int):
-    experiment: Experiment = Experiment.objects.filter(id=experiment_id).first()
-
-    if experiment and not experiment.commit:
-        experiment.fetch_commit_from_reference()
-
-
-@shared_task()
-def run_experiment(experiment_run_id: int):
+def run_experiment(experiment_id: int):
     global docker_client
 
     if not docker_client:
         docker_client = docker.from_env()
 
-    experiment_run = ExperimentRun.objects.filter(id=experiment_run_id).first()
+    experiment: Experiment = Experiment.objects.get(id=experiment_id)
+    if not experiment.commit:
+        experiment.fetch_commit_from_reference()
 
-    if experiment_run:
-        docker_env: Dict[str, str] = dict()
-        docker_env["IS_AHC"] = "true"
-        docker_env["AHC_EXPERIMENT_RUN_ID"] = str(experiment_run_id)
+    experiment_run = ExperimentRun.objects.create(
+        experiment=experiment, started_at=timezone.now()
+    )
 
-        container = docker_client.containers.run(
-            "ubuntu",
-            '/bin/sh -c "echo "$IS_AHC" && echo "$AHC_EXPERIMENT_RUN_ID""',
-            environment=docker_env,
-            detach=True,
-        )
+    container = docker_client.containers.run(
+        "ahc-runner:local",
+        ["/ahc_runner", "start", "--url", experiment.repository.upstream],
+        name=uuid.uuid4().hex,
+        environment={
+            "AHC_DATA_VOLUME": "/data",
+            "AHC_HOST_BIND_PATH": "/tmp/ahc-runner",
+        },
+        volumes=[
+            "/var/run/docker.sock:/var/run/docker.sock",
+            "/tmp/ahc-runner:/data",
+        ],
+        detach=True,
+    )
 
-        result = container.wait()
-        print(result)
-        exit_code = result["StatusCode"]
+    result = container.wait()
+    exit_code = result["StatusCode"]
 
-        experiment_run.log_path = container.logs()
-        experiment_run.exit_code = exit_code
-        experiment_run.save()
+    logs = container.logs()
+    logs = logs.decode("utf-8").replace("\r", "\n")
 
-        container.remove()
+    experiment_run.finished_at = timezone.now()
+    experiment_run.log_path = logs
+    experiment_run.exit_code = exit_code
+    experiment_run.save()
+
+    container.remove()
