@@ -43,7 +43,9 @@ def run_experiment(experiment_id: int):
     exit_code = result["StatusCode"]
 
     logs = container.logs()
-    logs = logs.decode("utf-8").replace("\r", "\n")
+    logs = (
+        logs.decode("utf-8", errors="replace").replace("\x00", "").replace("\r", "\n")
+    )
 
     experiment_run.finished_at = timezone.now()
     experiment_run.log_path = logs
