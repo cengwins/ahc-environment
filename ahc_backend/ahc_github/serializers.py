@@ -4,7 +4,7 @@ from .models import GithubProfile
 
 
 class GithubProfileSerializer(serializers.ModelSerializer):
-    access_token = serializers.CharField(max_length=150)
+    access_token = serializers.CharField(max_length=150, write_only=True)
 
     class Meta:
         model = GithubProfile
