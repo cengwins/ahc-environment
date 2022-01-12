@@ -1,18 +1,18 @@
-FROM python:3-alpine
+FROM golang:1.17-alpine AS builder
 
 WORKDIR /app
 
-ENV LIBRARY_PATH="/lib:/usr/lib" \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+COPY go.mod go.sum /app/
+RUN go mod download
 
-RUN apk add --no-cache --update \
-    build-base \
-    curl \
-    bash \
-    git \
-    yq
+COPY *.go .
 
-COPY . .
+RUN CGO_ENABLED=0 go build -o /ahc_runner
 
-ENTRYPOINT ["entrypoint.sh"]
+FROM gcr.io/distroless/static
+
+COPY --from=builder /ahc_runner /
+
+VOLUME [ "/data" ]
+
+CMD [ "/ahc_runner" ]
