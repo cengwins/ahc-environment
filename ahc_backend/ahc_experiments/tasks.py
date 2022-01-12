@@ -25,7 +25,7 @@ def run_experiment(experiment_id: int):
     )
 
     container = docker_client.containers.run(
-        "ahc-runner:local",
+        "boza.ceng.metu.edu.tr:8083/ahc/runner:dev",
         ["/ahc_runner", "start", "--url", experiment.repository.upstream],
         name=uuid.uuid4().hex,
         environment={
