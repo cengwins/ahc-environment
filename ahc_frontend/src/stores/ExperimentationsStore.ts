@@ -64,8 +64,12 @@ export default class ExperimentationsStore implements ExperimentationsStoreInter
       'post',
       { reference: 'main', reference_type: 'BRANCH' },
     );
-    if (this.currentExperimentations) this.currentExperimentations.push(response);
+    if (this.currentExperimentations) this.currentExperimentations.unshift(response);
     else this.currentExperimentations = [response];
+
+    setTimeout(async () => {
+      await this.getExperimentations();
+    }, 1500);
   }
 
   async deleteExperiment(id: string) {
