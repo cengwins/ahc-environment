@@ -114,7 +114,7 @@ class PasswordResetAPIView(APIView):
         send_mail(
             "Password Reset Request for AHC!",
             f"Please click here to reset your password. Click here to reset your password {password_reset.code}",
-            "noreply@ahc.oznakn.com",
+            "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
         )
