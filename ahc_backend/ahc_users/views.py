@@ -45,10 +45,12 @@ class LoginAPIView(APIView):
         serializer = LoginRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = UserProfile.find_username_or_email(serializer.data["username"])
+        profile = UserProfile.find_username_or_email(
+            serializer.validated_data["username"]
+        )
 
         if profile is None or not profile.user.check_password(
-            serializer.data["password"]
+            serializer.validated_data["password"]
         ):
             raise AuthenticationFailed()
 

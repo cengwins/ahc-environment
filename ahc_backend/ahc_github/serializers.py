@@ -9,7 +9,6 @@ class GithubProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = GithubProfile
         fields = ("access_token",)
-        extra_args = {"access_token": {"required": True, "allow_blank": False}}
 
 
 class GithubRepositorySerializer(serializers.Serializer):

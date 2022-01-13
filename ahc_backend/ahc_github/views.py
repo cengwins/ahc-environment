@@ -62,8 +62,8 @@ class GithubProfileAPIView(CreateAPIView):
     queryset = GithubProfile.objects.all()
     serializer_class = GithubProfileSerializer
 
-    def perform_create(self, serializer):
-        access_token = serializer.data["access_token"]
+    def perform_create(self, serializer: GithubProfileSerializer):
+        access_token = serializer.validated_data["access_token"]
 
         g = Github(access_token)
         try:
@@ -71,10 +71,14 @@ class GithubProfileAPIView(CreateAPIView):
         except github.GithubException:
             raise ValidationError({"access_token": "Access token is invalid."})
 
-        (github_profile, _) = GithubProfile.objects.update_or_create(
-            access_token=access_token, defaults={"user": self.request.user}
-        )
-        github_profile.save()
+        try:
+            github_profile = GithubProfile.objects.get(user=self.request.user)
+            github_profile.access_token = access_token
+            github_profile.save()
+        except:
+            github_profile = GithubProfile.objects.create(
+                user=self.request.user, access_token=access_token
+            )
 
         return github_profile
 
