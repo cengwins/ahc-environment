@@ -47,6 +47,9 @@ def run_experiment(experiment_id: int):
         logs.decode("utf-8", errors="replace").replace("\x00", "").replace("\r", "\n")
     )
 
+    if len(logs) > 4000:
+        logs = logs[:4000]
+
     experiment_run.finished_at = timezone.now()
     experiment_run.log_path = logs
     experiment_run.exit_code = exit_code
