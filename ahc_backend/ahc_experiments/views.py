@@ -51,4 +51,14 @@ class ListExperimentRunsAPIView(ListAPIView):
     serializer_class = ExperimentRunSerializer
 
     def get_queryset(self):
-        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"])
+        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"], experiment__repository=self.kwargs["repository_id"])
+
+
+class RetrieveExperimentRunsAPIView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated, RepositoryAccessPermission)
+    queryset = ExperimentRun.objects.all()
+    serializer_class = ExperimentRunSerializer
+    lookup_url_kwarg = "experiment_run_id"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"], experiment__repository=self.kwargs["repository_id"])

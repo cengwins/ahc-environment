@@ -56,4 +56,8 @@ urlpatterns = [
         "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/",
         ListExperimentRunsAPIView.as_view(),
     ),
+    path(
+        "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/<int:experiment_run_id>/",
+        RetrieveExperimentRunsAPIView.as_view(),
+    ),
 ]
