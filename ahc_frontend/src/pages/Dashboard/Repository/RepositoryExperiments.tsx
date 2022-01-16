@@ -17,8 +17,7 @@ const RepositoryExperiments = observer(() => {
   const { currentRepository: repository } = repositoriesStore;
   const { currentExperiments: experiments } = experimentStore;
 
-  if (!loading
-    && !failedToLoad) {
+  if (!loading && !failedToLoad) {
     // eslint-disable-next-line eqeqeq
     if (!repository || repository.id != repositoryId) {
       setLoading(true);

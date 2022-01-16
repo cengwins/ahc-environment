@@ -56,8 +56,7 @@ const Experiment = () => {
   const { currentRepository: repository } = repositoriesStore;
   const { currentExperiment: experiment } = experimentStore;
 
-  if (!loading
-    && !failedToLoad) {
+  if (!loading && !failedToLoad) {
     // eslint-disable-next-line eqeqeq
     if (!repository || repository.id != repositoryId) {
       setLoading(true);

@@ -26,8 +26,7 @@ const RepositoryHome = observer(() => {
 
   const { currentRepository: repository } = repositoriesStore;
 
-  if (!loading
-    && !failedToLoad
+  if (!loading && !failedToLoad
     // eslint-disable-next-line eqeqeq
     && (!repository || repository.id != repositoryId)) {
     setLoading(true);
