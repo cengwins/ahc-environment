@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Card, Spinner } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
-import mockReadMe from './mockReadMe';
+// import mockReadMe from './mockReadMe';
 import { github } from './svgs';
 
 const RepositoryField = (title: string, value: string) => (
@@ -20,6 +21,7 @@ const RepositoryHome = observer(() => {
   const { dashboardNavigationStore, repositoriesStore } = useStores();
   const [loading, setLoading] = useState(false);
   const [failedToLoad, setFailed] = useState(false);
+  const [readmeContent, setReadmeContent] = useState('');
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
 
@@ -34,6 +36,12 @@ const RepositoryHome = observer(() => {
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }
+
+  useEffect(() => {
+    if (repository) {
+      axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/README.md`).then((response) => setReadmeContent(response.data));
+    }
+  }, [repository]);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -71,7 +79,7 @@ const RepositoryHome = observer(() => {
         </div>
         <Card className="mt-4">
           <Card.Body>
-            <ReactMarkdown>{mockReadMe}</ReactMarkdown>
+            <ReactMarkdown>{readmeContent}</ReactMarkdown>
           </Card.Body>
         </Card>
       </div>
