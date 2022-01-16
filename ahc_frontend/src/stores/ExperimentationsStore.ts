@@ -11,6 +11,7 @@ interface RunInfo {
   finished_at: Date,
   exit_code: number,
   log_path: string,
+  logs: string,
 }
 
 interface ExperimentationInfo {

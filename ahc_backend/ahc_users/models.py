@@ -8,6 +8,8 @@ from django.db import models
 from django.db.models.query_utils import Q
 from stdimage import StdImageField
 
+from .custom_storage import ImageStorage
+
 
 def generate_uuid():
     return uuid.uuid4().hex
@@ -42,6 +44,7 @@ class UserProfile(models.Model):
             "large": {"width": 400, "height": 400},
         },
         delete_orphans=True,
+        storage=ImageStorage()
     )
 
     last_login = models.DateTimeField(null=True, blank=True)
