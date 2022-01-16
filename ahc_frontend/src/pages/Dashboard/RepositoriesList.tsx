@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { Container, ListGroup, Spinner } from 'react-bootstrap';
+import { Container, ListGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../../components/Loading';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
 
@@ -22,16 +23,7 @@ const RepositoriesList = observer(() => {
 
   return (
     <div>
-      {loading && (
-      <div className="d-flex">
-        <Spinner className="mx-auto my-4" animation="border" />
-      </div>
-      )}
-      {failedToLoad && (
-        <div>
-          Failed to load repositories. Please try again.
-        </div>
-      )}
+      <Loading loading={loading} failed={failedToLoad} />
       <ListGroup as="ol" variant="flush" className="text-start mt-3">
         {repositoriesStore.repositories && repositoriesStore.repositories.map((repo) => (
           <ListGroup.Item

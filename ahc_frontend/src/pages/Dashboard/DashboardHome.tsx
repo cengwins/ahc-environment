@@ -1,8 +1,9 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 import {
-  Button, Form, ListGroup, Modal, Spinner,
+  Button, Form, ListGroup, Modal,
 } from 'react-bootstrap';
+import Loading from '../../components/Loading';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
 import RepositoriesList from './RepositoriesList';
@@ -12,6 +13,7 @@ const DashboardHome = observer(() => {
   const [searchString, setSearchString] = useState('');
   const [show, setShow] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [searchFailed, setSearchFailed] = useState(false);
 
   const handleStringSearch = (e: any) => {
     const currentSearchString = e.target.value;
@@ -19,11 +21,17 @@ const DashboardHome = observer(() => {
     if (currentSearchString.length >= 3
       && githubStore.currentSearchString !== currentSearchString) {
       setSearching(true);
-      githubStore.getGithubRepos(currentSearchString).finally(() => {
-        if (currentSearchString === e.target.value) {
-          setSearching(false);
-        }
-      });
+      setSearchFailed(false);
+      githubStore.getGithubRepos(currentSearchString)
+        .catch(() => {
+          if (currentSearchString === e.target.value) {
+            setSearchFailed(true);
+          }
+        }).finally(() => {
+          if (currentSearchString === e.target.value) {
+            setSearching(false);
+          }
+        });
     }
     repositoriesStore.getRepositories();
   };
@@ -48,12 +56,9 @@ const DashboardHome = observer(() => {
             Please enter at least 3 characters to start searching.
           </span>
           )}
-          {searching && (
-          <div className="d-flex">
-            <Spinner className="mx-auto my-4" animation="border" />
+          <div className="w-100">
+            <Loading loading={searching} failed={searchFailed} />
           </div>
-          )}
-
           {!searching
           && (
           <div>

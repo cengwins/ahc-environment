@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Button, Spinner, Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Loading from '../../../components/Loading';
 
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
@@ -73,16 +74,7 @@ const Experiment = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {loading && (
-      <div className="d-flex">
-        <Spinner className="mx-auto my-4" animation="border" />
-      </div>
-      )}
-      {failedToLoad && (
-      <div>
-        Failed to load the repository. Please try again.
-      </div>
-      )}
+      <Loading loading={loading} failed={failedToLoad} />
       {experiment && (
       <>
         <h4>

@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import { Button, ListGroup, Spinner } from 'react-bootstrap';
+import { Button, ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
+import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 
 const RepositoryExperiments = observer(() => {
@@ -37,16 +38,7 @@ const RepositoryExperiments = observer(() => {
       <Button onClick={() => experimentStore.createExperiment()}>
         Run Experiment
       </Button>
-      {loading && (
-      <div className="d-flex">
-        <Spinner className="mx-auto my-4" animation="border" />
-      </div>
-      )}
-      {failedToLoad && (
-      <div>
-        Failed to load the repository. Please try again.
-      </div>
-      )}
+      <Loading loading={loading} failed={failedToLoad} />
       <ListGroup as="ol" variant="flush" className="text-start mt-3">
         {experiments && experiments.map((experiment) => (
           <ListGroup.Item
