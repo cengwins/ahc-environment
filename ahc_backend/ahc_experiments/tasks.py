@@ -6,11 +6,7 @@ from django.utils import timezone
 
 from .models import *
 from storages.backends.s3boto3 import S3Boto3Storage
-
-
-class LogStorage(S3Boto3Storage):
-    bucket_name = 'logs'
-
+from .custom_storage import LogStorage
 
 docker_client = None
 log_storage_inst = LogStorage()

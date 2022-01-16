@@ -1,9 +1,20 @@
 from rest_framework import serializers
 
 from .models import Experiment, ExperimentRun, ExperimentMetric
+from .custom_storage import LogStorage
+
+log_storage_inst = LogStorage()
 
 
 class ExperimentRunSerializer(serializers.ModelSerializer):
+    logs = serializers.SerializerMethodField()
+
+    def get_logs(self, obj):
+        file = log_storage_inst.open(obj.log_path, "r")
+        content = file.read()
+        file.close()
+        return content
+
     class Meta:
         model = ExperimentRun
         fields = (
@@ -13,6 +24,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "finished_at",
             "exit_code",
             "log_path",
+            "logs",
             "created_at",
             "updated_at",
         )
@@ -23,6 +35,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "finished_at",
             "exit_code",
             "log_path",
+            "logs",
             "created_at",
             "updated_at",
         )
