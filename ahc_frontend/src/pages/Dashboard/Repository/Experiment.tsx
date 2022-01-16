@@ -37,7 +37,7 @@ const metrics = [
   },
 ];
 
-const SimulationField = (title: string, value: string) => (
+const ExperimentField = (title: string, value: string) => (
   <div>
     <span>{`${title}: `}</span>
     <span>{value}</span>
@@ -45,27 +45,28 @@ const SimulationField = (title: string, value: string) => (
 );
 
 const Experiment = () => {
-  const { repositoryId, simulationId } = useParams();
+  const { repositoryId, experimentId } = useParams();
   const { dashboardNavigationStore, repositoriesStore, experimentStore } = useStores();
   const [loading, setLoading] = useState(false);
   const [failedToLoad, setFailed] = useState(false);
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
-  if (simulationId) dashboardNavigationStore.setExperimentId(simulationId);
+  if (experimentId) dashboardNavigationStore.setExperimentId(experimentId);
 
   const { currentRepository: repository } = repositoriesStore;
   const { currentExperiment: experiment } = experimentStore;
 
   if (!loading && !failedToLoad) {
     // eslint-disable-next-line eqeqeq
-    if (!repository || repository.id != repositoryId) {
+    if (repository?.id != repositoryId) {
       setLoading(true);
       repositoriesStore.getRepository(repositoryId as string)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
-    } else if (!experiment && simulationId) {
+    // eslint-disable-next-line eqeqeq
+    } else if (experiment?.id != experimentId) {
       setLoading(true);
-      experimentStore.getExperiment(simulationId)
+      experimentStore.getExperiment(experimentId as string)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
     }
@@ -77,16 +78,16 @@ const Experiment = () => {
       {experiment && (
       <>
         <h4>
-          Simulation
+          Experiment
           {' '}
           <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
         </h4>
-        {SimulationField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('ID', experiment.id)}
-        {SimulationField('Sequence ID', `${experiment.sequence_id}`)}
-        {SimulationField('Reference', experiment.reference)}
-        {SimulationField('Reference Type', experiment.reference_type)}
+        {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
+        {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+        {ExperimentField('ID', experiment.id)}
+        {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
+        {ExperimentField('Reference', experiment.reference)}
+        {ExperimentField('Reference Type', experiment.reference_type)}
 
         <h4 className="mt-4 mb-2">Metrics</h4>
         <Table striped hover>
