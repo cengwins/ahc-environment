@@ -43,17 +43,17 @@ const SimulationField = (title: string, value: string) => (
   </div>
 );
 
-const Simulation = () => {
+const Experiment = () => {
   const { repositoryId, simulationId } = useParams();
-  const { dashboardNavigationStore, repositoriesStore, experimentationsStore } = useStores();
+  const { dashboardNavigationStore, repositoriesStore, experimentStore } = useStores();
   const [loading, setLoading] = useState(false);
   const [failedToLoad, setFailed] = useState(false);
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
-  if (simulationId) dashboardNavigationStore.setSimulationId(simulationId);
+  if (simulationId) dashboardNavigationStore.setExperimentId(simulationId);
 
   const { currentRepository: repository } = repositoriesStore;
-  const { currentExperimentation: experimentation } = experimentationsStore;
+  const { currentExperiment: experiment } = experimentStore;
 
   if (!loading
     && !failedToLoad) {
@@ -63,15 +63,13 @@ const Simulation = () => {
       repositoriesStore.getRepository(repositoryId as string)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
-    } else if (!experimentation && simulationId) {
+    } else if (!experiment && simulationId) {
       setLoading(true);
-      experimentationsStore.getExperiment(simulationId)
+      experimentStore.getExperiment(simulationId)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
     }
   }
-
-  console.log(experimentation);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -85,19 +83,19 @@ const Simulation = () => {
         Failed to load the repository. Please try again.
       </div>
       )}
-      {experimentation && (
+      {experiment && (
       <>
         <h4>
           Simulation
           {' '}
-          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experimentation.commit}</span>
+          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
         </h4>
-        {SimulationField('Creation Time', `${new Date(experimentation.created_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('Update Time', `${new Date(experimentation.updated_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('ID', experimentation.id)}
-        {SimulationField('Sequence ID', `${experimentation.sequence_id}`)}
-        {SimulationField('Reference', experimentation.reference)}
-        {SimulationField('Reference Type', experimentation.reference_type)}
+        {SimulationField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
+        {SimulationField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+        {SimulationField('ID', experiment.id)}
+        {SimulationField('Sequence ID', `${experiment.sequence_id}`)}
+        {SimulationField('Reference', experiment.reference)}
+        {SimulationField('Reference Type', experiment.reference_type)}
 
         <h4 className="mt-4 mb-2">Metrics</h4>
         <Table striped hover>
@@ -127,7 +125,7 @@ const Simulation = () => {
         <h4 className="mt-4 mb-2">Logs</h4>
         <div className="mb-3">
           <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-            {`${experimentation.runs && experimentation.runs[0].log_path}${!(experimentation.runs && experimentation.runs[0]) && LogExample}`}
+            {`${experiment.runs && experiment.runs[0].log_path}${!(experiment.runs && experiment.runs[0]) && LogExample}`}
           </SyntaxHighlighter>
         </div>
         <Button>
@@ -139,4 +137,4 @@ const Simulation = () => {
   );
 };
 
-export default Simulation;
+export default Experiment;

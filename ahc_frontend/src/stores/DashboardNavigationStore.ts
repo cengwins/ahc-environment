@@ -3,7 +3,7 @@ import MainStore from './MainStore';
 
 export interface DashboardNavigationInterface {
   repositoryId?: string;
-  simulationId?: string;
+  experimentId?: string;
 }
 
 export default class DashboardNavigationStore implements DashboardNavigationInterface {
@@ -11,7 +11,7 @@ export default class DashboardNavigationStore implements DashboardNavigationInte
 
   repositoryId?: string | undefined;
 
-  simulationId?: string | undefined;
+  experimentId?: string | undefined;
 
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
@@ -22,7 +22,7 @@ export default class DashboardNavigationStore implements DashboardNavigationInte
     this.repositoryId = repositoryId;
   }
 
-  setSimulationId(simulationId: string) {
-    this.simulationId = simulationId;
+  setExperimentId(experimentId: string) {
+    this.experimentId = experimentId;
   }
 }

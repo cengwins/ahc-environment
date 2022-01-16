@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import DashboardNavigationStore from './DashboardNavigationStore';
-import ExperimentationsStore from './ExperimentationsStore';
+import ExperimentStore from './ExperimentStore';
 import GithubStore from './GithubStore';
 import NotificationStore from './NotificationStore';
 import RepositoriesStore from './RepositoriesStore';
@@ -11,7 +11,7 @@ export interface MainStoreInterface {
   notificationStore: NotificationStore;
   dashboardNavigationStore: DashboardNavigationStore;
   repositoriesStore: RepositoriesStore;
-  experimentationsStore: ExperimentationsStore;
+  experimentStore: ExperimentStore;
   githubStore: GithubStore;
 }
 
@@ -24,7 +24,7 @@ export default class MainStore implements MainStoreInterface {
 
   repositoriesStore: RepositoriesStore;
 
-  experimentationsStore: ExperimentationsStore;
+  experimentStore: ExperimentStore;
 
   githubStore: GithubStore;
 
@@ -33,7 +33,7 @@ export default class MainStore implements MainStoreInterface {
     this.notificationStore = new NotificationStore(this);
     this.dashboardNavigationStore = new DashboardNavigationStore(this);
     this.repositoriesStore = new RepositoriesStore(this);
-    this.experimentationsStore = new ExperimentationsStore(this);
+    this.experimentStore = new ExperimentStore(this);
     this.githubStore = new GithubStore(this);
   }
 }
