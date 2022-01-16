@@ -45,10 +45,12 @@ class LoginAPIView(APIView):
         serializer = LoginRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = UserProfile.find_username_or_email(serializer.data["username"])
+        profile = UserProfile.find_username_or_email(
+            serializer.validated_data["username"]
+        )
 
         if profile is None or not profile.user.check_password(
-            serializer.data["password"]
+            serializer.validated_data["password"]
         ):
             raise AuthenticationFailed()
 
@@ -114,7 +116,7 @@ class PasswordResetAPIView(APIView):
         send_mail(
             "Password Reset Request for AHC!",
             f"Please click here to reset your password. Click here to reset your password {password_reset.code}",
-            "noreply@ahc.oznakn.com",
+            "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
         )

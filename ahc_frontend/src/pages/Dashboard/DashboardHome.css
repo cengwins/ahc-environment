@@ -1,5 +1,8 @@
 .repository-item {
   padding: 12px 6px;
+}
+
+.clickable {
   cursor: pointer;
 }
 

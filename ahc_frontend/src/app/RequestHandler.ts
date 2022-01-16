@@ -4,16 +4,16 @@ export default class RequestHandler {
   public axiosInstance;
 
   constructor() {
-    const headers = localStorage.getItem('token') ? { Authorization: localStorage.getItem('token') } : {};
+    const headers = localStorage.getItem('token') ? { Authorization: `Token ${localStorage.getItem('token')}` } : {};
 
     this.axiosInstance = axios.create({
-      baseURL: 'http://localhost:8000/api/',
+      baseURL: process.env.REACT_APP_SERVER_URL || 'http://localhost:8000/api/',
       timeout: 5000,
       headers: headers as AxiosRequestHeaders,
     });
   }
 
-  async request(url: string, requestType: 'post' | 'get' | 'put', data?: any) {
+  async request(url: string, requestType: 'post' | 'get' | 'put' | 'delete', data?: any) {
     let result;
 
     switch (requestType) {
@@ -26,11 +26,14 @@ export default class RequestHandler {
       case 'put':
         result = await this.axiosInstance.put(url, data);
         break;
+      case 'delete':
+        result = await this.axiosInstance.delete(url, data);
+        break;
       default:
         throw Error('Undefined requestType');
     }
 
-    if (result.status === 200) return result.data;
+    if (result.status >= 200 && result.status < 400) return result.data;
 
     throw Error(result.data);
   }

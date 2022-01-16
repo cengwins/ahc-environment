@@ -1,20 +1,13 @@
+import { observer } from 'mobx-react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Card, Spinner } from 'react-bootstrap';
+import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
-
-const repository = {
-  id: 'id1',
-  name: 'Repository 1',
-  slug: 'ucanyiit/532',
-  created_at: new Date(),
-  updated_at: new Date(),
-  branch: 'main',
-  lastSimulationCommit: {
-    message: 'Implemented error detection and correction mechanism',
-    hash: 'ef9febd0',
-  },
-  lastSimulationDate: new Date(),
-};
+// import mockReadMe from './mockReadMe';
+import { github } from './svgs';
 
 const RepositoryField = (title: string, value: string) => (
   <div>
@@ -23,38 +16,76 @@ const RepositoryField = (title: string, value: string) => (
   </div>
 );
 
-const RepositoryHome = () => {
+const RepositoryHome = observer(() => {
   const { repositoryId } = useParams();
-  const { dashboardNavigationStore } = useStores();
+  const { dashboardNavigationStore, repositoriesStore } = useStores();
+  const [loading, setLoading] = useState(false);
+  const [failedToLoad, setFailed] = useState(false);
+  const [readmeContent, setReadmeContent] = useState('');
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
 
+  const { currentRepository: repository } = repositoriesStore;
+
+  if (!loading
+    && !failedToLoad
+    // eslint-disable-next-line eqeqeq
+    && (!repository || repository.id != repositoryId)) {
+    setLoading(true);
+    repositoriesStore.getRepository(repositoryId as string)
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    if (repository) {
+      axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/README.md`).then((response) => setReadmeContent(response.data));
+    }
+  }, [repository]);
+
   return (
     <div className="d-flex flex-column min-vh-100">
+      {loading && (
+      <div className="d-flex">
+        <Spinner className="mx-auto my-4" animation="border" />
+      </div>
+      )}
+      {failedToLoad && (
+        <div>
+          Failed to load the repository. Please try again.
+        </div>
+      )}
+      {repository && (
       <div>
         <h4>
           {repository.name}
           {' '}
           <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
         </h4>
-        {RepositoryField('Created At', repository.created_at.toLocaleDateString('tr-TR'))}
-        {RepositoryField('Updated At', repository.updated_at.toLocaleDateString('tr-TR'))}
-        <h4 className="mt-3">
-          Last Simulation
-          {' '}
-          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.lastSimulationCommit.hash}</span>
-        </h4>
-        <div>
-          <span>Date: </span>
-          <span>{`${repository.lastSimulationDate.toLocaleDateString('tr-TR')}`}</span>
+        {RepositoryField('id', repository.id)}
+        <div className="my-2">
+          <a className="btn btn-outline-primary me-2" href={repository.upstream} target="_blank" rel="noreferrer">
+            <span className="me-1">
+              {github}
+            </span>
+            View on GitHub
+          </a>
+          <a className="btn btn-outline-primary" href={repository.upstream.replace('github.com', 'github.dev')} target="_blank" rel="noreferrer">
+            <span className="me-1">
+              {github}
+            </span>
+            Open in GitHub.dev
+          </a>
         </div>
-        <div>
-          <span>Message: </span>
-          <span>{repository.lastSimulationCommit.message}</span>
-        </div>
+        <Card className="mt-4">
+          <Card.Body>
+            <ReactMarkdown>{readmeContent}</ReactMarkdown>
+          </Card.Body>
+        </Card>
       </div>
+      )}
     </div>
   );
-};
+});
 
 export default RepositoryHome;
