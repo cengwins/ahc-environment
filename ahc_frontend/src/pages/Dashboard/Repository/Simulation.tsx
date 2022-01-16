@@ -6,7 +6,6 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
-import LogExample from './LogExample';
 
 const metrics = [
   {
@@ -130,9 +129,11 @@ const Simulation = () => {
 
         <h4 className="mt-4 mb-2">Logs</h4>
         <div className="mb-3">
-          <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-            {`${experimentation.runs && experimentation?.runs?.[0]?.log_path}${!(experimentation.runs && experimentation?.runs?.[0]?.log_path) && LogExample}`}
-          </SyntaxHighlighter>
+          {experimentation?.runs?.[0]?.logs && (
+            <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+              {experimentation?.runs?.[0]?.logs}
+            </SyntaxHighlighter>
+          ) }
         </div>
         <Button>
           Download logs
