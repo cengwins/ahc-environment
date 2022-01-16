@@ -5,8 +5,19 @@ from celery import shared_task
 from django.utils import timezone
 
 from .models import *
+from storages.backends.s3boto3 import S3Boto3Storage
+
+
+class LogStorage(S3Boto3Storage):
+    bucket_name = 'logs'
+
 
 docker_client = None
+log_storage_inst = LogStorage()
+
+
+def generate_uuid():
+    return uuid.uuid4().hex
 
 
 @shared_task()
@@ -41,17 +52,21 @@ def run_experiment(experiment_id: int):
 
     result = container.wait()
     exit_code = result["StatusCode"]
-
     logs = container.logs()
     logs = (
         logs.decode("utf-8", errors="replace").replace("\x00", "").replace("\r", "\n")
     )
 
-    if len(logs) > 4000:
-        logs = logs[:4000]
-
     experiment_run.finished_at = timezone.now()
-    experiment_run.log_path = logs
+    file_name = generate_uuid()
+
+    file = log_storage_inst.open(file_name, "w")
+
+    file.write(logs)
+    file.close()
+
+    experiment_run.log_path = file_name
+
     experiment_run.exit_code = exit_code
     experiment_run.save()
 
