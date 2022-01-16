@@ -9,7 +9,10 @@ log_storage_inst = LogStorage()
 class ExperimentRunSerializer(serializers.ModelSerializer):
     logs = serializers.SerializerMethodField()
 
-    def get_logs(self, obj):
+    def get_logs(self, obj: ExperimentRun):
+        if not obj.log_path:
+            return None
+
         file = log_storage_inst.open(obj.log_path, "r")
         content = file.read()
         file.close()
