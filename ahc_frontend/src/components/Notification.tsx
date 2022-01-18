@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { Alert } from 'react-bootstrap';
+import { Toast, ToastContainer } from 'react-bootstrap';
 import { useStores } from '../stores/MainStore';
 import { NotificationInterface } from '../stores/NotificationStore';
 
@@ -17,23 +17,27 @@ const Notification = observer(() => {
       marginTop: '60px',
     }}
     >
-      {(Object.values(notifications)).map((notification: NotificationInterface) => {
-        const {
-          variant, title, text, footNote,
-        } = notification;
-        return (
-          <Alert variant={variant}>
-            {title && <Alert.Heading>{title}</Alert.Heading>}
-            {text && <span>{text}</span>}
-            {footNote && (
-            <>
-              <hr />
-              <p className="mb-0">{footNote}</p>
-            </>
-            )}
-          </Alert>
-        );
-      })}
+      <ToastContainer className="p-3">
+        {(Object.values(notifications)).map((notification: NotificationInterface) => {
+          const {
+            variant, title, text, footNote,
+          } = notification;
+          return (
+            <Toast bg={variant.toLowerCase()}>
+              {title && <Toast.Header>{title}</Toast.Header>}
+              <Toast.Body>
+                {text && <span>{text}</span>}
+                {footNote && (
+                <>
+                  <hr />
+                  <p className="mb-0">{footNote}</p>
+                </>
+                )}
+              </Toast.Body>
+            </Toast>
+          );
+        })}
+      </ToastContainer>
     </div>
   );
 });

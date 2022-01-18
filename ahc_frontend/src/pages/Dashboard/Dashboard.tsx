@@ -10,8 +10,8 @@ import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import DashboardSettings from './DashboardSettings';
 import DashboardHome from './DashboardHome';
-import RepositorySimulations from './Repository/RepositorySimulations';
-import Simulation from './Repository/Simulation';
+import RepositoryExperiments from './Repository/RepositoryExperiments';
+import Experiment from './Repository/Experiment';
 import RepositoryHome from './Repository/RepositoryHome';
 import { useStores } from '../../stores/MainStore';
 
@@ -44,16 +44,16 @@ const Dashboard = observer(() => {
       Component: <RepositoryHome />,
     },
     {
-      path: '/:repositoryId/simulations',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/simulations`,
-      name: 'Simulations',
-      Component: <RepositorySimulations />,
+      path: '/:repositoryId/experiments',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
+      name: 'Experiments',
+      Component: <RepositoryExperiments />,
     },
     {
-      path: '/:repositoryId/:simulationId',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.simulationId}`,
-      name: `Simulation: ${dashboardNavigationStore.simulationId}`,
-      Component: <Simulation />,
+      path: '/:repositoryId/:experimentId',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
+      name: `Experiment: ${dashboardNavigationStore.experimentId}`,
+      Component: <Experiment />,
     },
   ];
 
@@ -95,7 +95,7 @@ const Dashboard = observer(() => {
                 <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}`}>Overview</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}/simulations`}>Simulations</Nav.Link>
+                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`}>Experiments</Nav.Link>
               </Nav.Item>
             </Nav>
             )}

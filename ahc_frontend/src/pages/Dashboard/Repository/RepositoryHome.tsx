@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Card } from 'react-bootstrap';
 import axios from 'axios';
-import { Card, Spinner } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
+import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
 // import mockReadMe from './mockReadMe';
@@ -27,8 +28,7 @@ const RepositoryHome = observer(() => {
 
   const { currentRepository: repository } = repositoriesStore;
 
-  if (!loading
-    && !failedToLoad
+  if (!loading && !failedToLoad
     // eslint-disable-next-line eqeqeq
     && (!repository || repository.id != repositoryId)) {
     setLoading(true);
@@ -45,16 +45,7 @@ const RepositoryHome = observer(() => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {loading && (
-      <div className="d-flex">
-        <Spinner className="mx-auto my-4" animation="border" />
-      </div>
-      )}
-      {failedToLoad && (
-        <div>
-          Failed to load the repository. Please try again.
-        </div>
-      )}
+      <Loading loading={loading} failed={failedToLoad} />
       {repository && (
       <div>
         <h4>

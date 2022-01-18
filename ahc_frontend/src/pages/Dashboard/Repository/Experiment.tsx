@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Button, Spinner, Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Loading from '../../../components/Loading';
 
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
@@ -35,72 +36,61 @@ const metrics = [
   },
 ];
 
-const SimulationField = (title: string, value: string) => (
+const ExperimentField = (title: string, value: string) => (
   <div>
     <span>{`${title}: `}</span>
     <span>{value}</span>
   </div>
 );
 
-const Simulation = () => {
-  const { repositoryId, simulationId } = useParams();
-  const { dashboardNavigationStore, repositoriesStore, experimentationsStore } = useStores();
+const Experiment = () => {
+  const { repositoryId, experimentId } = useParams();
+  const { dashboardNavigationStore, repositoriesStore, experimentStore } = useStores();
   const [loading, setLoading] = useState(false);
   const [failedToLoad, setFailed] = useState(false);
 
   if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
-  if (simulationId) dashboardNavigationStore.setSimulationId(simulationId);
+  if (experimentId) dashboardNavigationStore.setExperimentId(experimentId);
 
   const { currentRepository: repository } = repositoriesStore;
-  const { currentExperimentation: experimentation } = experimentationsStore;
+  const { currentExperiment: experiment } = experimentStore;
 
-  if (!loading
-    && !failedToLoad) {
+  if (!loading && !failedToLoad) {
     // eslint-disable-next-line eqeqeq
-    if (!repository || repository.id != repositoryId) {
+    if (repository?.id != repositoryId) {
       setLoading(true);
       repositoriesStore.getRepository(repositoryId as string)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
-    } else if (!experimentation && simulationId) {
+    // eslint-disable-next-line eqeqeq
+    } else if (experiment?.id != experimentId) {
       setLoading(true);
-      experimentationsStore.getExperiment(simulationId)
+      experimentStore.getExperiment(experimentId as string)
         .catch(() => setFailed(true))
         .finally(() => setLoading(false));
     }
   }
 
-  console.log(experimentation);
-
   return (
     <div className="d-flex flex-column min-vh-100">
-      {loading && (
-      <div className="d-flex">
-        <Spinner className="mx-auto my-4" animation="border" />
-      </div>
-      )}
-      {failedToLoad && (
-      <div>
-        Failed to load the repository. Please try again.
-      </div>
-      )}
-      {experimentation && (
+      <Loading loading={loading} failed={failedToLoad} />
+      {experiment && (
       <>
         <h4>
-          Simulation
+          Experiment
           {' '}
-          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experimentation.commit}</span>
+          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
         </h4>
-        {SimulationField('Creation Time', `${new Date(experimentation.created_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('Update Time', `${new Date(experimentation.updated_at).toLocaleDateString('tr-TR')}`)}
-        {experimentation.runs?.[0]?.started_at
-          && SimulationField('Started Time', `${new Date(experimentation.runs?.[0]?.started_at).toLocaleDateString('tr-TR')}`)}
-        {experimentation.runs?.[0]?.finished_at
-          && SimulationField('Finished Time', `${new Date(experimentation.runs?.[0]?.finished_at).toLocaleDateString('tr-TR')}`)}
-        {SimulationField('ID', experimentation.id)}
-        {SimulationField('Sequence ID', `${experimentation.sequence_id}`)}
-        {SimulationField('Reference', experimentation.reference)}
-        {SimulationField('Reference Type', experimentation.reference_type)}
+        {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
+        {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+        {experiment.runs?.[0]?.started_at
+          && ExperimentField('Started Time', `${new Date(experiment.runs?.[0]?.started_at).toLocaleDateString('tr-TR')}`)}
+        {experiment.runs?.[0]?.finished_at
+          && ExperimentField('Finished Time', `${new Date(experiment.runs?.[0]?.finished_at).toLocaleDateString('tr-TR')}`)}
+        {ExperimentField('ID', experiment.id)}
+        {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
+        {ExperimentField('Reference', experiment.reference)}
+        {ExperimentField('Reference Type', experiment.reference_type)}
 
         <h4 className="mt-4 mb-2">Metrics</h4>
         <Table striped hover>
@@ -129,9 +119,9 @@ const Simulation = () => {
 
         <h4 className="mt-4 mb-2">Logs</h4>
         <div className="mb-3">
-          {experimentation?.runs?.[0]?.logs && (
+          {experiment?.runs?.[0]?.logs && (
             <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-              {experimentation?.runs?.[0]?.logs}
+              {experiment?.runs?.[0]?.logs}
             </SyntaxHighlighter>
           ) }
         </div>
@@ -144,4 +134,4 @@ const Simulation = () => {
   );
 };
 
-export default Simulation;
+export default Experiment;

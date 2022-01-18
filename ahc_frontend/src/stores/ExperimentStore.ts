@@ -14,7 +14,7 @@ interface RunInfo {
   logs: string,
 }
 
-interface ExperimentationInfo {
+interface ExperimentInfo {
   id: string,
   sequence_id: number,
   commit: string,
@@ -25,36 +25,36 @@ interface ExperimentationInfo {
   runs?: RunInfo[],
 }
 
-export interface ExperimentationsStoreInterface {
-  currentExperimentations: ExperimentationInfo[] | undefined;
-  currentExperimentation: ExperimentationInfo | undefined;
+export interface ExperimentStoreInterface {
+  currentExperiments: ExperimentInfo[] | undefined;
+  currentExperiment: ExperimentInfo | undefined;
 }
 
-export default class ExperimentationsStore implements ExperimentationsStoreInterface {
+export default class ExperimentStore implements ExperimentStoreInterface {
   private mainStore: MainStore;
 
-  currentExperimentations: ExperimentationInfo[] | undefined;
+  currentExperiments: ExperimentInfo[] | undefined;
 
-  currentExperimentation: ExperimentationInfo | undefined;
+  currentExperiment: ExperimentInfo | undefined;
 
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
     this.mainStore = mainStore;
   }
 
-  async getExperimentations() {
+  async getExperiments() {
     const { currentRepository } = this.mainStore.repositoriesStore;
     if (!currentRepository) throw Error('You are not in a repository');
     const response = await (new RequestHandler()).request(`/repositories/${currentRepository.id}/experiments/`, 'get');
     const { results } = response;
-    this.currentExperimentations = results;
+    this.currentExperiments = results;
   }
 
   async getExperiment(id: string) {
     const { currentRepository } = this.mainStore.repositoriesStore;
     if (!currentRepository) throw Error('You are not in a repository');
     const response = await (new RequestHandler()).request(`/repositories/${currentRepository.id}/experiments/${id}`, 'get');
-    this.currentExperimentation = response;
+    this.currentExperiment = response;
   }
 
   async createExperiment() {
@@ -65,11 +65,12 @@ export default class ExperimentationsStore implements ExperimentationsStoreInter
       'post',
       { reference: 'main', reference_type: 'BRANCH' },
     );
-    if (this.currentExperimentations) this.currentExperimentations.unshift(response);
-    else this.currentExperimentations = [response];
+
+    if (this.currentExperiments) this.currentExperiments.unshift(response);
+    else this.currentExperiments = [response];
 
     setTimeout(async () => {
-      await this.getExperimentations();
+      await this.getExperiments();
     }, 1500);
   }
 
@@ -77,9 +78,9 @@ export default class ExperimentationsStore implements ExperimentationsStoreInter
     const { currentRepository } = this.mainStore.repositoriesStore;
     if (!currentRepository) throw Error('You are not in a repository');
     await (new RequestHandler()).request(`/repositories/${currentRepository.id}`, 'delete');
-    if (this.currentExperimentations) {
-      this.currentExperimentations.filter(
-        (repository: ExperimentationInfo) => repository.id !== id,
+    if (this.currentExperiments) {
+      this.currentExperiments.filter(
+        (repository: ExperimentInfo) => repository.id !== id,
       );
     }
   }
