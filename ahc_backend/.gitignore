@@ -140,3 +140,7 @@ cython_debug/
 .DS_Store
 media/
 static/
+
+# ide project files
+.idea/
+.vscode/
