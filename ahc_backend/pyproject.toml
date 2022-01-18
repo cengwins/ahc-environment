@@ -35,6 +35,7 @@ isort = "^5.10.1"
 mypy = "^0.930"
 django-stubs = "^1.9.0"
 djangorestframework-stubs = "^1.4.0"
+pylint-django = "^2.5.0"
 
 [tool.isort]
 profile = "black"
@@ -58,7 +59,8 @@ persistent = "no"
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins = [ ]
+load-plugins = [ "pylint_django" ]
+django-settings-module = "yatsim.settings"
 
 # Use multiple processes to speed up Pylint.
 jobs = "4"
