@@ -1,4 +1,4 @@
-from ahc_experiments.models import Experiment
+from ahc_experiments.models import Experiment, ExperimentRun
 from rest_framework import permissions
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -23,5 +23,8 @@ class RepositoryAccessPermission(permissions.BasePermission):
 
         if isinstance(obj, Experiment):
             return obj.repository.users.filter(user=request.user).exists()
+
+        if isinstance(obj, ExperimentRun):
+            return obj.experiment.repository.users.filter(user=request.user).exists()
 
         return False
