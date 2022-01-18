@@ -1,4 +1,4 @@
-from django.conf.urls.static import static
+from django.views.static import serve as static_serve
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
@@ -10,6 +10,16 @@ from ahc_experiments.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        f"{settings.MEDIA_URL[1:]}<path:path>",
+        static_serve,
+        {"document_root": settings.MEDIA_ROOT},
+    ),
+    path(
+        f"{settings.STATIC_URL[1:]}<path:path>",
+        static_serve,
+        {"document_root": settings.STATIC_ROOT},
+    ),
     path("api/auth/login/", LoginAPIView.as_view()),
     path("api/auth/register/", RegisterAPIView.as_view()),
     path("api/auth/profile/", GetUserProfileAPIView.as_view()),
@@ -46,7 +56,8 @@ urlpatterns = [
         "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/",
         ListExperimentRunsAPIView.as_view(),
     ),
+    path(
+        "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/<int:experiment_run_id>/",
+        RetrieveExperimentRunsAPIView.as_view(),
+    ),
 ]
-
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

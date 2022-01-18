@@ -7,7 +7,6 @@ import Loading from '../../../components/Loading';
 
 import { useStores } from '../../../stores/MainStore';
 import '../DashboardHome.css';
-import LogExample from './LogExample';
 
 const metrics = [
   {
@@ -84,6 +83,10 @@ const Experiment = () => {
         </h4>
         {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
         {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+        {experiment.runs?.[0]?.started_at
+          && ExperimentField('Started Time', `${new Date(experiment.runs?.[0]?.started_at).toLocaleDateString('tr-TR')}`)}
+        {experiment.runs?.[0]?.finished_at
+          && ExperimentField('Finished Time', `${new Date(experiment.runs?.[0]?.finished_at).toLocaleDateString('tr-TR')}`)}
         {ExperimentField('ID', experiment.id)}
         {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
         {ExperimentField('Reference', experiment.reference)}
@@ -116,9 +119,11 @@ const Experiment = () => {
 
         <h4 className="mt-4 mb-2">Logs</h4>
         <div className="mb-3">
-          <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-            {`${experiment.runs && experiment.runs[0].log_path}${!(experiment.runs && experiment.runs[0]) && LogExample}`}
-          </SyntaxHighlighter>
+          {experiment?.runs?.[0]?.logs && (
+            <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+              {experiment?.runs?.[0]?.logs}
+            </SyntaxHighlighter>
+          ) }
         </div>
         <Button>
           Download logs

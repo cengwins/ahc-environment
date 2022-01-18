@@ -5,10 +5,14 @@ import GithubStore from '../../stores/GithubStore';
 import { useStores } from '../../stores/MainStore';
 
 const DashboardSettings = observer(() => {
-  const { notificationStore } = useStores();
+  const { userStore, notificationStore } = useStores();
   const [showEditToken, setShowEditToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
+
+  if (!userStore.username) {
+    userStore.getProfile();
+  }
 
   return (
     <>
@@ -46,7 +50,7 @@ const DashboardSettings = observer(() => {
           <h4>
             Github Account:
             {' '}
-            <a href="https://github.com/ucanyiit">ucanyiit</a>
+            <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
           </h4>
           <Button onClick={() => setShowEditToken(true)}>Replace</Button>
         </div>

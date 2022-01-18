@@ -11,6 +11,7 @@ interface RunInfo {
   finished_at: Date,
   exit_code: number,
   log_path: string,
+  logs: string,
 }
 
 interface ExperimentInfo {
@@ -64,8 +65,13 @@ export default class ExperimentStore implements ExperimentStoreInterface {
       'post',
       { reference: 'main', reference_type: 'BRANCH' },
     );
-    if (this.currentExperiments) this.currentExperiments.push(response);
+
+    if (this.currentExperiments) this.currentExperiments.unshift(response);
     else this.currentExperiments = [response];
+
+    setTimeout(async () => {
+      await this.getExperiments();
+    }, 1500);
   }
 
   async deleteExperiment(id: string) {
