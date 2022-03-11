@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Container,
@@ -18,19 +18,18 @@ const ProfileField = (title: string, value: string) => (
 
 const Profile = observer(() => {
   const { userStore } = useStores();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
 
   const {
     username, email, name, surname,
   } = userStore;
 
-  if (!loading && !failedToLoad && !username) {
-    setLoading(true);
+  useEffect(() => {
     userStore.getProfile()
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
-  }
+  }, []);
 
   return (
     <div className="d-flex flex-column min-vh-100">

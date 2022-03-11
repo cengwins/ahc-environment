@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, ListGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../../components/Loading';
@@ -8,18 +8,15 @@ import './DashboardHome.css';
 
 const RepositoriesList = observer(() => {
   const { repositoriesStore } = useStores();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const navigate = useNavigate();
 
-  if (!repositoriesStore.repositories
-    && !loading
-    && !failedToLoad) {
-    setLoading(true);
+  useEffect(() => {
     repositoriesStore.getRepositories()
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
-  }
+  }, []);
 
   return (
     <div>

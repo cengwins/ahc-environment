@@ -18,11 +18,13 @@ export default class DashboardNavigationStore implements DashboardNavigationInte
     this.mainStore = mainStore;
   }
 
-  setRepositoryId(repositoryId: string) {
+  async setRepositoryId(repositoryId: string) {
     this.repositoryId = repositoryId;
+    await this.mainStore.repositoriesStore.getRepository(repositoryId);
   }
 
-  setExperimentId(experimentId: string) {
+  async setExperimentId(experimentId: string) {
     this.experimentId = experimentId;
+    await this.mainStore.experimentStore.getExperiment(experimentId);
   }
 }
