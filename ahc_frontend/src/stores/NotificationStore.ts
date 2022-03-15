@@ -1,3 +1,4 @@
+import { AlertColor } from '@mui/material';
 import {
   autorun,
   makeAutoObservable,
@@ -5,10 +6,8 @@ import {
 import MainStore from './MainStore';
 
 export interface NotificationInterface {
-  variant: string;
-  title?: string;
+  variant: AlertColor;
   text?: string;
-  footNote?: string;
 }
 
 interface NotificationStoreInterface {
@@ -27,9 +26,13 @@ export default class NotificationStore implements NotificationStoreInterface {
     this.mainStore = mainStore;
   }
 
-  set(variant: string, title? : string, text?: string, footNote?: string, timeOut: number = 1000) {
+  set(
+    variant: AlertColor,
+    text: string,
+    timeOut: number = 5000,
+  ) {
     const notification: NotificationInterface = {
-      variant, title, text, footNote,
+      variant, text,
     };
     const notificationId = this.currentNotificationId;
     this.notifications[notificationId] = notification;
