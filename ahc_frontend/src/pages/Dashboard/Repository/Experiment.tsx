@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -45,91 +45,85 @@ const ExperimentField = (title: string, value: string) => (
 
 const Experiment = () => {
   const { repositoryId, experimentId } = useParams();
-  const { dashboardNavigationStore, repositoriesStore, experimentStore } = useStores();
-  const [loading, setLoading] = useState(false);
+  const { dashboardNavigationStore, experimentStore } = useStores();
+  const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
 
-  if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
-  if (experimentId) dashboardNavigationStore.setExperimentId(experimentId);
+  useEffect(() => {
+    const fetchFunction = async () => {
+      if (repositoryId) await dashboardNavigationStore.setRepositoryId(repositoryId);
+      if (experimentId) await dashboardNavigationStore.setExperimentId(experimentId);
+    };
 
-  const { currentRepository: repository } = repositoriesStore;
+    fetchFunction()
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
+  }, []);
+
   const { currentExperiment: experiment } = experimentStore;
 
-  if (!loading && !failedToLoad) {
-    // eslint-disable-next-line eqeqeq
-    if (repository?.id != repositoryId) {
-      setLoading(true);
-      repositoriesStore.getRepository(repositoryId as string)
-        .catch(() => setFailed(true))
-        .finally(() => setLoading(false));
-    // eslint-disable-next-line eqeqeq
-    } else if (experiment?.id != experimentId) {
-      setLoading(true);
-      experimentStore.getExperiment(experimentId as string)
-        .catch(() => setFailed(true))
-        .finally(() => setLoading(false));
-    }
+  if (!experiment || loading || failedToLoad) {
+    return (
+      <div className="d-flex flex-column min-vh-100">
+        <Loading loading={loading} failed={failedToLoad || !experiment} />
+      </div>
+    );
   }
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Loading loading={loading} failed={failedToLoad} />
-      {experiment && (
-      <>
-        <h4>
-          Experiment
-          {' '}
-          <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
-        </h4>
-        {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
-        {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
-        {experiment.runs?.[0]?.started_at
+      <h4>
+        Experiment
+        {' '}
+        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
+      </h4>
+      {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
+      {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+      {experiment.runs?.[0]?.started_at
           && ExperimentField('Started Time', `${new Date(experiment.runs?.[0]?.started_at).toLocaleDateString('tr-TR')}`)}
-        {experiment.runs?.[0]?.finished_at
+      {experiment.runs?.[0]?.finished_at
           && ExperimentField('Finished Time', `${new Date(experiment.runs?.[0]?.finished_at).toLocaleDateString('tr-TR')}`)}
-        {ExperimentField('ID', experiment.id)}
-        {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
-        {ExperimentField('Reference', experiment.reference)}
-        {ExperimentField('Reference Type', experiment.reference_type)}
+      {ExperimentField('ID', experiment.id)}
+      {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
+      {ExperimentField('Reference', experiment.reference)}
+      {ExperimentField('Reference Type', experiment.reference_type)}
 
-        <h4 className="mt-4 mb-2">Metrics</h4>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>Metric Name</th>
-              <th>Value</th>
-              <th>Type</th>
-              <th>Created at?</th>
+      <h4 className="mt-4 mb-2">Metrics</h4>
+      <Table striped hover>
+        <thead>
+          <tr>
+            <th>Metric Name</th>
+            <th>Value</th>
+            <th>Type</th>
+            <th>Created at?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {metrics.map(({ name, value, type }) => (
+            <tr key={name}>
+              <td>{name}</td>
+              <td>{value}</td>
+              <td>{type}</td>
+              <td>..</td>
             </tr>
-          </thead>
-          <tbody>
-            {metrics.map(({ name, value, type }) => (
-              <tr key={name}>
-                <td>{name}</td>
-                <td>{value}</td>
-                <td>{type}</td>
-                <td>..</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-        <Button>
-          Download .csv
-        </Button>
+          ))}
+        </tbody>
+      </Table>
+      <Button>
+        Download .csv
+      </Button>
 
-        <h4 className="mt-4 mb-2">Logs</h4>
-        <div className="mb-3">
-          {experiment?.runs?.[0]?.logs && (
-            <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-              {experiment?.runs?.[0]?.logs}
-            </SyntaxHighlighter>
-          ) }
-        </div>
-        <Button>
-          Download logs
-        </Button>
-      </>
-      )}
+      <h4 className="mt-4 mb-2">Logs</h4>
+      <div className="mb-3">
+        {experiment?.runs?.[0]?.logs && (
+        <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+          {experiment?.runs?.[0]?.logs}
+        </SyntaxHighlighter>
+        ) }
+      </div>
+      <Button>
+        Download logs
+      </Button>
     </div>
   );
 };

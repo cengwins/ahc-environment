@@ -1,11 +1,11 @@
-.repository-item {
-  padding: 12px 6px;
+.repository-name {
+  transition: background-color 300ms ease-in-out;
 }
 
 .clickable {
   cursor: pointer;
 }
 
-.repository-item:hover {
+.repository-name:hover {
   background-color: #eee;
 }

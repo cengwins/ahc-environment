@@ -1,5 +1,9 @@
+import { Button } from '@mui/material';
+
 const FooterItem = ({ link, text } : {link: string, text: string}) => (
-  <li className="list-inline-item mx-2"><a className="text-decoration-none" href={link}>{text}</a></li>
+  <li className="list-inline-item mx-2">
+    <Button className="text-decoration-none" href={link}>{text}</Button>
+  </li>
 );
 
 const Footer = () => (

@@ -1,4 +1,4 @@
-import { Container, Stack } from 'react-bootstrap';
+import { Container, Stack } from '@mui/material';
 import Header from '../components/Header';
 
 const PageNotFound = () => (
@@ -6,7 +6,7 @@ const PageNotFound = () => (
     <Header />
     <div className="App">
       <Container className="mt-5 text-start">
-        <Stack direction="vertical" gap={4} className="mt-5">
+        <Stack direction="column" spacing={4} className="mt-5">
           <div className="mt-5 mb-4">
             <h1>404: Page Not Found</h1>
             <h5>

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, ListGroup, Spinner } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '../../../components/Loading';
@@ -8,30 +8,26 @@ import { useStores } from '../../../stores/MainStore';
 const RepositoryExperiments = observer(() => {
   const navigate = useNavigate();
   const { repositoryId } = useParams();
-  const { dashboardNavigationStore, repositoriesStore, experimentStore } = useStores();
-  const [loading, setLoading] = useState(false);
+  const { dashboardNavigationStore, experimentStore } = useStores();
+  const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const [runningExperiment, setRunningExperiment] = useState(false);
 
-  if (repositoryId) dashboardNavigationStore.setRepositoryId(repositoryId);
-
-  const { currentRepository: repository } = repositoriesStore;
   const { currentExperiments: experiments } = experimentStore;
 
-  if (!loading && !failedToLoad) {
-    // eslint-disable-next-line eqeqeq
-    if (!repository || repository.id != repositoryId) {
-      setLoading(true);
-      repositoriesStore.getRepository(repositoryId as string)
-        .catch(() => setFailed(true))
-        .finally(() => setLoading(false));
-    } else if (!experiments) {
-      setLoading(true);
-      experimentStore.getExperiments()
-        .catch(() => setFailed(true))
-        .finally(() => setLoading(false));
-    }
-  }
+  useEffect(() => {
+    const fetchFunction = async () => {
+      if (repositoryId) await dashboardNavigationStore.setRepositoryId(repositoryId);
+    };
+
+    fetchFunction()
+      .then(() => {
+        experimentStore.getExperiments()
+          .catch(() => setFailed(true))
+          .finally(() => setLoading(false));
+      })
+      .catch(() => { setFailed(true); setLoading(false); });
+  }, []);
 
   return (
     <div className="d-flex flex-column min-vh-100">

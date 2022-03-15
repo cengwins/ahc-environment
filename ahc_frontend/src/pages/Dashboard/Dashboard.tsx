@@ -1,11 +1,11 @@
-import {
-  Breadcrumb,
-  Container, Nav, Stack,
-} from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 import {
   Route, Routes, useLocation,
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
+import {
+  Breadcrumbs, Container, Link, Stack,
+} from '@mui/material';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import DashboardSettings from './DashboardSettings';
@@ -68,16 +68,17 @@ const Dashboard = observer(() => {
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="my-5 text-start">
-        <Stack direction="vertical" gap={4} className="mt-5">
+        <Stack direction="column" spacing={4} className="mt-5">
           <div>
-            <Breadcrumb>
-              {crumbs.map(({ currentPath, name }) => (
-                <Breadcrumb.Item key={currentPath} href={currentPath}>
-                  {name}
-                </Breadcrumb.Item>
-              ))}
-
-            </Breadcrumb>
+            <div className="mb-3">
+              <Breadcrumbs separator="›" aria-label="breadcrumb">
+                {crumbs.map(({ currentPath, name }) => (
+                  <Link underline="hover" color="inherit" key={currentPath} href={currentPath}>
+                    {name}
+                  </Link>
+                ))}
+              </Breadcrumbs>
+            </div>
             {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
               <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
                 <Nav.Item>

@@ -1,56 +1,73 @@
+import {
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Table,
+  Button,
+  Tooltip,
+  Checkbox,
+} from '@mui/material';
 import { observer } from 'mobx-react';
-import { useState } from 'react';
-import { Container, ListGroup } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RepositoryInfo } from '../../stores/RepositoriesStore';
 import Loading from '../../components/Loading';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
 
+const RepositoryRow = ({ repository, navigate }: {repository: RepositoryInfo, navigate: any}) => (
+  <TableRow
+    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+  >
+    <TableCell>
+      <Checkbox />
+    </TableCell>
+    <Tooltip title={`/dashboard/${repository.id}`}>
+      <TableCell className="repository-name text-start clickable" onClick={() => { navigate(`/dashboard/${repository.id}`); }}>
+        {repository.name}
+      </TableCell>
+    </Tooltip>
+    <TableCell align="right">
+      <Tooltip title={repository.upstream}>
+        <Button href={repository.upstream} className="ms-auto">{repository.upstream_type}</Button>
+      </Tooltip>
+    </TableCell>
+  </TableRow>
+);
+
 const RepositoriesList = observer(() => {
   const { repositoriesStore } = useStores();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const navigate = useNavigate();
 
-  if (!repositoriesStore.repositories
-    && !loading
-    && !failedToLoad) {
-    setLoading(true);
+  useEffect(() => {
     repositoriesStore.getRepositories()
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
-  }
+  }, []);
 
   return (
     <div>
       <Loading loading={loading} failed={failedToLoad} />
-      <ListGroup as="ol" variant="flush" className="text-start mt-3">
-        {repositoriesStore.repositories && repositoriesStore.repositories.map((repo) => (
-          <ListGroup.Item
-            as="li"
-            key={repo.id}
-            className="repository-item text-start"
-          >
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <input
-                style={{ width: '16px', height: '16px' }}
-                className="align-self-center me-2"
-                type="checkbox"
-                id="vehicle1"
-                name="vehicle1"
-                value="Bike"
-              />
-              <Container
-                className="clickable"
-                onClick={() => { navigate(`/dashboard/${repo.id}`); }}
-              >
-                <h2>{repo.name}</h2>
-                <a href={`https://github.com/${repo.slug}`} className="ms-auto">{`${repo.slug}`}</a>
-              </Container>
-            </div>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
+
+      <TableContainer>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>Repository</TableCell>
+              <TableCell align="right">Upstream</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {repositoriesStore.repositories && repositoriesStore.repositories.map((repository) => (
+              <RepositoryRow key={repository.id} repository={repository} navigate={navigate} />))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 });

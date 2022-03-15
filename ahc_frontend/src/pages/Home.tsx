@@ -1,6 +1,6 @@
 import {
-  Container, ListGroup, Stack,
-} from 'react-bootstrap';
+  Container, List, ListItem, Stack,
+} from '@mui/material';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 
@@ -22,7 +22,7 @@ const Home = () => {
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="mt-5 text-start">
-        <Stack direction="vertical" gap={4} className="my-5">
+        <Stack direction="column" spacing={4} className="my-5">
           <div className="mb-4">
             <h1>AHC</h1>
             <h5 style={{ maxWidth: '480px' }}>
@@ -35,13 +35,13 @@ const Home = () => {
           </div>
           <div>
             <h2 className="mb-3">Objectives</h2>
-            <ListGroup as="ol" numbered variant="flush" className="text-start">
+            <List className="text-start">
               {objectives.map((objective) => (
-                <ListGroup.Item as="li" key={objective}>
+                <ListItem key={objective}>
                   <span className="ms-4">{objective}</span>
-                </ListGroup.Item>
+                </ListItem>
               ))}
-            </ListGroup>
+            </List>
           </div>
         </Stack>
       </Container>

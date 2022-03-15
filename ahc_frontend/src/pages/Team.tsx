@@ -1,26 +1,23 @@
 import {
-  Col,
-  Container, Row, Stack,
-  Card,
-} from 'react-bootstrap';
+  Card, CardContent, Container, Grid, Typography,
+} from '@mui/material';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 
 const MemberCard = (props : {member: {name: string, details: string, role: 'member' | 'supervisor'}}) => {
   const { member } = props;
   const { role, name, details } = member;
-  const title = role === 'member' ? 'Team Member' : 'Supervisor';
+  const title = role === 'member' ? '' : 'Supervisor, ';
   return (
-    <Card>
-      <Card.Header>
-        {title}
-        ,
-        {' '}
-        {name}
-      </Card.Header>
-      <Card.Body>
-        {details}
-      </Card.Body>
+    <Card sx={{ height: '100%' }}>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Typography variant={role === 'supervisor' ? 'h4' : 'h6'} component="h2" sx={{ mb: 2 }}>
+          {`${title}${name}`}
+        </Typography>
+        <Typography component="span" sx={{ flexGrow: 1, alignSelf: 'center' }}>
+          {details}
+        </Typography>
+      </CardContent>
     </Card>
   );
 };
@@ -59,21 +56,17 @@ const Team = () => {
     <div className="d-flex flex-column min-vh-100">
       <Header />
       <Container className="my-5 text-start">
-        <Stack direction="vertical" gap={4}>
-          <div className="mt-5 mb-4">
-            <h1>Team</h1>
-          </div>
-          <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
-          <Row>
-            {members.map((member, i) => (
-              <Col sm={6} key={member.name}>
-                <div className={`${i % 2 ? 'me-1' : 'ms-1'} mb-4`}>
-                  <MemberCard member={{ ...member, role: 'member' }} />
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </Stack>
+        <div className="mt-5 mb-4">
+          <h1>Team</h1>
+        </div>
+        <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          {members.map((member) => (
+            <Grid item sm={6} md={4} key={member.name}>
+              <MemberCard member={{ ...member, role: 'member' }} />
+            </Grid>
+          ))}
+        </Grid>
       </Container>
       <Footer />
     </div>

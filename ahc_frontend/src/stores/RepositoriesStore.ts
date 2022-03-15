@@ -4,7 +4,7 @@ import {
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
-interface RepositoryInfo {
+export interface RepositoryInfo {
   id: string;
   slug: string;
   name: string;

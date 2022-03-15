@@ -1,8 +1,17 @@
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  FormGroup,
+  Link,
+  List,
+  ListItem,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
-import {
-  Button, Form, ListGroup, Modal,
-} from 'react-bootstrap';
 import Loading from '../../components/Loading';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
@@ -38,18 +47,17 @@ const DashboardHome = observer(() => {
 
   return (
     <>
-      <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Repository</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog fullWidth open={show} onClose={() => setShow(false)}>
+        <DialogTitle>
+          Add a repository from GitHub.
+        </DialogTitle>
 
-          <Form>
-            <Form.Group className="mb-3" controlId="repository">
-              <Form.Label>Search for repositories:</Form.Label>
-              <Form.Control type="text" placeholder="Repository Name" onChange={handleStringSearch} />
-            </Form.Group>
-          </Form>
+        <DialogContent>
+          <form>
+            <FormGroup sx={{ mb: 2, pt: 1 }}>
+              <TextField type="text" label="Repository Name" placeholder="Repository Name" onChange={handleStringSearch} />
+            </FormGroup>
+          </form>
 
           {searchString && searchString.length < 3 && (
           <span className="small">
@@ -59,7 +67,7 @@ const DashboardHome = observer(() => {
           <div className="w-100">
             <Loading loading={searching} failed={searchFailed} />
           </div>
-          {!searching
+          {!searching && !searchFailed
           && (
           <div>
             {searchString && searchString.length >= 3 && githubStore.userRepos.length === 0 && (
@@ -67,41 +75,48 @@ const DashboardHome = observer(() => {
                 There are no repositories with the given name.
               </span>
             )}
-            <ListGroup as="ol" variant="flush" className="text-start mt-3">
+            <List className="text-start mt-3">
               {githubStore.userRepos.map((repository) => (
-                <ListGroup.Item
-                  as="li"
+                <ListItem
                   key={repository.full_name}
                   className="repository-item text-start"
                 >
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <h2>{repository.name}</h2>
-                    <a href={repository.html_url} target="_blank" rel="noreferrer">
-                      Go
-                    </a>
+                  <div style={{ display: 'block', width: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Link underline="hover" href={repository.html_url} target="_blank" rel="noreferrer">
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="h5" sx={{ color: 'secondary' }}>{repository.name}</Typography>
+                          <Typography variant="subtitle1" sx={{ fontSize: 'small' }}>
+                            {repository.html_url}
+                          </Typography>
+                        </div>
+                      </Link>
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          repositoriesStore.createRepository(
+                            { name: repository.name, upstream: repository.html_url },
+                          );
+                        }}
+                      >
+                        Add
+                      </Button>
+                    </div>
                   </div>
-                  <Button onClick={() => {
-                    repositoriesStore.createRepository(
-                      { name: repository.name, upstream: repository.html_url },
-                    );
-                  }}
-                  >
-                    Add
-                  </Button>
-                </ListGroup.Item>
+                </ListItem>
               ))}
-            </ListGroup>
+            </List>
           </div>
           )}
-        </Modal.Body>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <div className="d-flex flex-column min-vh-100">
         <div className="d-flex flex-row">
-          <Button variant="danger" className="ms-auto" onClick={() => setShow(true)}>
+          <Button color="error" variant="contained" className="ms-auto" onClick={() => setShow(true)}>
             Delete
           </Button>
-          <Button className="ms-2" onClick={() => setShow(true)}>
+          <Button variant="contained" className="ms-2" onClick={() => setShow(true)}>
             Add Repository
           </Button>
         </div>
