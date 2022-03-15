@@ -1,4 +1,4 @@
-import { Spinner } from 'react-bootstrap';
+import { CircularProgress } from '@mui/material';
 
 const Loading = (props : {loading: boolean, failed: boolean}) => {
   const { loading, failed } = props;
@@ -8,12 +8,12 @@ const Loading = (props : {loading: boolean, failed: boolean}) => {
         {loading && (
         <div className="d-flex flex-column">
           <p className="mx-auto">Loading..</p>
-          <Spinner className="mx-auto mb-4" animation="border" />
+          <CircularProgress className="mx-auto mb-4" />
         </div>
         )}
         {failed && (
           <div>
-            Failed to load the repository. Please try again.
+            Failed to load. Please try again.
           </div>
         )}
       </>
