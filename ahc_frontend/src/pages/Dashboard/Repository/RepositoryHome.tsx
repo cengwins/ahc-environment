@@ -1,14 +1,12 @@
 import { observer } from 'mobx-react';
 import { useState, useEffect } from 'react';
-import { Card } from 'react-bootstrap';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
+import { Button, Card, CardContent } from '@mui/material';
+import { GitHub } from '@mui/icons-material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
-import '../DashboardHome.css';
-// import mockReadMe from './mockReadMe';
-import { github } from './svgs';
 
 const RepositoryField = (title: string, value: string) => (
   <div>
@@ -59,23 +57,17 @@ const RepositoryHome = observer(() => {
       </h4>
       {RepositoryField('id', repository.id)}
       <div className="my-2">
-        <a className="btn btn-outline-primary me-2" href={repository.upstream} target="_blank" rel="noreferrer">
-          <span className="me-1">
-            {github}
-          </span>
+        <Button variant="outlined" className="me-2" href={repository.upstream} startIcon={<GitHub />}>
           View on GitHub
-        </a>
-        <a className="btn btn-outline-primary" href={repository.upstream.replace('github.com', 'github.dev')} target="_blank" rel="noreferrer">
-          <span className="me-1">
-            {github}
-          </span>
+        </Button>
+        <Button variant="outlined" className="me-2" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
           Open in GitHub.dev
-        </a>
+        </Button>
       </div>
-      <Card className="mt-4">
-        <Card.Body>
+      <Card variant="outlined" className="mt-4">
+        <CardContent sx={{ padding: '12px 20px' }}>
           <ReactMarkdown>{readmeContent}</ReactMarkdown>
-        </Card.Body>
+        </CardContent>
       </Card>
     </div>
   );
