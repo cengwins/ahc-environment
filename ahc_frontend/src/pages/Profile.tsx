@@ -1,9 +1,6 @@
+import { Button, Container } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import {
-  Button,
-  Container,
-} from 'react-bootstrap';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
@@ -45,7 +42,7 @@ const Profile = observer(() => {
             {ProfileField('Username', username)}
             {ProfileField('Email', email)}
             {ProfileField('Name', `${name} ${surname}`)}
-            <Button className="mt-4">
+            <Button variant="contained" className="mt-4">
               Reset Password
             </Button>
           </div>
