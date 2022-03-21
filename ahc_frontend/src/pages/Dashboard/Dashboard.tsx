@@ -1,23 +1,38 @@
-import { Nav } from 'react-bootstrap';
 import {
-  Route, Routes, useLocation,
+  Location, Route, Routes, useLocation, useNavigate,
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
-  Breadcrumbs, Container, Link, Stack,
+  Breadcrumbs, Button, Container, Stack, Tab, Tabs,
 } from '@mui/material';
-import Footer from '../../components/Footer';
-import Header from '../../components/Header';
+import { useState } from 'react';
 import DashboardSettings from './DashboardSettings';
 import DashboardHome from './DashboardHome';
 import RepositoryExperiments from './Repository/RepositoryExperiments';
 import Experiment from './Repository/Experiment';
 import RepositoryHome from './Repository/RepositoryHome';
 import { useStores } from '../../stores/MainStore';
+import { DashboardNavigationInterface } from '../../stores/DashboardNavigationStore';
+
+const getInitialValue = (
+  location: Location,
+  dashboardNavigationStore: DashboardNavigationInterface,
+) => {
+  const pathName = location.pathname.replace(/\/+$/, '');
+  if (location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`)) {
+    return `/dashboard/${dashboardNavigationStore.repositoryId}` === pathName ? 0 : 1;
+  }
+  return pathName === '/dashboard' ? 0 : 1;
+};
 
 const Dashboard = observer(() => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { dashboardNavigationStore } = useStores();
+  const initialValue = getInitialValue(location, dashboardNavigationStore);
+  const [value, setValue] = useState(initialValue);
+
+  if (initialValue !== value) setValue(initialValue);
 
   const routes : {
     path: string;
@@ -65,52 +80,61 @@ const Dashboard = observer(() => {
     }));
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <Container className="my-5 text-start">
-        <Stack direction="column" spacing={4} className="mt-5">
-          <div>
-            <div className="mb-3">
-              <Breadcrumbs separator="›" aria-label="breadcrumb">
-                {crumbs.map(({ currentPath, name }) => (
-                  <Link underline="hover" color="inherit" key={currentPath} href={currentPath}>
-                    {name}
-                  </Link>
-                ))}
-              </Breadcrumbs>
-            </div>
-            {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
-              <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
-                <Nav.Item>
-                  <Nav.Link href="/dashboard">Repositories</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/dashboard/settings">Settings</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            )}
-
-            {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
-            <Nav className="mb-3" fill variant="tabs" defaultActiveKey={location.pathname}>
-              <Nav.Item>
-                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}`}>Overview</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link href={`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`}>Experiments</Nav.Link>
-              </Nav.Item>
-            </Nav>
-            )}
-
-            <Routes>
-              {routes.map(({ path, Component, name }) => (
-                <Route path={path} key={name} element={Component} />
+    <Container className="my-5 text-start">
+      <Stack direction="column" spacing={4} className="mt-5">
+        <div>
+          <div className="mb-3">
+            <Breadcrumbs separator="›" aria-label="breadcrumb">
+              {crumbs.map(({ currentPath, name }) => (
+                <Button size="small" key={currentPath} onClick={() => navigate(currentPath)}>
+                  {name}
+                </Button>
               ))}
-            </Routes>
+            </Breadcrumbs>
           </div>
-        </Stack>
-      </Container>
-      <Footer />
-    </div>
+
+          {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
+          <Tabs
+            sx={{ mb: 2 }}
+            variant="fullWidth"
+            value={value}
+            onChange={(_, val) => {
+              setValue(val);
+              if (val === 0) navigate('/dashboard');
+              else navigate('/dashboard/settings');
+            }}
+            aria-label="basic tabs example"
+          >
+            <Tab label="Repositories" id="simple-tab-0" />
+            <Tab label="Settings" id="simple-tab-1" />
+          </Tabs>
+          )}
+
+          {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
+          <Tabs
+            sx={{ mb: 2 }}
+            variant="fullWidth"
+            value={value}
+            onChange={(_, val) => {
+              setValue(val);
+              if (val === 0) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}`);
+              else navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`);
+            }}
+            aria-label="basic tabs example"
+          >
+            <Tab label="Overview" />
+            <Tab label="Experiments" />
+          </Tabs>
+          )}
+
+          <Routes>
+            {routes.map(({ path, Component, name }) => (
+              <Route path={path} key={name} element={Component} />
+            ))}
+          </Routes>
+        </div>
+      </Stack>
+    </Container>
   );
 });
 
