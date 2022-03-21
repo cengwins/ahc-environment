@@ -1,25 +1,23 @@
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const FooterItem = ({ link, text } : {link: string, text: string}) => (
+const FooterItem = ({ onClick, text } : {onClick: Function, text: string}) => (
   <li className="list-inline-item mx-2">
-    <Button className="text-decoration-none" href={link}>{text}</Button>
+    <Button className="text-decoration-none" onClick={() => onClick()}>{text}</Button>
   </li>
 );
 
-const Footer = () => (
-  <div className="text-center pb-2 mt-auto">
-    {/* <div className="social">
-          <a href="#"><i className="icon ion-social-instagram" /></a>
-          <a href="#"><i className="icon ion-social-snapchat" /></a>
-          <a href="#"><i className="icon ion-social-twitter" /></a>
-          <a href="#"><i className="icon ion-social-facebook" /></a>
-        </div> */}
-    <ul className="list-inline">
-      <FooterItem link="/" text="Home" />
-      <FooterItem link="/team" text="Team" />
-    </ul>
-    <p className="copyright">bitiriyoruz © 2021</p>
-  </div>
-);
+const Footer = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="text-center pb-2 mt-auto">
+      <ul className="list-inline">
+        <FooterItem onClick={() => navigate('/')} text="Home" />
+        <FooterItem onClick={() => navigate('/team')} text="Team" />
+      </ul>
+      <p className="copyright">bitiriyoruz © 2021</p>
+    </div>
+  );
+};
 
 export default Footer;
