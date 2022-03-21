@@ -1,8 +1,6 @@
 import {
   Card, CardContent, Container, Grid, Typography,
 } from '@mui/material';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 
 const MemberCard = (props : {member: {name: string, details: string, role: 'member' | 'supervisor'}}) => {
   const { member } = props;
@@ -53,23 +51,19 @@ const Team = () => {
   ];
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <Container className="my-5 text-start">
-        <div className="mt-5 mb-4">
-          <h1>Team</h1>
-        </div>
-        <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-          {members.map((member) => (
-            <Grid item sm={6} md={4} key={member.name}>
-              <MemberCard member={{ ...member, role: 'member' }} />
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-      <Footer />
-    </div>
+    <Container className="my-5 text-start">
+      <div className="mt-5 mb-4">
+        <h1>Team</h1>
+      </div>
+      <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        {members.map((member) => (
+          <Grid item sm={6} md={4} key={member.name}>
+            <MemberCard member={{ ...member, role: 'member' }} />
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 };
 

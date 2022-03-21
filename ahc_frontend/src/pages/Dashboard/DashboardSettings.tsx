@@ -46,15 +46,13 @@ const DashboardSettings = observer(() => {
           </form>
         </DialogContent>
       </Dialog>
-      <div className="d-flex flex-column min-vh-100">
-        <div>
-          <h4>
-            Github Account:
-            {' '}
-            <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
-          </h4>
-          <Button variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
-        </div>
+      <div>
+        <h4>
+          Github Account:
+          {' '}
+          <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
+        </h4>
+        <Button variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
       </div>
     </>
   );

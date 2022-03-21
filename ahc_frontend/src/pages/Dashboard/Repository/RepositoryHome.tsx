@@ -42,14 +42,12 @@ const RepositoryHome = observer(() => {
 
   if (!repository || failedToLoad || loading) {
     return (
-      <div className="d-flex flex-column min-vh-100">
-        <Loading loading={loading} failed={failedToLoad || !repository} />
-      </div>
+      <Loading loading={loading} failed={failedToLoad || !repository} />
     );
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div>
       <h4>
         {repository.name}
         {' '}

@@ -111,7 +111,7 @@ const DashboardHome = observer(() => {
         </DialogContent>
       </Dialog>
 
-      <div className="d-flex flex-column min-vh-100">
+      <div>
         <div className="d-flex flex-row">
           <Button color="error" variant="contained" className="ms-auto" onClick={() => setShow(true)}>
             Delete

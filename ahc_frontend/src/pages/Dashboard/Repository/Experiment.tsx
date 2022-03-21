@@ -64,14 +64,12 @@ const Experiment = () => {
 
   if (!experiment || loading || failedToLoad) {
     return (
-      <div className="d-flex flex-column min-vh-100">
-        <Loading loading={loading} failed={failedToLoad || !experiment} />
-      </div>
+      <Loading loading={loading} failed={failedToLoad || !experiment} />
     );
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div>
       <h4>
         Experiment
         {' '}
