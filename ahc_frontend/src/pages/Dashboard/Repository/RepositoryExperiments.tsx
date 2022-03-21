@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { Button, ListGroup, Spinner } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
+import LoadingButton from '@mui/lab/LoadingButton';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 
@@ -30,8 +31,10 @@ const RepositoryExperiments = observer(() => {
   }, []);
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Button
+    <div className="d-flex flex-column">
+      <LoadingButton
+        loading={runningExperiment}
+        variant="contained"
         disabled={runningExperiment}
         onClick={() => {
           setRunningExperiment(true);
@@ -39,17 +42,8 @@ const RepositoryExperiments = observer(() => {
             .finally(() => setRunningExperiment(false));
         }}
       >
-        {runningExperiment && (
-        <Spinner
-          as="span"
-          animation="border"
-          size="sm"
-          role="status"
-          aria-hidden="true"
-        />
-        )}
-        {!runningExperiment && 'Run Experiment'}
-      </Button>
+        Run Experiment
+      </LoadingButton>
       <Loading loading={loading} failed={failedToLoad} />
       <ListGroup as="ol" variant="flush" className="text-start mt-3">
         {experiments && experiments.map((experiment) => (
