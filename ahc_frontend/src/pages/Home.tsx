@@ -1,5 +1,5 @@
 import {
-  Container, List, ListItem, Stack,
+  Container, List, ListItem, Stack, Typography,
 } from '@mui/material';
 
 const Home = () => {
@@ -20,21 +20,21 @@ const Home = () => {
     <Container className="mt-5 text-start">
       <Stack direction="column" spacing={4} className="my-5">
         <div className="mb-4">
-          <h1>AHC</h1>
-          <h5 style={{ maxWidth: '480px' }}>
+          <Typography component="h1" variant="h3">AHC</Typography>
+          <Typography component="h2" variant="h5" sx={{ maxWidth: '480px' }}>
             Wireless Ad Hoc Cloud Computing, Learning and Experimentation Environment
-          </h5>
+          </Typography>
         </div>
         <div>
-          <h2 className="mb-3">About</h2>
-          <p className="text-start">{text}</p>
+          <Typography component="h3" variant="h4" sx={{ mb: 2 }}>About</Typography>
+          <Typography component="p" variant="body1">{text}</Typography>
         </div>
         <div>
-          <h2 className="mb-3">Objectives</h2>
+          <Typography component="h3" variant="h4" sx={{ mb: 2 }}>Objectives</Typography>
           <List className="text-start">
             {objectives.map((objective) => (
               <ListItem key={objective}>
-                <span className="ms-4">{objective}</span>
+                <Typography component="p" variant="body1">{objective}</Typography>
               </ListItem>
             ))}
           </List>

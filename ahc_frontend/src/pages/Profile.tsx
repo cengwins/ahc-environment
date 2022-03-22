@@ -1,14 +1,16 @@
-import { Button, Container } from '@mui/material';
+import {
+  Button, Container, List, ListItem, Typography,
+} from '@mui/material';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import Loading from '../components/Loading';
 import { useStores } from '../stores/MainStore';
 
 const ProfileField = (title: string, value: string) => (
-  <div>
-    <span>{`${title}: `}</span>
-    <span>{value}</span>
-  </div>
+  <ListItem>
+    <Typography sx={{ mr: 1, fontWeight: 700 }}>{`${title}:`}</Typography>
+    <Typography>{value}</Typography>
+  </ListItem>
 );
 
 const Profile = observer(() => {
@@ -28,19 +30,27 @@ const Profile = observer(() => {
 
   return (
     <Container className="my-5">
-      <h1 className="mt-5">
+      <Typography component="h1" variant="h2" sx={{ mt: 5, mb: 4 }}>
         Profile
-      </h1>
-      <div className="mt-5">
+      </Typography>
+      <div>
         <Loading loading={loading} failed={failedToLoad} />
         {!loading && !failedToLoad && (
           <div>
-            {ProfileField('Username', username)}
-            {ProfileField('Email', email)}
-            {ProfileField('Name', `${name} ${surname}`)}
-            <Button variant="contained" className="mt-4">
-              Reset Password
-            </Button>
+            <Typography component="h2" variant="h5"> General Information: </Typography>
+            <List>
+              {ProfileField('Username', username)}
+              {ProfileField('Email', email)}
+              {ProfileField('Name', `${name} ${surname}`)}
+            </List>
+            <Typography component="h2" variant="h5"> Password & Security: </Typography>
+            <List>
+              <ListItem>
+                <Button variant="contained">
+                  Reset Password
+                </Button>
+              </ListItem>
+            </List>
           </div>
         )}
       </div>

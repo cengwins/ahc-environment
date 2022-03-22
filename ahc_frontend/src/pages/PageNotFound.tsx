@@ -1,14 +1,12 @@
-import { Container, Stack } from '@mui/material';
+import { Container, Stack, Typography } from '@mui/material';
 
 const PageNotFound = () => (
   <Container className="mt-5 text-start">
     <Stack direction="column" spacing={4} className="mt-5">
-      <div className="mt-5 mb-4">
-        <h1>404: Page Not Found</h1>
-        <h5>
-          The page you are trying to access is not available.
-        </h5>
-      </div>
+      <Typography component="h1" variant="h2" sx={{ mt: 5 }}>404: Page Not Found</Typography>
+      <Typography component="h2" variant="h6">
+        The page you are trying to access is not available.
+      </Typography>
     </Stack>
   </Container>
 );
