@@ -1,8 +1,11 @@
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { ListGroup } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingButton from '@mui/lab/LoadingButton';
+import {
+  Box,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+} from '@mui/material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 
@@ -31,8 +34,9 @@ const RepositoryExperiments = observer(() => {
   }, []);
 
   return (
-    <div className="d-flex flex-column">
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <LoadingButton
+        sx={{ mb: 2 }}
         loading={runningExperiment}
         variant="contained"
         disabled={runningExperiment}
@@ -45,25 +49,33 @@ const RepositoryExperiments = observer(() => {
         Run Experiment
       </LoadingButton>
       <Loading loading={loading} failed={failedToLoad} />
-      <ListGroup as="ol" variant="flush" className="text-start mt-3">
-        {experiments && experiments.map((experiment) => (
-          <ListGroup.Item
-            as="li"
-            key={experiment.id}
-            onClick={() => { navigate(`/dashboard/${repositoryId}/${experiment.id}`); }}
-            className="repository-item clickable text-start"
-          >
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <h2>{`Run #${experiment.sequence_id}`}</h2>
-              <span className="small">{`(${new Date(experiment.updated_at).toLocaleDateString('tr-TR')})`}</span>
-            </div>
-            <div>
-              <span>{experiment.commit}</span>
-            </div>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
-    </div>
+      <TableContainer>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell variant="head">Experiment</TableCell>
+              <TableCell variant="head" align="right">Date</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {experiments && experiments.map((experiment) => (
+              <TableRow
+                key={experiment.id}
+                onClick={() => { navigate(`/dashboard/${repositoryId}/${experiment.id}`); }}
+                className="experiment-item clickable"
+              >
+                <TableCell>
+                  {`Run #${experiment.sequence_id}`}
+                </TableCell>
+                <TableCell align="right">
+                  {`${new Date(experiment.updated_at).toLocaleString('tr-TR')}`}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 });
 

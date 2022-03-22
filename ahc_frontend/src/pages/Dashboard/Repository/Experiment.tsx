@@ -1,5 +1,7 @@
+import {
+  List, ListItem, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, Box,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Button, Table } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -37,10 +39,10 @@ const metrics = [
 ];
 
 const ExperimentField = (title: string, value: string) => (
-  <div>
-    <span>{`${title}: `}</span>
-    <span>{value}</span>
-  </div>
+  <ListItem>
+    <Typography sx={{ mr: 1, fontWeight: 700 }}>{`${title}:`}</Typography>
+    <Typography>{value}</Typography>
+  </ListItem>
 );
 
 const Experiment = () => {
@@ -69,60 +71,68 @@ const Experiment = () => {
   }
 
   return (
-    <div>
-      <h4>
+    <Box>
+      <Typography component="h2" variant="h5">
         Experiment
         {' '}
-        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</span>
-      </h4>
-      {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
-      {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
-      {experiment.runs?.[0]?.started_at
+        <Typography sx={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{experiment.commit}</Typography>
+      </Typography>
+      <List>
+        {ExperimentField('Creation Time', `${new Date(experiment.created_at).toLocaleDateString('tr-TR')}`)}
+        {ExperimentField('Update Time', `${new Date(experiment.updated_at).toLocaleDateString('tr-TR')}`)}
+        {experiment.runs?.[0]?.started_at
           && ExperimentField('Started Time', `${new Date(experiment.runs?.[0]?.started_at).toLocaleDateString('tr-TR')}`)}
-      {experiment.runs?.[0]?.finished_at
+        {experiment.runs?.[0]?.finished_at
           && ExperimentField('Finished Time', `${new Date(experiment.runs?.[0]?.finished_at).toLocaleDateString('tr-TR')}`)}
-      {ExperimentField('ID', experiment.id)}
-      {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
-      {ExperimentField('Reference', experiment.reference)}
-      {ExperimentField('Reference Type', experiment.reference_type)}
+        {ExperimentField('ID', experiment.id)}
+        {ExperimentField('Sequence ID', `${experiment.sequence_id}`)}
+        {ExperimentField('Reference', experiment.reference)}
+        {ExperimentField('Reference Type', experiment.reference_type)}
+      </List>
 
-      <h4 className="mt-4 mb-2">Metrics</h4>
-      <Table striped hover>
-        <thead>
-          <tr>
-            <th>Metric Name</th>
-            <th>Value</th>
-            <th>Type</th>
-            <th>Created at?</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Typography component="h2" variant="h5">
+        Metrics
+      </Typography>
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Metric Name</TableCell>
+            <TableCell>Value</TableCell>
+            <TableCell>Type</TableCell>
+            <TableCell>Created at?</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {metrics.map(({ name, value, type }) => (
-            <tr key={name}>
-              <td>{name}</td>
-              <td>{value}</td>
-              <td>{type}</td>
-              <td>..</td>
-            </tr>
+            <TableRow key={name}>
+              <TableCell>{name}</TableCell>
+              <TableCell>{value}</TableCell>
+              <TableCell>{type}</TableCell>
+              <TableCell>..</TableCell>
+            </TableRow>
           ))}
-        </tbody>
+        </TableBody>
       </Table>
-      <Button>
+      <Button variant="contained" sx={{ my: 2 }}>
         Download .csv
       </Button>
 
-      <h4 className="mt-4 mb-2">Logs</h4>
-      <div className="mb-3">
+      <Typography component="h2" variant="h5">
+        Logs
+      </Typography>
+
+      <Box sx={{ mb: 2 }}>
         {experiment?.runs?.[0]?.logs && (
         <SyntaxHighlighter language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
           {experiment?.runs?.[0]?.logs}
         </SyntaxHighlighter>
         ) }
-      </div>
-      <Button>
+      </Box>
+      <Button variant="contained">
         Download logs
       </Button>
-    </div>
+    </Box>
   );
 };
 
