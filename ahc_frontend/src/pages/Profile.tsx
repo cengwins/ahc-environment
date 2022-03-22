@@ -4,6 +4,7 @@ import {
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import Loading from '../components/Loading';
+import ResetPasswordDialog from '../components/ResetPassword';
 import { useStores } from '../stores/MainStore';
 
 const ProfileField = (title: string, value: string) => (
@@ -17,6 +18,7 @@ const Profile = observer(() => {
   const { userStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
+  const [resetPassOpen, setResetPassOpen] = useState(false);
 
   const {
     username, email, name, surname,
@@ -46,7 +48,7 @@ const Profile = observer(() => {
             <Typography component="h2" variant="h5">Password & Security: </Typography>
             <List>
               <ListItem>
-                <Button variant="contained">
+                <Button variant="contained" onClick={() => setResetPassOpen(true)}>
                   Reset Password
                 </Button>
               </ListItem>
@@ -54,6 +56,11 @@ const Profile = observer(() => {
           </div>
         )}
       </div>
+
+      <ResetPasswordDialog
+        open={resetPassOpen}
+        onClose={() => setResetPassOpen(false)}
+      />
     </Container>
   );
 });
