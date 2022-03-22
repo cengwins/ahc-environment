@@ -29,21 +29,21 @@ const Profile = observer(() => {
   }, []);
 
   return (
-    <Container className="my-5">
-      <Typography component="h1" variant="h2" sx={{ mt: 5, mb: 4 }}>
+    <Container sx={{ py: 5 }}>
+      <Typography component="h1" variant="h2" sx={{ my: 5 }}>
         Profile
       </Typography>
       <div>
         <Loading loading={loading} failed={failedToLoad} />
         {!loading && !failedToLoad && (
           <div>
-            <Typography component="h2" variant="h5"> General Information: </Typography>
+            <Typography component="h2" variant="h5">General Information: </Typography>
             <List>
               {ProfileField('Username', username)}
               {ProfileField('Email', email)}
               {ProfileField('Name', `${name} ${surname}`)}
             </List>
-            <Typography component="h2" variant="h5"> Password & Security: </Typography>
+            <Typography component="h2" variant="h5">Password & Security: </Typography>
             <List>
               <ListItem>
                 <Button variant="contained">

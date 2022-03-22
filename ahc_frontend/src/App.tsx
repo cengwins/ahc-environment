@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -15,7 +16,7 @@ const App = observer(() => {
   const { token } = userStore;
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <BrowserRouter>
         <Header />
         <Routes>
@@ -27,7 +28,7 @@ const App = observer(() => {
         </Routes>
         <Footer />
       </BrowserRouter>
-    </div>
+    </Box>
   );
 });
 

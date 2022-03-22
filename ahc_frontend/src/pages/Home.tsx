@@ -1,4 +1,5 @@
 import {
+  Box,
   Container, List, ListItem, Stack, Typography,
 } from '@mui/material';
 
@@ -17,21 +18,21 @@ const Home = () => {
   ];
 
   return (
-    <Container className="mt-5 text-start">
-      <Stack direction="column" spacing={4} className="my-5">
-        <div className="mb-4">
+    <Container sx={{ mt: 5 }}>
+      <Stack direction="column" spacing={4} sx={{ my: 5 }}>
+        <Box sx={{ mb: 3 }}>
           <Typography component="h1" variant="h3">AHC</Typography>
           <Typography component="h2" variant="h5" sx={{ maxWidth: '480px' }}>
             Wireless Ad Hoc Cloud Computing, Learning and Experimentation Environment
           </Typography>
-        </div>
+        </Box>
         <div>
           <Typography component="h3" variant="h4" sx={{ mb: 2 }}>About</Typography>
           <Typography component="p" variant="body1">{text}</Typography>
         </div>
         <div>
           <Typography component="h3" variant="h4" sx={{ mb: 2 }}>Objectives</Typography>
-          <List className="text-start">
+          <List>
             {objectives.map((objective) => (
               <ListItem key={objective}>
                 <Typography component="p" variant="body1">{objective}</Typography>

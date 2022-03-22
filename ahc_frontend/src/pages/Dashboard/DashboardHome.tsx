@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogContent,
@@ -61,26 +62,26 @@ const DashboardHome = observer(() => {
           </form>
 
           {searchString && searchString.length < 3 && (
-          <span className="small">
+          <Typography fontSize="small">
             Please enter at least 3 characters to start searching.
-          </span>
+          </Typography>
           )}
-          <div className="w-100">
+          <Box sx={{ width: '100%' }}>
             <Loading loading={searching} failed={searchFailed} />
-          </div>
+          </Box>
           {!searching && !searchFailed
           && (
           <div>
             {searchString && searchString.length >= 3 && githubStore.userRepos.length === 0 && (
-              <span>
+              <Typography>
                 There are no repositories with the given name.
-              </span>
+              </Typography>
             )}
-            <List className="text-start mt-3">
+            <List sx={{ mt: 3 }}>
               {githubStore.userRepos.map((repository) => (
                 <ListItem
                   key={repository.full_name}
-                  className="repository-item text-start"
+                  className="repository-item"
                 >
                   <div style={{ display: 'block', width: '100%' }}>
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -115,11 +116,11 @@ const DashboardHome = observer(() => {
       </Dialog>
 
       <div>
-        <div className="d-flex flex-row">
+        <Box sx={{ display: 'flex' }}>
           <Button
             color="error"
             variant="contained"
-            className="ms-auto"
+            sx={{ ml: 'auto' }}
             onClick={() => {
               if (chosens.length === 0) {
                 notificationStore.set('info', 'Please choose repositories to delete.');
@@ -140,12 +141,12 @@ const DashboardHome = observer(() => {
           </Button>
           <Button
             variant="contained"
-            className="ms-2"
+            sx={{ ml: 2 }}
             onClick={() => setShow(true)}
           >
             Add Repository
           </Button>
-        </div>
+        </Box>
 
         <RepositoriesList chosens={chosens} setChosens={setChosens} />
       </div>

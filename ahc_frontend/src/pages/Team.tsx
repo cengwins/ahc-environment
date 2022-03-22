@@ -51,7 +51,7 @@ const Team = () => {
   ];
 
   return (
-    <Container className="my-5 text-start">
+    <Container sx={{ py: 5 }}>
       <Typography component="h1" variant="h2" sx={{ mt: 5, mb: 4 }}>Team</Typography>
       <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
       <Grid container spacing={2} sx={{ mt: 2 }}>

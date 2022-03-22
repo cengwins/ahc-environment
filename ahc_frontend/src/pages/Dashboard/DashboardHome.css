@@ -1,4 +1,4 @@
-.repository-name {
+.repository-name, .experiment-item {
   transition: background-color 300ms ease-in-out;
 }
 
@@ -6,6 +6,6 @@
   cursor: pointer;
 }
 
-.repository-name:hover {
+.repository-name:hover, .experiment-item:hover {
   background-color: #eee;
 }

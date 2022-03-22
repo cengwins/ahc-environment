@@ -1,22 +1,27 @@
-import { Button } from '@mui/material';
+import {
+  Box, Button, Stack, Typography,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const FooterItem = ({ onClick, text } : {onClick: Function, text: string}) => (
-  <li className="list-inline-item mx-2">
-    <Button className="text-decoration-none" onClick={() => onClick()}>{text}</Button>
-  </li>
+  <Box sx={{ mx: 2, width: 'auto' }}>
+    <Button onClick={() => onClick()}>{text}</Button>
+  </Box>
 );
 
 const Footer = () => {
   const navigate = useNavigate();
   return (
-    <div className="text-center pb-2 mt-auto">
-      <ul className="list-inline">
+    <Box sx={{
+      mb: 2, mt: 'auto', alignContent: 'center', display: 'flex', flexDirection: 'column',
+    }}
+    >
+      <Stack direction="row" sx={{ mx: 'auto', mb: 1 }}>
         <FooterItem onClick={() => navigate('/')} text="Home" />
         <FooterItem onClick={() => navigate('/team')} text="Team" />
-      </ul>
-      <p className="copyright">bitiriyoruz © 2021</p>
-    </div>
+      </Stack>
+      <Typography sx={{ mx: 'auto' }}>bitiriyoruz © 2021</Typography>
+    </Box>
   );
 };
 

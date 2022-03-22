@@ -4,7 +4,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import {
-  Button, Card, CardContent, Typography,
+  Box, Button, Card, CardContent, Typography,
 } from '@mui/material';
 import { GitHub } from '@mui/icons-material';
 import Loading from '../../../components/Loading';
@@ -53,20 +53,22 @@ const RepositoryHome = observer(() => {
       <Typography component="h4" variant="h6" sx={{ mt: 2 }}>
         {repository.name}
         {' '}
-        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
+        <span style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
       </Typography>
       {RepositoryField('id', repository.id)}
-      <div className="my-2">
-        <Button variant="outlined" className="me-2" href={repository.upstream} startIcon={<GitHub />}>
+      <Box sx={{ my: 2 }}>
+        <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream} startIcon={<GitHub />}>
           View on GitHub
         </Button>
-        <Button variant="outlined" className="me-2" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
+        <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
           Open in GitHub.dev
         </Button>
-      </div>
-      <Card variant="outlined" className="mt-4">
+      </Box>
+      <Card variant="outlined" sx={{ mt: 4 }}>
         <CardContent sx={{ padding: '12px 20px' }}>
-          <ReactMarkdown>{readmeContent}</ReactMarkdown>
+          <Box>
+            <ReactMarkdown>{readmeContent}</ReactMarkdown>
+          </Box>
         </CardContent>
       </Card>
     </div>

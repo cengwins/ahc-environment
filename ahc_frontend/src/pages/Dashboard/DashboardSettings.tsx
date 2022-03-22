@@ -54,7 +54,7 @@ const DashboardSettings = observer(() => {
           {' '}
           <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
         </Typography>
-        <Button variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
+        <Button sx={{ mt: 2 }} variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
       </div>
     </>
   );

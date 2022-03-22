@@ -28,13 +28,13 @@ const RepositoryRow = ({
         <Checkbox value={chosen} onChange={() => onValueChange(repository.id, !chosen)} />
       </TableCell>
       <Tooltip title={`/dashboard/${repository.id}`}>
-        <TableCell variant="body" className="repository-name text-start clickable" onClick={() => { navigate(`/dashboard/${repository.id}`); }}>
+        <TableCell variant="body" className="repository-name clickable" onClick={() => { navigate(`/dashboard/${repository.id}`); }}>
           {repository.name}
         </TableCell>
       </Tooltip>
       <TableCell variant="body" align="right">
         <Tooltip title={repository.upstream}>
-          <Button href={repository.upstream} className="ms-auto">{repository.upstream_type}</Button>
+          <Button href={repository.upstream}>{repository.upstream_type}</Button>
         </Tooltip>
       </TableCell>
     </TableRow>

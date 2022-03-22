@@ -3,6 +3,7 @@ import {
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
+  Box,
   Breadcrumbs, Button, Container, Stack, Tab, Tabs,
 } from '@mui/material';
 import { useState } from 'react';
@@ -80,10 +81,10 @@ const Dashboard = observer(() => {
     }));
 
   return (
-    <Container className="my-5 text-start">
-      <Stack direction="column" spacing={4} className="mt-5">
-        <div>
-          <div className="mb-3">
+    <Container sx={{ py: 5 }}>
+      <Stack direction="column" spacing={4} sx={{ mt: 5 }}>
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2 }}>
             <Breadcrumbs separator="›" aria-label="breadcrumb">
               {crumbs.map(({ currentPath, name }) => (
                 <Button size="small" key={currentPath} onClick={() => navigate(currentPath)}>
@@ -91,7 +92,7 @@ const Dashboard = observer(() => {
                 </Button>
               ))}
             </Breadcrumbs>
-          </div>
+          </Box>
 
           {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
           <Tabs
@@ -132,7 +133,7 @@ const Dashboard = observer(() => {
               <Route path={path} key={name} element={Component} />
             ))}
           </Routes>
-        </div>
+        </Box>
       </Stack>
     </Container>
   );

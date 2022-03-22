@@ -1,4 +1,4 @@
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 const Loading = (props : {loading: boolean, failed: boolean}) => {
   const { loading, failed } = props;
@@ -6,10 +6,10 @@ const Loading = (props : {loading: boolean, failed: boolean}) => {
     return (
       <>
         {loading && (
-        <div className="d-flex flex-column">
-          <p className="mx-auto">Loading..</p>
-          <CircularProgress className="mx-auto mb-4" />
-        </div>
+        <Box sx={{ display: 'flex', flexDirection: 'column', my: 2 }}>
+          <CircularProgress sx={{ mx: 'auto' }} />
+          <Typography sx={{ mx: 'auto', mt: 1 }}>Loading..</Typography>
+        </Box>
         )}
         {failed && (
           <div>
