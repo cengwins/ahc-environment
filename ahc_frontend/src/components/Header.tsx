@@ -101,8 +101,22 @@ const Header = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <LogInDialog open={logInOpen} onClose={() => setLogInOpen(false)} />
-      <RegisterDialog open={registerOpen} onClose={() => setRegisterOpen(false)} />
+      <LogInDialog
+        open={logInOpen}
+        onClose={() => setLogInOpen(false)}
+        dontHaveAccount={() => {
+          setLogInOpen(false);
+          setRegisterOpen(true);
+        }}
+      />
+      <RegisterDialog
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        haveAccount={() => {
+          setLogInOpen(true);
+          setRegisterOpen(false);
+        }}
+      />
       {notifications && <Notification />}
     </>
   );

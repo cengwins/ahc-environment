@@ -1,11 +1,12 @@
 import {
-  Button, Dialog, DialogContent, DialogTitle, FormGroup, TextField,
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, TextField,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
 
-const LogInDialog = ({ open, onClose }: {open:boolean, onClose: any}) => {
+const LogInDialog = ({ open, onClose, dontHaveAccount }:
+  {open:boolean, onClose: any, dontHaveAccount: any}) => {
   const { userStore, notificationStore } = useStores();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +19,7 @@ const LogInDialog = ({ open, onClose }: {open:boolean, onClose: any}) => {
       open={open}
       onClose={onClose}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ alignSelf: 'center' }}>
         Log in
       </DialogTitle>
       <DialogContent>
@@ -44,9 +45,14 @@ const LogInDialog = ({ open, onClose }: {open:boolean, onClose: any}) => {
           <FormGroup sx={{ mb: 2 }}>
             <TextField label="Password" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
           </FormGroup>
-          <Button variant="contained" type="submit" disabled={waitingResponse}>
-            Log In
-          </Button>
+          <DialogActions>
+            <Button onClick={dontHaveAccount}>
+              Do not have an account?
+            </Button>
+            <Button variant="contained" type="submit" disabled={waitingResponse}>
+              Log In
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>

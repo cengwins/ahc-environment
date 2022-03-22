@@ -1,10 +1,11 @@
 import {
-  Button, Dialog, DialogContent, DialogTitle, FormGroup, TextField,
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, TextField,
 } from '@mui/material';
 import { useState } from 'react';
 import { useStores } from '../stores/MainStore';
 
-const Register = ({ open, onClose }: {open:boolean, onClose: any}) => {
+const Register = ({ open, onClose, haveAccount }:
+  {open:boolean, onClose: any, haveAccount: any}) => {
   const { userStore, notificationStore } = useStores();
   const [username, setUsername] = useState('');
   const [email, setMail] = useState('');
@@ -19,7 +20,7 @@ const Register = ({ open, onClose }: {open:boolean, onClose: any}) => {
       open={open}
       onClose={onClose}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ alignSelf: 'center' }}>
         Register
       </DialogTitle>
       <DialogContent>
@@ -57,9 +58,15 @@ const Register = ({ open, onClose }: {open:boolean, onClose: any}) => {
           <FormGroup sx={{ mb: 2 }}>
             <TextField label="Password" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
           </FormGroup>
-          <Button variant="contained" type="submit" disabled={waitingResponse}>
-            Register
-          </Button>
+
+          <DialogActions>
+            <Button onClick={haveAccount}>
+              Already have an account?
+            </Button>
+            <Button variant="contained" type="submit" disabled={waitingResponse}>
+              Register
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>
