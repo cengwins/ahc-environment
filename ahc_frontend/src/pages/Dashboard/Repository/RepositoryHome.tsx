@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
-import { Button, Card, CardContent } from '@mui/material';
+import {
+  Button, Card, CardContent, Typography,
+} from '@mui/material';
 import { GitHub } from '@mui/icons-material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
@@ -48,11 +50,11 @@ const RepositoryHome = observer(() => {
 
   return (
     <div>
-      <h4>
+      <Typography component="h4" variant="h6" sx={{ mt: 2 }}>
         {repository.name}
         {' '}
         <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
-      </h4>
+      </Typography>
       {RepositoryField('id', repository.id)}
       <div className="my-2">
         <Button variant="outlined" className="me-2" href={repository.upstream} startIcon={<GitHub />}>

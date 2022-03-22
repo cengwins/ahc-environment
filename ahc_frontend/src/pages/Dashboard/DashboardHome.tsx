@@ -18,11 +18,12 @@ import './DashboardHome.css';
 import RepositoriesList from './RepositoriesList';
 
 const DashboardHome = observer(() => {
-  const { githubStore, repositoriesStore } = useStores();
+  const { githubStore, repositoriesStore, notificationStore } = useStores();
   const [searchString, setSearchString] = useState('');
   const [show, setShow] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchFailed, setSearchFailed] = useState(false);
+  const [chosens, setChosens] = useState<string[]>([]);
 
   const handleStringSearch = (e: any) => {
     const currentSearchString = e.target.value;
@@ -96,7 +97,9 @@ const DashboardHome = observer(() => {
                         onClick={() => {
                           repositoriesStore.createRepository(
                             { name: repository.name, upstream: repository.html_url },
-                          );
+                          )
+                            .then(() => notificationStore.set('success', 'Repository is successfully added.'))
+                            .catch(() => notificationStore.set('error', 'Failed to add the repository.'));
                         }}
                       >
                         Add
@@ -113,15 +116,38 @@ const DashboardHome = observer(() => {
 
       <div>
         <div className="d-flex flex-row">
-          <Button color="error" variant="contained" className="ms-auto" onClick={() => setShow(true)}>
+          <Button
+            color="error"
+            variant="contained"
+            className="ms-auto"
+            onClick={() => {
+              if (chosens.length === 0) {
+                notificationStore.set('info', 'Please choose repositories to delete.');
+                return;
+              }
+              repositoriesStore.deleteRepositories(chosens)
+                .then((removedIds) => {
+                  if (chosens.length === removedIds.length) {
+                    notificationStore.set('success', `${chosens.length} repositories are deleted.`);
+                  } else {
+                    notificationStore.set('info', `Only ${removedIds.length} out of ${chosens.length} repositories are deleted.`);
+                  }
+                  setChosens(chosens.filter((chosenId) => !removedIds.includes(chosenId)));
+                });
+            }}
+          >
             Delete
           </Button>
-          <Button variant="contained" className="ms-2" onClick={() => setShow(true)}>
+          <Button
+            variant="contained"
+            className="ms-2"
+            onClick={() => setShow(true)}
+          >
             Add Repository
           </Button>
         </div>
 
-        <RepositoriesList />
+        <RepositoriesList chosens={chosens} setChosens={setChosens} />
       </div>
     </>
   );
