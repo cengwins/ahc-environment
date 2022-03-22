@@ -50,7 +50,12 @@ const Header = () => {
     <>
       <AppBar position="fixed" color="inherit">
         <Toolbar variant="dense">
-          <Typography component="h1" variant="h5">
+          <Typography
+            onClick={() => navigate('/')}
+            className="clickable"
+            variant="h5"
+            component="h5"
+          >
             AHC
           </Typography>
           <Box sx={{ ml: 'auto', display: { xs: 'none', md: 'flex' } }}>
