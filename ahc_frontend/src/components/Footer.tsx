@@ -1,25 +1,28 @@
-import { Button } from '@mui/material';
+import {
+  Box, Button, Stack, Typography,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const FooterItem = ({ link, text } : {link: string, text: string}) => (
-  <li className="list-inline-item mx-2">
-    <Button className="text-decoration-none" href={link}>{text}</Button>
-  </li>
+const FooterItem = ({ onClick, text } : {onClick: Function, text: string}) => (
+  <Box sx={{ mx: 2, width: 'auto' }}>
+    <Button onClick={() => onClick()}>{text}</Button>
+  </Box>
 );
 
-const Footer = () => (
-  <div className="text-center pb-2 mt-auto">
-    {/* <div className="social">
-          <a href="#"><i className="icon ion-social-instagram" /></a>
-          <a href="#"><i className="icon ion-social-snapchat" /></a>
-          <a href="#"><i className="icon ion-social-twitter" /></a>
-          <a href="#"><i className="icon ion-social-facebook" /></a>
-        </div> */}
-    <ul className="list-inline">
-      <FooterItem link="/" text="Home" />
-      <FooterItem link="/team" text="Team" />
-    </ul>
-    <p className="copyright">bitiriyoruz © 2021</p>
-  </div>
-);
+const Footer = () => {
+  const navigate = useNavigate();
+  return (
+    <Box sx={{
+      mb: 2, mt: 'auto', alignContent: 'center', display: 'flex', flexDirection: 'column',
+    }}
+    >
+      <Stack direction="row" sx={{ mx: 'auto', mb: 1 }}>
+        <FooterItem onClick={() => navigate('/')} text="Home" />
+        <FooterItem onClick={() => navigate('/team')} text="Team" />
+      </Stack>
+      <Typography sx={{ mx: 'auto' }}>bitiriyoruz © 2021</Typography>
+    </Box>
+  );
+};
 
 export default Footer;

@@ -50,11 +50,17 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
     else this.repositories = [response];
   }
 
-  async deleteRepository(id: string) {
-    await (new RequestHandler()).request(`/repositories/${id}`, 'delete');
+  async deleteRepositories(ids: string[]) {
+    const removedIds: string[] = [];
+    await Promise.all(ids.map(async (id) => {
+      await (new RequestHandler()).request(`/repositories/${id}`, 'delete').then(() => removedIds.push(id));
+    }));
     if (this.repositories) {
-      this.repositories.filter((repository: RepositoryInfo) => repository.id !== id);
+      this.repositories = this.repositories.filter(
+        (repository: RepositoryInfo) => !removedIds.includes(repository.id),
+      );
     }
+    return removedIds;
   }
 
   async getMembersOfRepository(id: string) {

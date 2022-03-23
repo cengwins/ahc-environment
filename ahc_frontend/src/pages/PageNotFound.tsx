@@ -1,22 +1,14 @@
-import { Container, Stack } from '@mui/material';
-import Header from '../components/Header';
+import { Container, Stack, Typography } from '@mui/material';
 
 const PageNotFound = () => (
-  <div className="d-flex flex-column min-vh-100">
-    <Header />
-    <div className="App">
-      <Container className="mt-5 text-start">
-        <Stack direction="column" spacing={4} className="mt-5">
-          <div className="mt-5 mb-4">
-            <h1>404: Page Not Found</h1>
-            <h5>
-              The page you are trying to access is not available.
-            </h5>
-          </div>
-        </Stack>
-      </Container>
-    </div>
-  </div>
+  <Container sx={{ mt: 5 }}>
+    <Stack direction="column" spacing={4} sx={{ mt: 5 }}>
+      <Typography component="h1" variant="h2">404: Page Not Found</Typography>
+      <Typography component="h2" variant="h6">
+        The page you are trying to access is not available.
+      </Typography>
+    </Stack>
+  </Container>
 );
 
 export default PageNotFound;

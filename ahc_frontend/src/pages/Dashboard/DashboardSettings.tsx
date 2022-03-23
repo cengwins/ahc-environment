@@ -1,5 +1,5 @@
 import {
-  Button, Dialog, DialogContent, DialogTitle, FormGroup, TextField,
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, TextField, Typography,
 } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ const DashboardSettings = observer(() => {
   return (
     <>
       <Dialog fullWidth open={showEditToken} onClose={() => setShowEditToken(false)}>
-        <DialogTitle>
+        <DialogTitle sx={{ alignSelf: 'center' }}>
           Set GitHub Token
         </DialogTitle>
         <DialogContent>
@@ -40,21 +40,21 @@ const DashboardSettings = observer(() => {
               <TextField label="GitHub Token" type="text" placeholder="Github Token" onChange={(e) => setGithubToken(e.target.value)} />
             </FormGroup>
 
-            <Button variant="contained" type="submit" disabled={waitingResponse}>
-              Save
-            </Button>
+            <DialogActions>
+              <Button variant="contained" type="submit" disabled={waitingResponse}>
+                Save
+              </Button>
+            </DialogActions>
           </form>
         </DialogContent>
       </Dialog>
-      <div className="d-flex flex-column min-vh-100">
-        <div>
-          <h4>
-            Github Account:
-            {' '}
-            <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
-          </h4>
-          <Button variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
-        </div>
+      <div>
+        <Typography component="h4" variant="h5">
+          Github Account:
+          {' '}
+          <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
+        </Typography>
+        <Button sx={{ mt: 2 }} variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
       </div>
     </>
   );

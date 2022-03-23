@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
-import { Button, Card, CardContent } from '@mui/material';
+import {
+  Box, Button, Card, CardContent, Typography,
+} from '@mui/material';
 import { GitHub } from '@mui/icons-material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
@@ -42,31 +44,31 @@ const RepositoryHome = observer(() => {
 
   if (!repository || failedToLoad || loading) {
     return (
-      <div className="d-flex flex-column min-vh-100">
-        <Loading loading={loading} failed={failedToLoad || !repository} />
-      </div>
+      <Loading loading={loading} failed={failedToLoad || !repository} />
     );
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <h4>
+    <div>
+      <Typography component="h4" variant="h6" sx={{ mt: 2 }}>
         {repository.name}
         {' '}
-        <span className="small" style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
-      </h4>
+        <span style={{ fontFamily: 'monospace', backgroundColor: '#ddd' }}>{repository.slug}</span>
+      </Typography>
       {RepositoryField('id', repository.id)}
-      <div className="my-2">
-        <Button variant="outlined" className="me-2" href={repository.upstream} startIcon={<GitHub />}>
+      <Box sx={{ my: 2 }}>
+        <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream} startIcon={<GitHub />}>
           View on GitHub
         </Button>
-        <Button variant="outlined" className="me-2" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
+        <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
           Open in GitHub.dev
         </Button>
-      </div>
-      <Card variant="outlined" className="mt-4">
+      </Box>
+      <Card variant="outlined" sx={{ mt: 4 }}>
         <CardContent sx={{ padding: '12px 20px' }}>
-          <ReactMarkdown>{readmeContent}</ReactMarkdown>
+          <Box>
+            <ReactMarkdown>{readmeContent}</ReactMarkdown>
+          </Box>
         </CardContent>
       </Card>
     </div>

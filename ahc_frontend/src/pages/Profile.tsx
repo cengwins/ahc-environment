@@ -1,22 +1,24 @@
-import { Button, Container } from '@mui/material';
+import {
+  Button, Container, List, ListItem, Typography,
+} from '@mui/material';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 import Loading from '../components/Loading';
+import ResetPasswordDialog from '../components/ResetPassword';
 import { useStores } from '../stores/MainStore';
 
 const ProfileField = (title: string, value: string) => (
-  <div>
-    <span>{`${title}: `}</span>
-    <span>{value}</span>
-  </div>
+  <ListItem>
+    <Typography sx={{ mr: 1, fontWeight: 700 }}>{`${title}:`}</Typography>
+    <Typography>{value}</Typography>
+  </ListItem>
 );
 
 const Profile = observer(() => {
   const { userStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
+  const [resetPassOpen, setResetPassOpen] = useState(false);
 
   const {
     username, email, name, surname,
@@ -29,28 +31,37 @@ const Profile = observer(() => {
   }, []);
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <Container className="my-5">
-        <h1 className="mt-5">
-          Profile
-        </h1>
-        <div className="mt-5">
-          <Loading loading={loading} failed={failedToLoad} />
-          {!loading && !failedToLoad && (
+    <Container sx={{ py: 5 }}>
+      <Typography component="h1" variant="h2" sx={{ my: 5 }}>
+        Profile
+      </Typography>
+      <div>
+        <Loading loading={loading} failed={failedToLoad} />
+        {!loading && !failedToLoad && (
           <div>
-            {ProfileField('Username', username)}
-            {ProfileField('Email', email)}
-            {ProfileField('Name', `${name} ${surname}`)}
-            <Button variant="contained" className="mt-4">
-              Reset Password
-            </Button>
+            <Typography component="h2" variant="h5">General Information: </Typography>
+            <List>
+              {ProfileField('Username', username)}
+              {ProfileField('Email', email)}
+              {ProfileField('Name', `${name} ${surname}`)}
+            </List>
+            <Typography component="h2" variant="h5">Password & Security: </Typography>
+            <List>
+              <ListItem>
+                <Button variant="contained" onClick={() => setResetPassOpen(true)}>
+                  Reset Password
+                </Button>
+              </ListItem>
+            </List>
           </div>
-          )}
-        </div>
-      </Container>
-      <Footer />
-    </div>
+        )}
+      </div>
+
+      <ResetPasswordDialog
+        open={resetPassOpen}
+        onClose={() => setResetPassOpen(false)}
+      />
+    </Container>
   );
 });
 export default Profile;
