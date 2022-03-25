@@ -1,5 +1,4 @@
-import github.GithubException
-from github import Github
+from github import Github, AuthenticatedUser
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
@@ -69,7 +68,7 @@ class GithubProfileAPIView(CreateAPIView):
         # returned object does. Instead, we should check the oauth_scopes property of
         # the Github object.
         g = Github(access_token)
-        g.get_user()
+        g_user: AuthenticatedUser = g.get_user()
         if g.oauth_scopes is None:
             raise ValidationError({"access_token": "Access token is invalid."})
         elif "repo" not in g.oauth_scopes:
@@ -83,7 +82,8 @@ class GithubProfileAPIView(CreateAPIView):
             github_profile.save()
         except:  # TODO: (DK) Do not swallow the exception.
             github_profile = GithubProfile.objects.create(
-                user=self.request.user, access_token=access_token
+                user=self.request.user, access_token=access_token,
+                github_username=g_user.login
             )
 
         return github_profile
