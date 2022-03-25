@@ -44,7 +44,7 @@ class ListCreateRepositoryUsersAPIView(ListCreateAPIView):
     queryset = RepositoryUser.objects.all()
     serializer_class = RepositoryUserSerializer
 
-    def create(self, request: Request):
+    def create(self, request: Request, *args, **kwargs):
         email = request.data["email"]
 
         user = User.objects.get(email=email)
