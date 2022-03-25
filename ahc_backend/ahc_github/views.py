@@ -65,11 +65,16 @@ class GithubProfileAPIView(CreateAPIView):
     def perform_create(self, serializer: GithubProfileSerializer):
         access_token = serializer.validated_data["access_token"]
 
+        # (DK): g.get_user() does not raise any exceptions, invoking methods of the
+        # returned object does. Instead, we should check the oauth_scopes property of
+        # the Github object.
         g = Github(access_token)
-        try:
-            g.get_user()
-        except github.GithubException:
+        g.get_user()
+        if g.oauth_scopes is None:
             raise ValidationError({"access_token": "Access token is invalid."})
+        elif "repo" not in g.oauth_scopes:
+            raise ValidationError({"access_token": "Access token should have "
+                                                   "scope `repo`."})
 
         try:
             github_profile = GithubProfile.objects.get(user=self.request.user)
