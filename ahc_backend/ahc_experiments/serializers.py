@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from ahc_utils.helpers import BasicException
 from .models import Experiment, ExperimentRun, ExperimentMetric
 from .custom_storage import LogStorage
 
@@ -12,8 +13,11 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
     def get_logs(self, obj: ExperimentRun):
         if not obj.log_path:
             return None
+        try:
+            file = log_storage_inst.open(obj.log_path, "r")
+        except Exception as e:
+            raise BasicException(e)
 
-        file = log_storage_inst.open(obj.log_path, "r")
         content = file.read()
         file.close()
         return content
