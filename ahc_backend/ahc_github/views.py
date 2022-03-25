@@ -72,8 +72,9 @@ class GithubProfileAPIView(CreateAPIView):
         if g.oauth_scopes is None:
             raise ValidationError({"access_token": "Access token is invalid."})
         elif "repo" not in g.oauth_scopes:
-            raise ValidationError({"access_token": "Access token should have "
-                                                   "scope `repo`."})
+            raise ValidationError(
+                {"access_token": "Access token should have " "scope `repo`."}
+            )
 
         # Overrides previous token if exists.
         try:
@@ -82,8 +83,9 @@ class GithubProfileAPIView(CreateAPIView):
             github_profile.save()
         except:  # TODO: (DK) Do not swallow the exception.
             github_profile = GithubProfile.objects.create(
-                user=self.request.user, access_token=access_token,
-                github_username=g_user.login
+                user=self.request.user,
+                access_token=access_token,
+                github_username=g_user.login,
             )
 
         return github_profile
