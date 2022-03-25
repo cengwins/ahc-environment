@@ -76,11 +76,12 @@ class GithubProfileAPIView(CreateAPIView):
             raise ValidationError({"access_token": "Access token should have "
                                                    "scope `repo`."})
 
+        # Overrides previous token if exists.
         try:
             github_profile = GithubProfile.objects.get(user=self.request.user)
             github_profile.access_token = access_token
             github_profile.save()
-        except:
+        except:  # TODO: (DK) Do not swallow the exception.
             github_profile = GithubProfile.objects.create(
                 user=self.request.user, access_token=access_token
             )
