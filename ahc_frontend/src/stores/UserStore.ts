@@ -73,4 +73,12 @@ export default class UserStore implements UserStoreInterface {
     this.name = first_name;
     this.surname = last_name;
   }
+
+  static async resetPasswordRequest(data: { email: string }) {
+    await (new RequestHandler()).request('/user/password_reset/', 'post', data);
+  }
+
+  static async resetPassword(data: { code: string, password: string }) {
+    await (new RequestHandler()).request('/user/password_reset/', 'patch', data);
+  }
 }

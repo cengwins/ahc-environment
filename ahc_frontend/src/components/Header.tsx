@@ -11,11 +11,13 @@ import LogInDialog from './Login';
 import RegisterDialog from './Register';
 import { useStores } from '../stores/MainStore';
 import Notification from './Notification';
+import ForgotPasswordDialog from './ForgotPassword';
 
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [logInOpen, setLogInOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const { userStore, notificationStore } = useStores();
   const { token } = userStore;
   const { notifications } = notificationStore;
@@ -116,6 +118,10 @@ const Header = () => {
           setLogInOpen(false);
           setRegisterOpen(true);
         }}
+        forgotPassword={() => {
+          setLogInOpen(false);
+          setForgotPasswordOpen(true);
+        }}
       />
       <RegisterDialog
         open={registerOpen}
@@ -125,6 +131,15 @@ const Header = () => {
           setRegisterOpen(false);
         }}
       />
+      <ForgotPasswordDialog
+        open={forgotPasswordOpen}
+        onClose={() => setForgotPasswordOpen(false)}
+        loginInstead={() => {
+          setForgotPasswordOpen(false);
+          setLogInOpen(true);
+        }}
+      />
+
       {notifications && <Notification />}
     </>
   );

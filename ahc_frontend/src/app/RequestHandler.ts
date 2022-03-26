@@ -1,5 +1,7 @@
 import axios, { AxiosRequestHeaders } from 'axios';
 
+type RequestType = 'post' | 'get' | 'put' | 'delete' | 'patch';
+
 export default class RequestHandler {
   public axiosInstance;
 
@@ -13,7 +15,7 @@ export default class RequestHandler {
     });
   }
 
-  async request(url: string, requestType: 'post' | 'get' | 'put' | 'delete', data?: any) {
+  async request(url: string, requestType: RequestType, data?: any) {
     let result;
 
     switch (requestType) {
@@ -28,6 +30,9 @@ export default class RequestHandler {
         break;
       case 'delete':
         result = await this.axiosInstance.delete(url, data);
+        break;
+      case 'patch':
+        result = await this.axiosInstance.patch(url, data);
         break;
       default:
         throw Error('Undefined requestType');

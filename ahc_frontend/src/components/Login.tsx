@@ -5,8 +5,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
 
-const LogInDialog = ({ open, onClose, dontHaveAccount }:
-  {open:boolean, onClose: any, dontHaveAccount: any}) => {
+const LogInDialog = ({
+  open, onClose, forgotPassword, dontHaveAccount,
+}:
+  {open:boolean, onClose: any, forgotPassword: any, dontHaveAccount: any}) => {
   const { userStore, notificationStore } = useStores();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ const LogInDialog = ({ open, onClose, dontHaveAccount }:
       onClose={onClose}
     >
       <DialogTitle sx={{ alignSelf: 'center' }}>
-        Log in
+        Log In
       </DialogTitle>
       <DialogContent>
         <form
@@ -46,8 +48,11 @@ const LogInDialog = ({ open, onClose, dontHaveAccount }:
             <TextField label="Password" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
           </FormGroup>
           <DialogActions>
-            <Button onClick={dontHaveAccount}>
-              Do not have an account?
+            <Button size="small" color="error" onClick={forgotPassword}>
+              Forgot Password?
+            </Button>
+            <Button size="small" onClick={dontHaveAccount}>
+              Create Account
             </Button>
             <Button variant="contained" type="submit" disabled={waitingResponse}>
               Log In

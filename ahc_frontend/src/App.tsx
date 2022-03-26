@@ -7,6 +7,7 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Home from './pages/Home';
 import PageNotFound from './pages/PageNotFound';
+import PasswordReset from './pages/PasswordReset';
 import Profile from './pages/Profile/index';
 import { useStores } from './stores/MainStore';
 
@@ -22,6 +23,7 @@ const App = observer(() => {
           <Route path="/" element={<Home />} />
           {token && <Route path="/profile" element={<Profile />} />}
           {token && <Route path="/dashboard/*" element={<Dashboard />} />}
+          <Route path="/reset/:code" element={<PasswordReset />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
         <Footer />

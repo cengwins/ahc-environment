@@ -5,16 +5,16 @@ import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import Loading from '../../components/Loading';
-import ResetPasswordDialog from '../../components/ResetPassword';
 import { useStores } from '../../stores/MainStore';
+import UserStore from '../../stores/UserStore';
 import GitHubSettings from './GitHubSettings';
 import ProfileField from './ProfileField';
 
 const Profile = observer(() => {
-  const { userStore } = useStores();
+  const { userStore, notificationStore } = useStores();
   const [loading, setLoading] = useState(true);
+  const [resetButtonLoading, setResetButtonLoading] = useState(false);
   const [failedToLoad, setFailed] = useState(false);
-  const [resetPassOpen, setResetPassOpen] = useState(false);
 
   const {
     username, email, name, surname,
@@ -48,7 +48,20 @@ const Profile = observer(() => {
             </Typography>
             <List>
               <ListItem>
-                <Button variant="contained" onClick={() => setResetPassOpen(true)}>
+                <Button
+                  variant="contained"
+                  disabled={resetButtonLoading}
+                  onClick={() => {
+                    setResetButtonLoading(true);
+                    UserStore.resetPasswordRequest({ email }).then(() => {
+                      notificationStore.set('success', 'Password reset request is received. Check your email.');
+                    }).catch((result) => {
+                      notificationStore.set('error', result.message);
+                    }).finally(() => {
+                      setResetButtonLoading(false);
+                    });
+                  }}
+                >
                   Reset Password
                 </Button>
               </ListItem>
@@ -57,11 +70,6 @@ const Profile = observer(() => {
           </div>
         )}
       </div>
-
-      <ResetPasswordDialog
-        open={resetPassOpen}
-        onClose={() => setResetPassOpen(false)}
-      />
 
     </Container>
   );

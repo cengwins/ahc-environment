@@ -60,7 +60,7 @@ const Register = ({ open, onClose, haveAccount }:
           </FormGroup>
 
           <DialogActions>
-            <Button onClick={haveAccount}>
+            <Button size="small" onClick={haveAccount}>
               Already have an account?
             </Button>
             <Button variant="contained" type="submit" disabled={waitingResponse}>
