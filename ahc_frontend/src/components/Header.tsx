@@ -4,6 +4,9 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
+import {
+  blue, deepPurple, green, red,
+} from '@mui/material/colors';
 import LogInDialog from './Login';
 import RegisterDialog from './Register';
 import { useStores } from '../stores/MainStore';
@@ -28,21 +31,20 @@ const Header = () => {
     navigate('/');
   };
 
-  const menuLinks = [
-    { title: 'Home', onClick: () => navigate('/') },
-    { title: 'Team', onClick: () => navigate('/team') },
+  const menuLinks: {title: string, color: string, onClick: any }[] = [
+    { title: 'Home', color: blue[600], onClick: () => navigate('/') },
   ];
 
   if (token) {
     menuLinks.push(
-      { title: 'Dashboard', onClick: () => navigate('/dashboard') },
-      { title: 'Profile', onClick: () => navigate('/profile') },
-      { title: 'Log Out', onClick: logOut },
+      { title: 'Profile', color: blue[600], onClick: () => navigate('/profile') },
+      { title: 'Dashboard', color: deepPurple[600], onClick: () => navigate('/dashboard') },
+      { title: 'Log Out', color: red[600], onClick: logOut },
     );
   } else {
     menuLinks.push(
-      { title: 'Log In', onClick: () => setLogInOpen(true) },
-      { title: 'Register', onClick: () => setRegisterOpen(true) },
+      { title: 'Log In', color: green[600], onClick: () => setLogInOpen(true) },
+      { title: 'Register', color: green[600], onClick: () => setRegisterOpen(true) },
     );
   }
 
@@ -53,15 +55,16 @@ const Header = () => {
           <Typography
             onClick={() => navigate('/')}
             className="clickable"
-            variant="h5"
-            component="h5"
+            variant="h6"
+            component="h3"
+            sx={{ color: `${blue[500]}` }}
           >
-            AHC
+            AHC Experimentation Environment
           </Typography>
           <Box sx={{ ml: 'auto', display: { xs: 'none', md: 'flex' } }}>
-            {menuLinks.map((link) => (
-              <Button key={link.title} onClick={link.onClick}>
-                {link.title}
+            {menuLinks.map(({ title, color, onClick }) => (
+              <Button sx={{ color }} key={title} onClick={onClick}>
+                {title}
               </Button>
             ))}
           </Box>
