@@ -7,7 +7,6 @@ import {
   Breadcrumbs, Button, Container, Stack, Tab, Tabs,
 } from '@mui/material';
 import { useState } from 'react';
-import DashboardSettings from './DashboardSettings';
 import DashboardHome from './DashboardHome';
 import RepositoryExperiments from './Repository/RepositoryExperiments';
 import Experiment from './Repository/Experiment';
@@ -46,12 +45,6 @@ const Dashboard = observer(() => {
       currentPath: '/',
       name: 'Dashboard',
       Component: <DashboardHome />,
-    },
-    {
-      path: '/settings',
-      currentPath: '/settings',
-      name: 'Settings',
-      Component: <DashboardSettings />,
     },
     {
       path: '/:repositoryId',
@@ -93,23 +86,6 @@ const Dashboard = observer(() => {
               ))}
             </Breadcrumbs>
           </Box>
-
-          {!location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
-          <Tabs
-            sx={{ mb: 2 }}
-            variant="fullWidth"
-            value={value}
-            onChange={(_, val) => {
-              setValue(val);
-              if (val === 0) navigate('/dashboard');
-              else navigate('/dashboard/settings');
-            }}
-            aria-label="basic tabs example"
-          >
-            <Tab label="Repositories" id="simple-tab-0" />
-            <Tab label="Settings" id="simple-tab-1" />
-          </Tabs>
-          )}
 
           {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
           <Tabs

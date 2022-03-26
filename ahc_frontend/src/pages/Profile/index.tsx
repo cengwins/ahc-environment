@@ -1,18 +1,14 @@
 import {
   Button, Container, List, ListItem, Typography,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import Loading from '../components/Loading';
-import ResetPasswordDialog from '../components/ResetPassword';
-import { useStores } from '../stores/MainStore';
-
-const ProfileField = (title: string, value: string) => (
-  <ListItem>
-    <Typography sx={{ mr: 1, fontWeight: 700 }}>{`${title}:`}</Typography>
-    <Typography>{value}</Typography>
-  </ListItem>
-);
+import Loading from '../../components/Loading';
+import ResetPasswordDialog from '../../components/ResetPassword';
+import { useStores } from '../../stores/MainStore';
+import GitHubSettings from './GitHubSettings';
+import ProfileField from './ProfileField';
 
 const Profile = observer(() => {
   const { userStore } = useStores();
@@ -32,20 +28,24 @@ const Profile = observer(() => {
 
   return (
     <Container sx={{ py: 5 }}>
-      <Typography component="h1" variant="h2" sx={{ my: 5 }}>
+      <Typography component="h1" variant="h2" sx={{ my: 5, color: `${blue[600]}` }}>
         Profile
       </Typography>
       <div>
         <Loading loading={loading} failed={failedToLoad} />
         {!loading && !failedToLoad && (
           <div>
-            <Typography component="h2" variant="h5">General Information: </Typography>
+            <Typography component="h2" variant="h5" sx={{ color: `${blue[700]}` }}>
+              General Information
+            </Typography>
             <List>
-              {ProfileField('Username', username)}
-              {ProfileField('Email', email)}
-              {ProfileField('Name', `${name} ${surname}`)}
+              <ProfileField title="Username" value={username} />
+              <ProfileField title="Email" value={email} />
+              <ProfileField title="Name" value={`${name} ${surname}`} />
             </List>
-            <Typography component="h2" variant="h5">Password & Security: </Typography>
+            <Typography component="h2" variant="h5" sx={{ color: `${blue[700]}` }}>
+              Password & Security
+            </Typography>
             <List>
               <ListItem>
                 <Button variant="contained" onClick={() => setResetPassOpen(true)}>
@@ -53,6 +53,7 @@ const Profile = observer(() => {
                 </Button>
               </ListItem>
             </List>
+            <GitHubSettings />
           </div>
         )}
       </div>
@@ -61,7 +62,9 @@ const Profile = observer(() => {
         open={resetPassOpen}
         onClose={() => setResetPassOpen(false)}
       />
+
     </Container>
   );
 });
+
 export default Profile;
