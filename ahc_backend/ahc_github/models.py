@@ -61,7 +61,7 @@ class GithubProfile(models.Model):
         )
 
     def __str__(self):
-        return self.user.get_full_name()
+        return f"{self.user.get_full_name()}: {self.github_username}"
 
 
 class GithubRepositoryDeployToken(models.Model):
