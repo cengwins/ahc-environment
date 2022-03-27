@@ -14,6 +14,9 @@ class Repository(models.Model):
         GIT = "GIT"
 
     slug = models.CharField(max_length=40)
+
+    # TODO (DK): This seems redundant. upstream field holds this info.
+    # Let's check GET /repos/{owner}/{repo} response fields.
     name = models.CharField(max_length=100)
 
     upstream = models.CharField(max_length=150)
