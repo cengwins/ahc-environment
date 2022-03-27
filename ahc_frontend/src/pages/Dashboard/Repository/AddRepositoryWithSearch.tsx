@@ -11,8 +11,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useDebouncedValue } from '@mantine/hooks';
 import { observer } from 'mobx-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 
@@ -21,29 +22,27 @@ const AddRepositoryWithSearchDialog = observer((
 ) => {
   const { githubStore, repositoriesStore, notificationStore } = useStores();
   const [searchString, setSearchString] = useState('');
+  const [debouncedSearchString] = useDebouncedValue(searchString, 500);
   const [searching, setSearching] = useState(false);
   const [searchFailed, setSearchFailed] = useState(false);
 
-  const handleStringSearch = (e: any) => {
-    const currentSearchString = e.target.value;
-    setSearchString(currentSearchString);
-    if (currentSearchString.length >= 3
-      && githubStore.currentSearchString !== currentSearchString) {
+  useEffect(() => {
+    if (debouncedSearchString.length >= 3) {
       setSearching(true);
       setSearchFailed(false);
-      githubStore.getGithubRepos(currentSearchString)
+      githubStore.getGithubRepos(debouncedSearchString)
+        .then(() => repositoriesStore.getRepositories())
         .catch(() => {
-          if (currentSearchString === e.target.value) {
+          if (githubStore.currentSearchString === debouncedSearchString) {
             setSearchFailed(true);
           }
         }).finally(() => {
-          if (currentSearchString === e.target.value) {
+          if (githubStore.currentSearchString === debouncedSearchString) {
             setSearching(false);
           }
         });
     }
-    repositoriesStore.getRepositories();
-  };
+  }, [debouncedSearchString]);
 
   return (
     <Dialog fullWidth open={show} onClose={() => setShow(false)}>
@@ -59,27 +58,31 @@ const AddRepositoryWithSearchDialog = observer((
       <DialogContent>
         <form>
           <FormGroup sx={{ mb: 2, pt: 1 }}>
-            <TextField type="text" label="Repository Name" placeholder="Repository Name" onChange={handleStringSearch} />
+            <TextField type="text" label="Repository Name" placeholder="Repository Name" onChange={(e) => setSearchString(e.target.value)} />
           </FormGroup>
         </form>
 
-        {searchString && searchString.length < 3 && (
-          <Typography fontSize="small">
+        {debouncedSearchString && debouncedSearchString.length < 3 && (
+          <Typography>
             Please enter at least 3 characters to start searching.
           </Typography>
         )}
         <Box sx={{ width: '100%' }}>
           <Loading loading={searching} failed={searchFailed} />
         </Box>
-        {!searching && !searchFailed
-          && (
+        {!searching && !searchFailed && debouncedSearchString.length >= 3 && (
           <div>
-            {searchString && searchString.length >= 3 && githubStore.userRepos.length === 0 && (
+            <Typography>
+              {`Results for: ${debouncedSearchString}`}
+            </Typography>
+            {debouncedSearchString
+            && debouncedSearchString.length >= 3
+            && githubStore.userRepos.length === 0 && (
               <Typography>
                 There are no repositories with the given name.
               </Typography>
             )}
-            <List sx={{ mt: 3 }}>
+            <List>
               {githubStore.userRepos.map((repository) => (
                 <ListItem
                   key={repository.id}
@@ -113,7 +116,7 @@ const AddRepositoryWithSearchDialog = observer((
               ))}
             </List>
           </div>
-          )}
+        )}
       </DialogContent>
     </Dialog>
   );
