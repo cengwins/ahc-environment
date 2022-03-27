@@ -26,13 +26,8 @@ class ListGithubRepositoriesAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        search = request.query_params.get("search") or ""
-
-        if len(search) < 3:
-            raise ValidationError({"search": "length must be at least 3"})
-
         github_profile: GithubProfile = request.user.github_profile
-        github_repositories = github_profile.search_repos(search)
+        github_repositories = github_profile.get_repos()
 
         return Response(GithubRepositorySerializer(github_repositories, many=True).data)
 
