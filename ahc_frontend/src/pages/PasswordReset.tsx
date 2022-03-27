@@ -29,7 +29,6 @@ const PasswordReset = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            console.log(newPass);
             setWaitingResponse(true);
             UserStore.resetPassword({ code: code as string, password: newPass }).then(() => {
               notificationStore.set('success', 'Password reset successfully.');

@@ -4,15 +4,14 @@ import {
 import { observer } from 'mobx-react';
 import {
   Box,
-  Breadcrumbs, Button, Container, Stack, Tab, Tabs,
+  Breadcrumbs, Button, Container, Stack,
 } from '@mui/material';
 import { useState } from 'react';
 import DashboardHome from './DashboardHome';
-import RepositoryExperiments from './Repository/RepositoryExperiments';
-import Experiment from './Repository/Experiment';
-import RepositoryHome from './Repository/RepositoryHome';
 import { useStores } from '../../stores/MainStore';
 import { DashboardNavigationInterface } from '../../stores/DashboardNavigationStore';
+import RepositoryNavigator from './Repository/RepositoryNavigator';
+import PageNotFound from '../PageNotFound';
 
 const getInitialValue = (
   location: Location,
@@ -47,22 +46,10 @@ const Dashboard = observer(() => {
       Component: <DashboardHome />,
     },
     {
-      path: '/:repositoryId',
+      path: '/:repositoryId/*',
       currentPath: `/${dashboardNavigationStore.repositoryId}`,
       name: `Repository: ${dashboardNavigationStore.repositoryId}`,
-      Component: <RepositoryHome />,
-    },
-    {
-      path: '/:repositoryId/experiments',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
-      name: 'Experiments',
-      Component: <RepositoryExperiments />,
-    },
-    {
-      path: '/:repositoryId/:experimentId',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
-      name: `Experiment: ${dashboardNavigationStore.experimentId}`,
-      Component: <Experiment />,
+      Component: <RepositoryNavigator />,
     },
   ];
 
@@ -87,27 +74,11 @@ const Dashboard = observer(() => {
             </Breadcrumbs>
           </Box>
 
-          {location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`) && (
-          <Tabs
-            sx={{ mb: 2 }}
-            variant="fullWidth"
-            value={value}
-            onChange={(_, val) => {
-              setValue(val);
-              if (val === 0) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}`);
-              else navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`);
-            }}
-            aria-label="basic tabs example"
-          >
-            <Tab label="Overview" />
-            <Tab label="Experiments" />
-          </Tabs>
-          )}
-
           <Routes>
             {routes.map(({ path, Component, name }) => (
               <Route path={path} key={name} element={Component} />
             ))}
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Box>
       </Stack>

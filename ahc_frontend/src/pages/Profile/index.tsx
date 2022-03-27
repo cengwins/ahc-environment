@@ -28,7 +28,7 @@ const Profile = observer(() => {
 
   return (
     <Container sx={{ py: 5 }}>
-      <Typography component="h1" variant="h2" sx={{ my: 5, color: `${blue[600]}` }}>
+      <Typography component="h1" variant="h2" sx={{ my: 5, color: `${blue[700]}` }}>
         Profile
       </Typography>
       <div>
