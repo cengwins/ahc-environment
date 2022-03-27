@@ -1,13 +1,14 @@
 import {
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Table,
+  Box,
   Button,
   Tooltip,
   Checkbox,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  Typography,
+  CardActionArea,
 } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
@@ -17,27 +18,52 @@ import Loading from '../../components/Loading';
 import { useStores } from '../../stores/MainStore';
 import './DashboardHome.css';
 
-const RepositoryRow = ({
+const RepositoryCard = ({
   repository, navigate, chosen, onValueChange,
 }:
   {repository: RepositoryInfo, navigate: any, chosen: boolean, onValueChange: any}) => (
-    <TableRow
-      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-    >
-      <TableCell variant="body">
-        <Checkbox value={chosen} onChange={() => onValueChange(repository.id, !chosen)} />
-      </TableCell>
-      <Tooltip title={`/dashboard/${repository.id}`}>
-        <TableCell variant="body" className="repository-name clickable" onClick={() => { navigate(`/dashboard/${repository.id}`); }}>
-          {repository.name}
-        </TableCell>
-      </Tooltip>
-      <TableCell variant="body" align="right">
-        <Tooltip title={repository.upstream}>
-          <Button href={repository.upstream}>{repository.upstream_type}</Button>
-        </Tooltip>
-      </TableCell>
-    </TableRow>
+    <Grid item md={6} xs={12}>
+      <Card variant="outlined">
+        <CardActionArea onClick={() => navigate(`/dashboard/${repository.id}`)}>
+          <CardHeader
+            title={(
+              <Tooltip
+                title={`/dashboard/${repository.id}`}
+                sx={{ width: 'auto' }}
+              >
+                <Box>{repository.name}</Box>
+              </Tooltip>
+)}
+            action={(
+              <Checkbox
+                value={chosen}
+                sx={{ mr: 0.5, transform: 'scale(1.3)' }}
+                onClick={(e) => e.stopPropagation()}
+                onChange={() => onValueChange(repository.id, !chosen)}
+              />
+              )}
+          />
+          <CardContent>
+            <Typography>{repository.description}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              <Tooltip
+                title={repository.upstream}
+                sx={{ ml: 'auto' }}
+              >
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.href = repository.upstream;
+                  }}
+                >
+                  {repository.upstream_type}
+                </Button>
+              </Tooltip>
+            </Box>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Grid>
 );
 
 const RepositoriesList = observer(({ chosens, setChosens }
@@ -57,34 +83,23 @@ const RepositoriesList = observer(({ chosens, setChosens }
     <div>
       <Loading loading={loading} failed={failedToLoad} />
 
-      <TableContainer>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell variant="head" />
-              <TableCell variant="head">Repository</TableCell>
-              <TableCell variant="head" align="right">Upstream</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {repositoriesStore.repositories && repositoriesStore.repositories.map((repository) => (
-              <RepositoryRow
-                key={repository.id}
-                repository={repository}
-                navigate={navigate}
-                chosen={chosens.includes(repository.id)}
-                onValueChange={(id: string, value: boolean) => {
-                  if (value) {
-                    setChosens([...chosens, repository.id]);
-                  } else {
-                    setChosens(chosens.filter((curId) => curId !== repository.id));
-                  }
-                }}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Grid container style={{ marginTop: 1 }} spacing={{ xs: 2, md: 3 }}>
+        {repositoriesStore.repositories && repositoriesStore.repositories.map((repository) => (
+          <RepositoryCard
+            key={repository.id}
+            repository={repository}
+            navigate={navigate}
+            chosen={chosens.includes(repository.id)}
+            onValueChange={(id: string, value: boolean) => {
+              if (value) {
+                setChosens([...chosens, repository.id]);
+              } else {
+                setChosens(chosens.filter((curId) => curId !== repository.id));
+              }
+            }}
+          />
+        ))}
+      </Grid>
     </div>
   );
 });

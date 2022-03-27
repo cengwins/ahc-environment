@@ -8,7 +8,7 @@ const MemberCard = (props : {member: {name: string, details: string, role: 'memb
   const { role, name, details } = member;
   const title = role === 'member' ? '' : 'Supervisor, ';
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
         <Typography variant={role === 'supervisor' ? 'h4' : 'h6'} component="h2" sx={{ mb: 2, color: `${blue[800]}` }}>
           {`${title}${name}`}
