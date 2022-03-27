@@ -5,17 +5,15 @@ import {
   DialogContent,
   DialogTitle,
   FormGroup,
-  List,
-  ListItem,
   TextField,
   Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
+import PropertyList from '../../components/PropertyList';
 import GithubStore from '../../stores/GithubStore';
 import { useStores } from '../../stores/MainStore';
-import ProfileField from './ProfileField';
 
 const GitHubSettings = observer(() => {
   const { userStore, notificationStore } = useStores();
@@ -23,6 +21,16 @@ const GitHubSettings = observer(() => {
   const [githubToken, setGithubToken] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
 
+  const properties = [
+    { title: 'Username', value: userStore.username },
+    {
+      title: 'Set GitHub Token',
+      value: (
+        <Button variant="contained" onClick={() => setShowEditToken(true)}>
+          Set GitHub Token
+        </Button>),
+    },
+  ];
   return (
     <>
       <Dialog fullWidth open={showEditToken} onClose={() => setShowEditToken(false)}>
@@ -55,19 +63,10 @@ const GitHubSettings = observer(() => {
           </form>
         </DialogContent>
       </Dialog>
-      <>
-        <Typography component="h2" variant="h5" sx={{ color: `${blue[700]}` }}>
-          GitHub Integration
-        </Typography>
-        <List>
-          <ProfileField title="Username" value={userStore.username} />
-          <ListItem>
-            <Button variant="contained" onClick={() => setShowEditToken(true)}>
-              Set GitHub Token
-            </Button>
-          </ListItem>
-        </List>
-      </>
+      <Typography component="h2" variant="h5" sx={{ color: `${blue[700]}`, my: 2 }}>
+        GitHub Integration
+      </Typography>
+      <PropertyList properties={properties} />
     </>
   );
 });

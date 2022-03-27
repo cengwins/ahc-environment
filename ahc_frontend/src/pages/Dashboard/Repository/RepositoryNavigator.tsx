@@ -89,43 +89,43 @@ const RepositoryNavigator = observer(() => {
   return (
     <Box sx={{ mb: 2 }}>
       <Box sx={{ display: 'flex' }}>
-        <Typography component="h2" variant="h3" sx={{ mt: 2, color: `${blue[700]}` }}>
+        <Typography component="h2" variant="h4" sx={{ mt: 2, color: `${blue[700]}` }}>
           {repository.name}
           {' '}
         </Typography>
         <Typography
           component="h6"
-          variant="subtitle1"
+          variant="subtitle2"
           sx={{
-            color: `${grey[900]}`, fontFamily: 'monospace', backgroundColor: '#ddd', alignSelf: 'center', ml: 2,
+            color: `${grey[900]}`, fontFamily: 'monospace', backgroundColor: '#ddd', alignSelf: 'center', ml: 1,
           }}
         >
           {repository.slug}
         </Typography>
         <Box sx={{ my: 2, ml: 'auto' }}>
-          <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream} startIcon={<GitHub />}>
+          <Button variant="outlined" sx={{ mr: 1 }} href={repository.upstream} startIcon={<GitHub />}>
             View repository on GitHub
           </Button>
-          <Button variant="outlined" sx={{ mr: 2 }} href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
+          <Button variant="outlined" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
             Open in GitHub.dev
           </Button>
         </Box>
       </Box>
-      <Tabs
-        sx={{ mb: 2 }}
-        variant="fullWidth"
-        value={value}
-        onChange={(_, val) => {
-          setValue(val);
-          if (val === 0) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}`);
-          else navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`);
-        }}
-        aria-label="basic tabs example"
-      >
-        <Tab label="Overview" />
-        <Tab label="Experiments" />
-      </Tabs>
-
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs
+          variant="fullWidth"
+          value={value}
+          onChange={(_, val) => {
+            setValue(val);
+            if (val === 0) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}`);
+            else navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`);
+          }}
+          aria-label="basic tabs example"
+        >
+          <Tab label="Overview" />
+          <Tab label="Experiments" />
+        </Tabs>
+      </Box>
       <Routes>
         {routes.map(({ path, Component, name }) => (
           <Route path={path} key={name} element={Component} />

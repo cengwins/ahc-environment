@@ -118,7 +118,7 @@ const DashboardHome = observer(() => {
       </Dialog>
 
       <div>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
             Your Repositories
           </Typography>

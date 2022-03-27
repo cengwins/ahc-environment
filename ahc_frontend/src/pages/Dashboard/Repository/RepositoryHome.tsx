@@ -3,16 +3,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import {
-  Box, Card, CardContent,
+  Box, Card, CardContent, Typography,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
-
-const RepositoryField = (title: string, value: string) => (
-  <div>
-    <span>{`${title}: `}</span>
-    <span>{value}</span>
-  </div>
-);
+import PropertyList from '../../../components/PropertyList';
 
 const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) => {
   const [readmeContent, setReadmeContent] = useState('Loading...');
@@ -25,10 +20,19 @@ const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) =
     }
   }, [repository]);
 
+  const properties = [
+    { title: 'Identifier', value: repository.id },
+    { title: 'Name', value: repository.name },
+    { title: 'Slug', value: repository.slug },
+    { title: 'Upstream', value: repository.upstream },
+    { title: 'Upstream Type', value: repository.upstream_type },
+  ];
+
   return (
     <div>
-      {RepositoryField('id', repository.id)}
-      <Card variant="outlined" sx={{ mt: 4 }}>
+      <PropertyList properties={properties} />
+      <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>README</Typography>
+      <Card variant="outlined" sx={{ my: 2 }}>
         <CardContent sx={{ padding: '12px 20px' }}>
           <Box>
             <ReactMarkdown>{readmeContent}</ReactMarkdown>
