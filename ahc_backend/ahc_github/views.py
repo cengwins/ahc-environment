@@ -1,4 +1,4 @@
-from github import Github, AuthenticatedUser
+from github import Github, AuthenticatedUser, BadCredentialsException
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
@@ -29,6 +29,8 @@ class ListGithubRepositoriesAPIView(APIView):
         github_profile: GithubProfile = request.user.github_profile
         github_repositories = github_profile.get_repos()
 
+        import pdb; pdb.set_trace()
+        gh = GithubRepositorySerializer(github_repositories, many=True)
         return Response(GithubRepositorySerializer(github_repositories, many=True).data)
 
 
@@ -64,9 +66,15 @@ class GithubProfileAPIView(CreateAPIView):
         # the Github object.
         g = Github(access_token)
         g_user: AuthenticatedUser = g.get_user()
-        if g.oauth_scopes is None:
-            raise ValidationError({"access_token": "Access token is invalid."})
-        elif "repo" not in g.oauth_scopes:
+
+        try:
+            _ = g_user.name  # TERRIBLE
+
+        except BadCredentialsException:
+            if g.oauth_scopes is None:
+                raise ValidationError({"access_token": "Access token is invalid."})
+
+        if "repo" not in g.oauth_scopes:
             raise ValidationError(
                 {"access_token": "Access token should have " "scope `repo`."}
             )
@@ -75,6 +83,7 @@ class GithubProfileAPIView(CreateAPIView):
         try:
             github_profile = GithubProfile.objects.get(user=self.request.user)
             github_profile.access_token = access_token
+            github_profile.github_username = g_user.login
             github_profile.save()
         except:  # TODO: (DK) Do not swallow the exception.
             github_profile = GithubProfile.objects.create(
@@ -82,6 +91,7 @@ class GithubProfileAPIView(CreateAPIView):
                 access_token=access_token,
                 github_username=g_user.login,
             )
+            github_profile.save()
 
         return github_profile
 
