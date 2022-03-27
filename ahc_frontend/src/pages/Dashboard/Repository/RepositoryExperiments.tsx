@@ -12,7 +12,7 @@ import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 
 const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();
-  const { experimentStore } = useStores();
+  const { experimentStore, notificationStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const [runningExperiment, setRunningExperiment] = useState(false);
@@ -35,6 +35,8 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
         onClick={() => {
           setRunningExperiment(true);
           experimentStore.createExperiment()
+            .then(() => notificationStore.set('success', 'Experiment created'))
+            .catch(() => notificationStore.set('error', 'Failed to create experiment'))
             .finally(() => setRunningExperiment(false));
         }}
       >
