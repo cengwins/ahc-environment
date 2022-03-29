@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "ahc_github",
     "ahc_repositories",
     "ahc_experiments",
+    "ahc_runners",
 ]
 
 MIDDLEWARE = [
