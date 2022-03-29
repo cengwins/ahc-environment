@@ -51,12 +51,10 @@ const RepositoryCard = ({
                 sx={{ ml: 'auto' }}
               >
                 <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.location.href = repository.upstream;
-                  }}
+                  target="_blank"
+                  href={repository.upstream}
                 >
-                  {repository.upstream_type}
+                  Open in GitHub
                 </Button>
               </Tooltip>
             </Box>

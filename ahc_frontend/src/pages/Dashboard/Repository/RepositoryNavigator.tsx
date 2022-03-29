@@ -103,10 +103,10 @@ const RepositoryNavigator = observer(() => {
           {repository.slug}
         </Typography>
         <Box sx={{ my: 2, ml: 'auto' }}>
-          <Button variant="outlined" sx={{ mr: 1 }} href={repository.upstream} startIcon={<GitHub />}>
+          <Button target="_blank" variant="outlined" sx={{ mr: 1 }} href={repository.upstream} startIcon={<GitHub />}>
             View repository on GitHub
           </Button>
-          <Button variant="outlined" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
+          <Button target="_blank" variant="outlined" href={repository.upstream.replace('github.com', 'github.dev')} startIcon={<GitHub />}>
             Open in GitHub.dev
           </Button>
         </Box>
