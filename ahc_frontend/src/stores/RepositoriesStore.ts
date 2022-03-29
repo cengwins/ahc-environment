@@ -8,6 +8,7 @@ export interface RepositoryInfo {
   id: string;
   slug: string;
   name: string;
+  description: string;
   upstream: string;
   upstream_type: string;
 }

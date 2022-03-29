@@ -1,5 +1,5 @@
 import {
-  Box, Button, Stack, Typography,
+  Box, Button, Stack,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,9 +18,13 @@ const Footer = () => {
     >
       <Stack direction="row" sx={{ mx: 'auto', mb: 1 }}>
         <FooterItem onClick={() => navigate('/')} text="Home" />
-        <FooterItem onClick={() => navigate('/team')} text="Team" />
+        <FooterItem
+          onClick={() => {
+            window.location.href = 'mailto:ahc@ceng.metu.edu.tr';
+          }}
+          text="Contact"
+        />
       </Stack>
-      <Typography sx={{ mx: 'auto' }}>bitiriyoruz © 2021</Typography>
     </Box>
   );
 };
