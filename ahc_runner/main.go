@@ -211,16 +211,35 @@ func runJob(upstream_url string) error {
 		}
 	}
 
-	env := make([]string, len(config.Env))
-	i := 0
+	// TODO: handle the case where config.Image == "."
+
+	env := make([]string, len(config.Env)+3)
+	env[0] = fmt.Sprintf("AHC_TOKEN=%s", "DEFAULT_TOKEN")
+	i := 1
+
 	for k, s := range config.Env {
 		env[i] = fmt.Sprintf("%s=%s", k, s)
 		i += 1
 	}
 
-	err = runContainer(config.Image, config.Command, env)
-	if err != nil {
-		return err
+	ahc_run_name_env_index := i
+	ahc_run_seq_env_index := i + 1
+
+	for _, run := range config.Experiment.Runs {
+		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
+
+		env[ahc_run_name_env_index] = fmt.Sprintf("AHC_RUN_NAME=%s", run.Name)
+
+		for i := 0; i < run.SamplingCount; i++ {
+			fmt.Printf("Running for run %s sampling id %d\n", run.Name, i)
+
+			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
+
+			err = runContainer(config.Image, config.Command, env)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
