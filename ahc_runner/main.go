@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
+	"time"
 
 	types "github.com/docker/docker/api/types"
 	containertypes "github.com/docker/docker/api/types/container"
@@ -25,6 +28,24 @@ type AHCConfiguration struct {
 	Image   string
 	Command string
 	Env     map[string]string
+}
+
+type RunnerResponse struct {
+	Name string
+}
+
+type RepositoryResponse struct {
+	Id       int
+	Slug     int
+	Name     string
+	Upstream string
+}
+
+type ExperimentResponse struct {
+	Id          int
+	Sequence_id int
+	Commit      string
+	Repository  RepositoryResponse
 }
 
 var volumeId string
@@ -148,6 +169,84 @@ func runContainer(image string, command string, env []string) error {
 	}
 
 	return nil
+}
+
+
+func checkRunner(connect_url string, connect_secret string) bool {
+	connect_path := fmt.Sprintf("http://%s/api/runner/", connect_url)
+
+	client := http.Client{}
+	req, err := http.NewRequest("GET", connect_path, nil)
+	if err != nil {
+		return false
+	}
+
+	req.Header = http.Header{
+		"Authorization": []string{fmt.Sprintf("Basic %s", connect_secret)},
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		fmt.Println("Could not connect to server, exiting...")
+		return false
+	}
+
+	var data RunnerResponse
+	err = json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
+		return false
+	}
+
+	fmt.Printf("Connected with runner %s\n", data.Name)
+
+	return true
+}
+
+func checkForNewJob(connect_url string, connect_secret string) bool {
+	connect_path := fmt.Sprintf("http://%s/api/jobs/", connect_url)
+
+	client := http.Client{}
+	req, err := http.NewRequest("GET", connect_path, nil)
+	if err != nil {
+		return false
+	}
+
+	req.Header = http.Header{
+		"Authorization": []string{fmt.Sprintf("Basic %s", connect_secret)},
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 && res.StatusCode != 204 {
+		fmt.Println("Could not connect to server, exiting...")
+		return false
+	}
+
+	if res.StatusCode == 204 {
+		fmt.Println("No new job found, skipping...")
+		return true
+	}
+
+	var data ExperimentResponse
+	json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
+		return false
+	}
+
+	fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Repository.Name, data.Repository.Upstream, data.Commit)
+
+	runJob(data.Repository.Upstream)
+
+	return true
 }
 
 func main() {
