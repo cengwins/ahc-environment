@@ -7,6 +7,7 @@ from ahc_users.views import *
 from ahc_github.views import *
 from ahc_repositories.views import *
 from ahc_experiments.views import *
+from ahc_runners.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -60,4 +61,6 @@ urlpatterns = [
         "api/repositories/<int:repository_id>/experiments/<int:experiment_id>/runs/<int:experiment_run_id>/",
         RetrieveExperimentRunsAPIView.as_view(),
     ),
+    path("api/jobs/", FetchRunnerJobAPIView.as_view()),
+    path("api/runner/", RetrieveRunnerAPIView.as_view()),
 ]
