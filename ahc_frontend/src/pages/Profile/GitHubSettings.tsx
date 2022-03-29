@@ -51,8 +51,19 @@ const GitHubSettings = observer(() => {
               });
             }}
           >
-            <FormGroup sx={{ mb: 2, pt: 1 }}>
-              <TextField label="GitHub Token" type="text" placeholder="Github Token" onChange={(e) => setGithubToken(e.target.value)} />
+            <FormGroup sx={{
+              mb: 2, pt: 1, display: 'flex', flexDirection: 'row',
+            }}
+            >
+              <TextField sx={{ flexGrow: 1 }} label="GitHub Token" type="text" placeholder="Github Token" onChange={(e) => setGithubToken(e.target.value)} />
+              <Button
+                variant="outlined"
+                sx={{ ml: 2 }}
+                target="_blank"
+                href="https://github.com/settings/tokens/new?description=AHC%20Experiment%20Environment&scopes=repo"
+              >
+                Generate
+              </Button>
             </FormGroup>
 
             <DialogActions>
