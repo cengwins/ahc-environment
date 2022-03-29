@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "import_export",
+    "nested_admin",
     "admin_interface",
     "colorfield",
     "django.contrib.admin",

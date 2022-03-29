@@ -1,3 +1,4 @@
+from django.conf.urls import include
 from django.views.static import serve as static_serve
 from django.contrib import admin
 from django.urls import path
@@ -10,6 +11,8 @@ from ahc_experiments.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('_nested_admin/', include('nested_admin.urls')),
+
     path(
         f"{settings.MEDIA_URL[1:]}<path:path>",
         static_serve,
