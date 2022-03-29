@@ -171,6 +171,41 @@ func runContainer(image string, command string, env []string) error {
 	return nil
 }
 
+func runJob(upstream_url string) error {
+	volumeId = uuid.NewString()
+	containerVolumePath = fmt.Sprintf("%s/%s", containerBindPath, volumeId)
+	hostVolumePath = fmt.Sprintf("%s/%s", hostBindPath, volumeId)
+
+	fmt.Printf("Using directory %s\n", containerVolumePath)
+
+	clone(upstream_url)
+
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	if config.Image != "." {
+		err = pullImage(config.Image)
+		if err != nil {
+			return err
+		}
+	}
+
+	env := make([]string, len(config.Env))
+	i := 0
+	for k, s := range config.Env {
+		env[i] = fmt.Sprintf("%s=%s", k, s)
+		i += 1
+	}
+
+	err = runContainer(config.Image, config.Command, env)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func checkRunner(connect_url string, connect_secret string) bool {
 	connect_path := fmt.Sprintf("http://%s/api/runner/", connect_url)
@@ -249,6 +284,20 @@ func checkForNewJob(connect_url string, connect_secret string) bool {
 	return true
 }
 
+func startDaemon(connect_url string, connect_secret string) {
+	r := checkRunner(connect_url, connect_secret)
+
+	if r {
+		for range time.Tick(5 * time.Second) {
+			r = checkForNewJob(connect_url, connect_secret)
+
+			if !r {
+				break
+			}
+		}
+	}
+}
+
 func main() {
 	app := &cli.App{
 		Name: "AHC Runner",
@@ -260,7 +309,7 @@ func main() {
 
 			containerBindPath = os.Getenv("AHC_DATA_VOLUME")
 			if containerBindPath == "" {
-				containerBindPath = hostBindPath
+				containerBindPath = "/data"
 			}
 
 			var err error
@@ -269,11 +318,6 @@ func main() {
 			if err != nil {
 				return err
 			}
-			volumeId = uuid.NewString()
-			containerVolumePath = fmt.Sprintf("%s/%s", containerBindPath, volumeId)
-			hostVolumePath = fmt.Sprintf("%s/%s", hostBindPath, volumeId)
-
-			fmt.Printf("Using directory %s\n", containerVolumePath)
 
 			return nil
 		},
@@ -290,31 +334,29 @@ func main() {
 				Action: func(c *cli.Context) error {
 					upstream_url := c.String("url")
 
-					clone(upstream_url)
+					return runJob(upstream_url)
+				},
+			},
+			{
+				Name:  "daemon",
+				Usage: "Start daemon",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "url",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "secret",
+						Required: true,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					connect_url := c.String("url")
+					connect_secret := c.String("secret")
 
-					config, err := readConfig()
-					if err != nil {
-						return err
-					}
+					fmt.Printf("Starting daemon for %s\n", connect_url)
 
-					if config.Image != "." {
-						err = pullImage(config.Image)
-						if err != nil {
-							return err
-						}
-					}
-
-					env := make([]string, len(config.Env))
-					i := 0
-					for k, s := range config.Env {
-						env[i] = fmt.Sprintf("%s=%s", k, s)
-						i += 1
-					}
-
-					err = runContainer(config.Image, config.Command, env)
-					if err != nil {
-						return err
-					}
+					startDaemon(connect_url, connect_secret)
 
 					return nil
 				},
