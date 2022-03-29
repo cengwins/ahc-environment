@@ -24,10 +24,29 @@ import (
 
 const AHC_FILENAME = ".ahc.yml"
 
+type TopologyConfiguration struct {
+	Name  string
+	Nodes []string
+	Links []string
+}
+
+type ExperimentRunConfiguration struct {
+	Name          string
+	Topology      string
+	SamplingCount int
+}
+
+type ExperimentConfiguration struct {
+	Runs []ExperimentRunConfiguration
+}
+
 type AHCConfiguration struct {
 	Image   string
 	Command string
 	Env     map[string]string
+
+	Topologies []TopologyConfiguration
+	Experiment ExperimentConfiguration
 }
 
 type RunnerResponse struct {
