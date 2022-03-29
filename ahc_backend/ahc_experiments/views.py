@@ -1,6 +1,5 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (
-    CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveAPIView,
@@ -51,7 +50,14 @@ class ListExperimentRunsAPIView(ListAPIView):
     serializer_class = ExperimentRunSerializer
 
     def get_queryset(self):
-        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"], experiment__repository=self.kwargs["repository_id"])
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                experiment=self.kwargs["experiment_id"],
+                experiment__repository=self.kwargs["repository_id"],
+            )
+        )
 
 
 class RetrieveExperimentRunsAPIView(RetrieveAPIView):
@@ -61,4 +67,11 @@ class RetrieveExperimentRunsAPIView(RetrieveAPIView):
     lookup_url_kwarg = "experiment_run_id"
 
     def get_queryset(self):
-        return super().get_queryset().filter(experiment=self.kwargs["experiment_id"], experiment__repository=self.kwargs["repository_id"])
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                experiment=self.kwargs["experiment_id"],
+                experiment__repository=self.kwargs["repository_id"],
+            )
+        )
