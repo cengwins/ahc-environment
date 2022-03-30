@@ -3,8 +3,13 @@ import {
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
+  Alert,
   Box,
-  Breadcrumbs, Button, Container, Stack,
+  Breadcrumbs,
+  Button,
+  Link,
+  Container,
+  Stack,
 } from '@mui/material';
 import { useState } from 'react';
 import DashboardHome from './DashboardHome';
@@ -27,7 +32,7 @@ const getInitialValue = (
 const Dashboard = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dashboardNavigationStore } = useStores();
+  const { dashboardNavigationStore, userStore } = useStores();
   const initialValue = getInitialValue(location, dashboardNavigationStore);
   const [value, setValue] = useState(initialValue);
 
@@ -51,6 +56,12 @@ const Dashboard = observer(() => {
       name: `Repository: ${dashboardNavigationStore.repositoryId}`,
       Component: <RepositoryNavigator />,
     },
+    {
+      path: '*',
+      currentPath: '*',
+      name: '404',
+      Component: <PageNotFound />,
+    },
   ];
 
   const crumbs = routes
@@ -73,12 +84,19 @@ const Dashboard = observer(() => {
               ))}
             </Breadcrumbs>
           </Box>
-
+          {!userStore.activated && (
+          <Alert sx={{ mb: 2 }} severity="error">
+            {'Your account is not yet activated. Please '}
+            <Link href="mailto:ahc@ceng.metu.edu.tr">
+              send a mail
+            </Link>
+            {' if your account is not activated after some time.'}
+          </Alert>
+          )}
           <Routes>
-            {routes.map(({ path, Component, name }) => (
+            {userStore.activated && (routes.map(({ path, Component, name }) => (
               <Route path={path} key={name} element={Component} />
-            ))}
-            <Route path="*" element={<PageNotFound />} />
+            )))}
           </Routes>
         </Box>
       </Stack>

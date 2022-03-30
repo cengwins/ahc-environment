@@ -17,7 +17,7 @@ const Profile = observer(() => {
   const [failedToLoad, setFailed] = useState(false);
 
   const {
-    username, email, name, surname,
+    username, email, name, surname, activated,
   } = userStore;
 
   useEffect(() => {
@@ -31,6 +31,7 @@ const Profile = observer(() => {
     { title: 'Email', value: email },
     { title: 'Name', value: name },
     { title: 'Surname', value: surname },
+    { title: 'Activated', value: activated ? 'Yes' : 'No' },
   ];
 
   const securityProperties = [
