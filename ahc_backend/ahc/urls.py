@@ -22,5 +22,5 @@ urlpatterns = [
     # The user's available repositories.
     path("api/repositories/", include("ahc_repositories.urls")),
     # A repository's experiments.
-    path("api/repositories/<int:repository_id>", include("ahc_experiments.urls")),
+    path("api/repositories/<int:repository_id>/experiments", include("ahc_experiments.urls")),
 ]
