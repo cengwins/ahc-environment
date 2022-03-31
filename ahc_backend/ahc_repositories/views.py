@@ -1,3 +1,4 @@
+from ahc_github.models import GithubProfile
 from ahc_repositories.permissions import RepositoryAccessPermission
 from django.contrib.auth.models import User
 
@@ -19,6 +20,7 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
     serializer_class = RepositorySerializer
 
     def get_queryset(self):
+
         return super().get_queryset().filter(users__user=self.request.user)
 
     def perform_create(self, serializer):
@@ -27,6 +29,20 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
         RepositoryUser.objects.create(repository=repository, user=self.request.user)
 
         return repository
+
+    def create(self, request: Request, *args, **kwargs):
+        github_profile: GithubProfile = self.request.user.github_profile
+        upstream = request.data["upstream"]
+        upstream_split = upstream.split("/")
+        upstream_username = upstream_split[-2]
+        upstream_repo_name = upstream_split[-1]
+        full_name = "{}/{}".format(upstream_username, upstream_repo_name)
+        github_repository = (github_profile.get_repo(full_name))
+        request.data["stargazers_count"] = github_repository.stargazers_count
+        request.data["description"] = github_repository.description
+        request.data["html_url"] = github_repository.html_url
+        request.data["private"] = github_repository.private
+        return super().create(request, *args, **kwargs)
 
 
 class RetrieveUpdateDestroyRepositoriesAPIView(RetrieveUpdateDestroyAPIView):
@@ -56,8 +72,8 @@ class ListCreateRepositoryUsersAPIView(ListCreateAPIView):
     def get_queryset(self):
         return (
             super()
-            .get_queryset()
-            .filter(
+                .get_queryset()
+                .filter(
                 repository=self.kwargs["repository_id"],
             )
         )
@@ -72,8 +88,8 @@ class RetrieveDestroyRepositoryUsersAPIView(RetrieveDestroyAPIView):
     def get_queryset(self):
         return (
             super()
-            .get_queryset()
-            .filter(
+                .get_queryset()
+                .filter(
                 repository=self.kwargs["repository_id"],
             )
         )

@@ -28,8 +28,6 @@ class ListGithubRepositoriesAPIView(APIView):
     def get(self, request):
         github_profile: GithubProfile = request.user.github_profile
         github_repositories = github_profile.get_repos()
-
-        import pdb; pdb.set_trace()
         gh = GithubRepositorySerializer(github_repositories, many=True)
         return Response(GithubRepositorySerializer(github_repositories, many=True).data)
 
