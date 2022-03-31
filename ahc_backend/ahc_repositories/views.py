@@ -20,7 +20,6 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
     serializer_class = RepositorySerializer
 
     def get_queryset(self):
-
         return super().get_queryset().filter(users__user=self.request.user)
 
     def perform_create(self, serializer):
@@ -37,7 +36,7 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
         upstream_username = upstream_split[-2]
         upstream_repo_name = upstream_split[-1]
         full_name = "{}/{}".format(upstream_username, upstream_repo_name)
-        github_repository = (github_profile.get_repo(full_name))
+        github_repository = github_profile.get_repo(full_name)
         request.data["stargazers_count"] = github_repository.stargazers_count
         request.data["description"] = github_repository.description
         request.data["html_url"] = github_repository.html_url
