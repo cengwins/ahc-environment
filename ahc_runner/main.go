@@ -348,7 +348,7 @@ func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("%s\n%s\n", prelogs, logs),
+				Logs:       fmt.Sprintf("Run: %s\nSampling Sequence: %d\n\n%s\n", run.Name, i, logs),
 			}
 			k += 1
 		}
