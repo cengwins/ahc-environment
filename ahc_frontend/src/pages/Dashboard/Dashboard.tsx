@@ -1,5 +1,5 @@
 import {
-  Location, Route, Routes, useLocation, useNavigate,
+  Route, Routes, useLocation, useNavigate,
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
@@ -11,32 +11,15 @@ import {
   Container,
   Stack,
 } from '@mui/material';
-import { useState } from 'react';
 import DashboardHome from './DashboardHome';
 import { useStores } from '../../stores/MainStore';
-import { DashboardNavigationInterface } from '../../stores/DashboardNavigationStore';
 import RepositoryNavigator from './Repository/RepositoryNavigator';
 import PageNotFound from '../PageNotFound';
-
-const getInitialValue = (
-  location: Location,
-  dashboardNavigationStore: DashboardNavigationInterface,
-) => {
-  const pathName = location.pathname.replace(/\/+$/, '');
-  if (location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`)) {
-    return `/dashboard/${dashboardNavigationStore.repositoryId}` === pathName ? 0 : 1;
-  }
-  return pathName === '/dashboard' ? 0 : 1;
-};
 
 const Dashboard = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
   const { dashboardNavigationStore, userStore } = useStores();
-  const initialValue = getInitialValue(location, dashboardNavigationStore);
-  const [value, setValue] = useState(initialValue);
-
-  if (initialValue !== value) setValue(initialValue);
 
   const routes : {
     path: string;
