@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	types "github.com/docker/docker/api/types"
@@ -246,14 +247,19 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	}
 	defer reader.Close()
 
-	content, _ := ioutil.ReadAll(reader)
+	readerContent, _ := ioutil.ReadAll(reader)
 
 	err = dockerClient.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{})
 	if err != nil {
 		return "", err
 	}
 
-	return string(content), nil
+	logs := string(readerContent)
+
+	logs = strings.ReplaceAll(logs, "\x00", "")
+	logs = strings.ReplaceAll(logs, "\r", "\n")
+
+	return logs, nil
 }
 
 func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
@@ -316,6 +322,10 @@ func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
 
 	result = make([]SubmitRunnerJobRequestRun, totalRuns)
 
+	prelogs := resultBuffer.String()
+	prelogs = strings.ReplaceAll(prelogs, "\x00", "")
+	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
+
 	k := 0
 	for _, run := range config.Experiment.Runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
@@ -338,7 +348,7 @@ func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("%s\n%s\n", resultBuffer.String(), logs),
+				Logs:       fmt.Sprintf("%s\n%s\n", prelogs, logs),
 			}
 			k += 1
 		}
