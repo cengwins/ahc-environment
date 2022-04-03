@@ -29,6 +29,10 @@ class RunnerJob(models.Model):
         Runner, related_name="jobs", null=True, blank=True, on_delete=models.CASCADE
     )
 
+    is_running = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False)
+    will_cancel = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
