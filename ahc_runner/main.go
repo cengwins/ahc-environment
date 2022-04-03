@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,8 +14,12 @@ import (
 
 	types "github.com/docker/docker/api/types"
 	containertypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	mounttypes "github.com/docker/docker/api/types/mount"
 	docker "github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
+	jsonmessage "github.com/docker/docker/pkg/jsonmessage"
+	"github.com/docker/docker/pkg/term"
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/google/uuid"
@@ -33,7 +38,7 @@ type TopologyConfiguration struct {
 type ExperimentRunConfiguration struct {
 	Name          string
 	Topology      string
-	SamplingCount int
+	SamplingCount int `yaml:"sampling_count"`
 }
 
 type ExperimentConfiguration struct {
@@ -100,6 +105,13 @@ func clone(url string) error {
 	return nil
 }
 
+func printJsonStreamToScreen(rd io.ReadCloser) {
+	defer rd.Close()
+
+	termFd, isTerm := term.GetFdInfo(os.Stdout)
+	jsonmessage.DisplayJSONMessagesStream(rd, os.Stdout, termFd, isTerm, nil)
+}
+
 func initDocker() error {
 	var err error
 	dockerClient, err = docker.NewClientWithOpts(docker.FromEnv)
@@ -127,12 +139,40 @@ func readConfig() (AHCConfiguration, error) {
 
 func pullImage(image string) error {
 	ctx := context.Background()
-	_, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
+	res, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
 
+	printJsonStreamToScreen(res)
+
 	return nil
+}
+
+func buildImage(path string) (string, error) {
+	ctx := context.Background()
+	tar, err := archive.TarWithOptions(path, &archive.TarOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	imageId := uuid.NewString()
+
+	opts := types.ImageBuildOptions{
+		Dockerfile: "Dockerfile",
+		Tags:       []string{imageId},
+		PullParent: true,
+		NoCache:    true,
+		Remove:     true,
+	}
+	res, err := dockerClient.ImageBuild(ctx, tar, opts)
+	if err != nil {
+		return "", err
+	}
+
+	printJsonStreamToScreen(res.Body)
+
+	return imageId, nil
 }
 
 func runContainer(image string, command string, env []string) error {
@@ -165,19 +205,25 @@ func runContainer(image string, command string, env []string) error {
 		"",
 	)
 	if err != nil {
+		fmt.Printf("%s\n", err)
 		return err
 	}
 
 	err = dockerClient.ContainerStart(ctx, c.ID, types.ContainerStartOptions{})
 	if err != nil {
+		fmt.Printf("%s\n", err)
 		return err
 	}
 
-	reader, _ := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
+	reader, err := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Follow:     true,
 	})
+	if err != nil {
+		return err
+	}
+
 	defer reader.Close()
 	content, _ := ioutil.ReadAll(reader)
 	fmt.Print(string(content))
@@ -197,21 +243,29 @@ func runJob(upstream_url string) error {
 
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	clone(upstream_url)
+	err := clone(upstream_url)
+	if err != nil {
+		return err
+	}
 
 	config, err := readConfig()
 	if err != nil {
 		return err
 	}
 
-	if config.Image != "." {
+	containerImage := config.Image
+
+	if containerImage == "." {
+		containerImage, err = buildImage(containerVolumePath)
+		if err != nil {
+			return err
+		}
+	} else {
 		err = pullImage(config.Image)
 		if err != nil {
 			return err
 		}
 	}
-
-	// TODO: handle the case where config.Image == "."
 
 	env := make([]string, len(config.Env)+3)
 	env[0] = fmt.Sprintf("AHC_TOKEN=%s", "DEFAULT_TOKEN")
@@ -225,6 +279,12 @@ func runJob(upstream_url string) error {
 	ahc_run_name_env_index := i
 	ahc_run_seq_env_index := i + 1
 
+	if len(config.Experiment.Runs) == 0 {
+		fmt.Printf("No run configuration found for experiment, exiting...\n")
+
+		return nil
+	}
+
 	for _, run := range config.Experiment.Runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
@@ -235,7 +295,7 @@ func runJob(upstream_url string) error {
 
 			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
 
-			err = runContainer(config.Image, config.Command, env)
+			err = runContainer(containerImage, config.Command, env)
 			if err != nil {
 				return err
 			}
@@ -317,7 +377,10 @@ func checkForNewJob(connect_url string, connect_secret string) bool {
 
 	fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Repository.Name, data.Repository.Upstream, data.Commit)
 
-	runJob(data.Repository.Upstream)
+	err = runJob(data.Repository.Upstream)
+	if err != nil {
+		return false
+	}
 
 	return true
 }
@@ -347,7 +410,7 @@ func main() {
 
 			containerBindPath = os.Getenv("AHC_DATA_VOLUME")
 			if containerBindPath == "" {
-				containerBindPath = "/data"
+				containerBindPath = "/tmp/ahc-runner"
 			}
 
 			var err error
@@ -357,6 +420,24 @@ func main() {
 				return err
 			}
 
+			return nil
+		},
+		After: func(c *cli.Context) error {
+			ctx := context.Background()
+
+			fmt.Printf("Cleaning leftovers\n")
+
+			_, err := dockerClient.BuildCachePrune(ctx, types.BuildCachePruneOptions{All: true})
+			if err != nil {
+				return err
+			}
+
+			pruneFilters := filters.NewArgs()
+			pruneFilters.Add("dangling", "false")
+			_, err = dockerClient.ImagesPrune(ctx, pruneFilters)
+			if err != nil {
+				return err
+			}
 			return nil
 		},
 		Commands: []*cli.Command{
@@ -372,7 +453,12 @@ func main() {
 				Action: func(c *cli.Context) error {
 					upstream_url := c.String("url")
 
-					return runJob(upstream_url)
+					err := runJob(upstream_url)
+					if err != nil {
+						fmt.Printf("%s\n", err)
+					}
+
+					return err
 				},
 			},
 			{
