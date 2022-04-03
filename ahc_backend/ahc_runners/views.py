@@ -1,10 +1,20 @@
+import uuid
 from rest_framework.views import APIView, Request, Response
 
 from ahc_utils.helpers import unauthorized
 
+from ahc_experiments.models import Experiment, ExperimentRun
 from ahc_experiments.serializers import ExperimentWithRepositorySerializer
+from ahc_experiments.custom_storage import LogStorage
 from ahc_runners.models import Runner, RunnerJob
 from ahc_runners.serializers import RunnerSerializer
+
+
+log_storage = LogStorage()
+
+
+def generate_uuid():
+    return uuid.uuid4().hex
 
 
 def fetch_runner_from_request(request: Request) -> Runner:
@@ -49,3 +59,34 @@ class FetchRunnerJobAPIView(APIView):
         job.save()
 
         return Response(ExperimentWithRepositorySerializer(job.experiment).data)
+
+
+class FinishRunnerJobAPIView(APIView):
+    def post(self, request: Request):
+        runner = fetch_runner_from_request(request)
+
+        experiment_id = request.data["experiment_id"]
+        runs = request.data["runs"]
+
+        experiment = Experiment.objects.filter(id=int(experiment_id)).first()
+
+        if experiment is None:
+            raise unauthorized("no_experiment")
+
+        for run in runs:
+            file_name = generate_uuid()
+            file = log_storage.open(file_name, "w")
+
+            file.write(run["logs"])
+            file.close()
+
+            experiment_run = ExperimentRun.objects.create(
+                experiment=experiment,
+                started_at=run["started_at"],
+                finished_at=run["finished_at"],
+                exit_code=run["exit_code"],
+                log_path=file_name,
+            )
+            experiment_run.save()
+
+        return Response(None, 200)
