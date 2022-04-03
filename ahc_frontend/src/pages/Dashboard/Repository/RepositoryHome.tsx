@@ -13,7 +13,7 @@ const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) =
   const [readmeContent, setReadmeContent] = useState('Loading...');
 
   useEffect(() => {
-    if (repository) {
+    if (repository.upstream) {
       axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/README.md`)
         .then((response) => setReadmeContent(response.data))
         .catch(() => setReadmeContent('Failed to fetch README.md.'));
