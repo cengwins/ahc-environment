@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
 import {
-  Box, Card, CardContent, Typography,
+  Card, CardContent, Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 
 const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo}) => {
@@ -22,11 +23,16 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
   return (
     <div>
       <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>ahc.yml</Typography>
-      <Card variant="outlined" sx={{ my: 2 }}>
+      <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <CardContent sx={{ padding: '12px 20px' }}>
-          <Box>
-            <ReactMarkdown>{ahcymlContent}</ReactMarkdown>
-          </Box>
+          <SyntaxHighlighter
+            language="yaml"
+            style={coy}
+            wrapLongLines
+            showLineNumbers
+          >
+            {ahcymlContent}
+          </SyntaxHighlighter>
         </CardContent>
       </Card>
     </div>
