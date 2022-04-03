@@ -213,13 +213,13 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 					Source: hostVolumePath,
 					Target: "/app",
 				},
-				/* {
+				{
 					Type:   mounttypes.TypeBind,
 					Source: "/dev/bus/usb",
 					Target: "/dev/bus/usb",
-				}, */
+				},
 			},
-			// Privileged: true,
+			Privileged: true,
 		},
 		nil,
 		nil,
