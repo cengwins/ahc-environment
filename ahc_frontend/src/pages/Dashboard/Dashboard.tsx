@@ -64,7 +64,24 @@ const Dashboard = observer(() => {
     },
   ];
 
-  const crumbs = routes
+  const breadcrumbRoutes: {
+    path: string;
+    currentPath: string;
+    name: string;
+  }[] = [
+    {
+      path: '/:repositoryId/experiments',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
+      name: 'Experiments',
+    },
+    {
+      path: '/:repositoryId/:experimentId',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
+      name: `Experiment: ${dashboardNavigationStore.experimentId}`,
+    },
+  ];
+
+  const crumbs = ([...routes, ...breadcrumbRoutes])
     .filter(({ currentPath: pathCheck }) => location.pathname.includes(pathCheck))
     .map(({ currentPath, ...rest }) => ({
       currentPath: `/dashboard${currentPath}`,

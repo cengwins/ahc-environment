@@ -62,25 +62,21 @@ const RepositoryNavigator = observer(() => {
 
   const routes : {
   path: string;
-  currentPath: string;
   Component: any;
   name: string;
 }[] = [
   {
     path: '/',
-    currentPath: `/${dashboardNavigationStore.repositoryId}`,
     name: `Repository: ${dashboardNavigationStore.repositoryId}`,
     Component: <RepositoryHome repository={repository} />,
   },
   {
     path: '/experiments',
-    currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
     name: 'Experiments',
     Component: <RepositoryExperiments repository={repository} />,
   },
   {
     path: '/:experimentId',
-    currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
     name: `Experiment: ${dashboardNavigationStore.experimentId}`,
     Component: <Experiment />,
   },
