@@ -23,7 +23,7 @@ urlpatterns = [
     path("api/repositories/", include("ahc_repositories.urls")),
     # A repository's experiments.
     path(
-        "api/repositories/<int:repository_id>/experiments",
+        "api/repositories/<int:repository_id>/experiments/",
         include("ahc_experiments.urls"),
     ),
     # Runner related endpoints
