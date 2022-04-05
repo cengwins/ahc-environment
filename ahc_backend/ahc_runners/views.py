@@ -3,11 +3,12 @@ from rest_framework.views import APIView, Request, Response
 
 from ahc_utils.helpers import unauthorized
 
-from ahc_experiments.models import Experiment, ExperimentRun
+from ahc_experiments.models import ExperimentRun
 from ahc_experiments.custom_storage import LogStorage
-from ahc_runners.models import Runner, RunnerJob
+from ahc_runners.models import RunnerJob
 from ahc_runners.serializers import RunnerJobSerializer, RunnerSerializer
 
+from .permissions import RunnerAccessPermission, RunnerJobAccessPermission
 
 log_storage = LogStorage()
 
@@ -16,38 +17,20 @@ def generate_uuid():
     return uuid.uuid4().hex
 
 
-def fetch_runner_from_request(request: Request) -> Runner:
-    if "Authorization" not in request.headers:
-        raise unauthorized("no_auth_header")
-
-    auth_header = request.headers["Authorization"]
-    auth_header_items = auth_header.split(" ")
-
-    if len(auth_header_items) != 2:
-        raise unauthorized("wrong_auth_header")
-
-    auth_header_prefix, auth_header_payload = auth_header_items
-
-    if auth_header_prefix != "Basic":
-        raise unauthorized("wrong_auth_header_prefix")
-
-    runner = Runner.objects.filter(secret=auth_header_payload).first()
-    if runner is None:
-        raise unauthorized("wrong_auth_header_payload")
-
-    return runner
-
-
 class RetrieveRunnerAPIView(APIView):
+    permission_classes = (RunnerAccessPermission,)
+
     def get(self, request: Request):
-        runner = fetch_runner_from_request(request)
+        runner = request.runner
 
         return Response(RunnerSerializer(runner).data)
 
 
 class FetchRunnerJobAPIView(APIView):
+    permission_classes = (RunnerAccessPermission,)
+
     def get(self, request: Request):
-        runner = fetch_runner_from_request(request)
+        runner = request.runner
 
         job = RunnerJob.objects.filter(runner=None).first()
 
@@ -61,16 +44,17 @@ class FetchRunnerJobAPIView(APIView):
 
 
 class SubmitRunnerJobResultAPIView(APIView):
-    def post(self, request: Request):
-        runner = fetch_runner_from_request(request)
+    permission_classes = (RunnerAccessPermission, RunnerJobAccessPermission)
 
-        job_id = request.data["id"]
+    def post(self, request: Request, job_id):
+        runner = request.runner
+
         job = RunnerJob.objects.filter(id=job_id).first()
         if job is None or job.runner.id != runner.id:
             raise unauthorized("wrong_job")
 
-        if "runs" in request.data:
-            runs = request.data["runs"]
+        if "experiment" in request.data and "runs" in request.data["experiment"]:
+            runs = request.data["experiment"]["runs"]
 
             experiment = job.experiment
 
