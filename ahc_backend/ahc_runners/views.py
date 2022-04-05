@@ -26,7 +26,7 @@ class RetrieveRunnerAPIView(APIView):
         return Response(RunnerSerializer(runner).data)
 
 
-class FetchRunnerJobAPIView(APIView):
+class AssignRunnerJobAPIView(APIView):
     permission_classes = (RunnerAccessPermission,)
 
     def get(self, request: Request):
@@ -39,6 +39,19 @@ class FetchRunnerJobAPIView(APIView):
 
         job.runner = runner
         job.save()
+
+        return Response(RunnerJobSerializer(job).data)
+
+
+class FetchRunnerJobAPIView(APIView):
+    permission_classes = (RunnerAccessPermission, RunnerJobAccessPermission)
+
+    def get(self, request: Request, job_id):
+        runner = request.runner
+
+        job = RunnerJob.objects.filter(id=job_id).first()
+        if job is None or job.runner.id != runner.id:
+            raise unauthorized("wrong_job")
 
         return Response(RunnerJobSerializer(job).data)
 
@@ -56,26 +69,25 @@ class SubmitRunnerJobResultAPIView(APIView):
         if "experiment" in request.data and "runs" in request.data["experiment"]:
             runs = request.data["experiment"]["runs"]
 
-            experiment = job.experiment
+            if runs:
+                if job.experiment is None:
+                    raise unauthorized("no_experiment")
 
-            if experiment is None:
-                raise unauthorized("no_experiment")
+                for run in runs:
+                    file_name = generate_uuid()
+                    file = log_storage.open(file_name, "w")
 
-            for run in runs:
-                file_name = generate_uuid()
-                file = log_storage.open(file_name, "w")
+                    file.write(run["logs"])
+                    file.close()
 
-                file.write(run["logs"])
-                file.close()
-
-                experiment_run = ExperimentRun.objects.create(
-                    experiment=experiment,
-                    started_at=run["started_at"],
-                    finished_at=run["finished_at"],
-                    exit_code=run["exit_code"],
-                    log_path=file_name,
-                )
-                experiment_run.save()
+                    experiment_run = ExperimentRun.objects.create(
+                        experiment=job.experiment,
+                        started_at=run["started_at"],
+                        finished_at=run["finished_at"],
+                        exit_code=run["exit_code"],
+                        log_path=file_name,
+                    )
+                    experiment_run.save()
 
         if "is_running" in request.data:
             job.is_running = request.data["is_running"]
