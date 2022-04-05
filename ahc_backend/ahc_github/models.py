@@ -16,6 +16,9 @@ class GithubProfile(models.Model):
     )
     access_token = models.CharField(max_length=120)
 
+    # AuthenticatedUser object's login attribute.
+    github_username = models.CharField(max_length=120)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,10 +31,20 @@ class GithubProfile(models.Model):
     def get_authenticated_user(self) -> AuthenticatedUser:
         return self.github_client.get_user()
 
-    def get_repos(self) -> PaginatedList:
-        return self.get_authenticated_user().get_repos()
+    def get_repos(self, *args, **kwargs) -> PaginatedList:
+        """Retrieves the repos the user has access to.
+
+        Uses GitHub's GET /user/repos endpoint.
+
+        args and kwargs are forwarded to AuthenticatedUser.get_repos() method.
+        """
+        return self.get_authenticated_user().get_repos(*args, **kwargs)
 
     def get_repo(self, repo_name: str) -> Repository:
+        """Retrieves a repository given a full_name of a repository.
+
+        full_name is of form {owner}/{repo_name}
+        """
         return self.github_client.get_repo(full_name_or_id=repo_name)
 
     def get_branch(self, repo_name: str, branch_name: str) -> Branch:
@@ -48,7 +61,7 @@ class GithubProfile(models.Model):
         )
 
     def __str__(self):
-        return self.user.get_full_name()
+        return f"{self.user.get_full_name()}: {self.github_username}"
 
 
 class GithubRepositoryDeployToken(models.Model):

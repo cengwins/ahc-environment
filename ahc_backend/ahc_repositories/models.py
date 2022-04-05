@@ -14,6 +14,16 @@ class Repository(models.Model):
         GIT = "GIT"
 
     slug = models.CharField(max_length=40)
+    private = models.BooleanField()
+
+    html_url = models.CharField(max_length=255)
+
+    description = models.CharField(max_length=255, null=True, blank=True)
+
+    stargazers_count = models.IntegerField()
+
+    # TODO (DK): This seems redundant. upstream field holds this info.
+    # Let's check GET /repos/{owner}/{repo} response fields.
     name = models.CharField(max_length=100)
 
     upstream = models.CharField(max_length=150)

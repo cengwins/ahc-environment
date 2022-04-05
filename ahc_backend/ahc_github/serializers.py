@@ -21,6 +21,10 @@ class GithubRepositorySerializer(serializers.Serializer):
 
     html_url = serializers.CharField()
 
+    description = serializers.CharField()
+
+    stargazers_count = serializers.IntegerField()
+
     class Meta:
         fields = "__all__"
 
