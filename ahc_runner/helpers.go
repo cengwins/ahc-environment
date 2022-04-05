@@ -15,6 +15,7 @@ import (
 )
 
 const AHC_FILENAME = "ahc.yml"
+const AHC_FILENAME_FALLBACK = ".ahc.yml"
 
 type TopologyConfiguration struct {
 	Name  string   `yaml:"name"`
@@ -73,19 +74,23 @@ func gitClone(containerVolumePath string, url string, outStream io.Writer) error
 func readAHCConfig(containerVolumePath string) (AHCConfiguration, error) {
 	filePath := path.Join(containerVolumePath, AHC_FILENAME)
 
-	if _, err := os.Stat(filePath); !errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		filePath = path.Join(containerVolumePath, AHC_FILENAME_FALLBACK)
+
+		if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+			filePath = ""
+		}
+	}
+
+	if filePath != "" {
 		buf, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			return AHCConfiguration{}, err
+		if err == nil {
+			c := AHCConfiguration{}
+			err = yaml.Unmarshal(buf, &c)
+			if err == nil {
+				return c, nil
+			}
 		}
-
-		c := AHCConfiguration{}
-		err = yaml.Unmarshal(buf, &c)
-		if err != nil {
-			return AHCConfiguration{}, err
-		}
-
-		return c, nil
 	}
 
 	defaultConfig := AHCConfiguration{
