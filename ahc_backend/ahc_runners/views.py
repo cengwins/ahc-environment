@@ -4,10 +4,9 @@ from rest_framework.views import APIView, Request, Response
 from ahc_utils.helpers import unauthorized
 
 from ahc_experiments.models import Experiment, ExperimentRun
-from ahc_experiments.serializers import ExperimentWithRepositorySerializer
 from ahc_experiments.custom_storage import LogStorage
 from ahc_runners.models import Runner, RunnerJob
-from ahc_runners.serializers import RunnerSerializer
+from ahc_runners.serializers import RunnerJobSerializer, RunnerSerializer
 
 
 log_storage = LogStorage()
@@ -58,7 +57,7 @@ class FetchRunnerJobAPIView(APIView):
         job.runner = runner
         job.save()
 
-        return Response(ExperimentWithRepositorySerializer(job.experiment).data)
+        return Response(RunnerJobSerializer(job).data)
 
 
 class FinishRunnerJobAPIView(APIView):
