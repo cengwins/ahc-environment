@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode"
 
 	types "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -79,8 +80,10 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 	result = make([]SubmitJobResultRequestExperimentRun, totalRuns)
 
 	prelogs := resultBuffer.String()
-	prelogs = strings.ReplaceAll(prelogs, "\x00", "")
 	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
+	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
+		return !unicode.IsGraphic(r)
+	})
 
 	k := 0
 	for _, run := range config.Experiment.Runs {

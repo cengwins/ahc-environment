@@ -61,7 +61,7 @@ func setServerCredentials(url string, secret string) {
 func makeRequest(req *http.Request) (*http.Response, error) {
 	client := http.Client{}
 	req.Header = http.Header{
-		"Authorization": []string{fmt.Sprintf("Basic %s", serverSecret)},
+		"Authorization": []string{fmt.Sprintf("Runner %s", serverSecret)},
 		"Content-Type":  []string{"application/json"},
 	}
 
@@ -118,7 +118,7 @@ func submitRunnerJobResult(jobId int, experimentId int, result []SubmitJobResult
 		return err
 	}
 
-	connect_path := fmt.Sprintf("http://%s/api/runner/submit/", serverUrl)
+	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/submit/", serverUrl, jobId)
 
 	req, err := http.NewRequest("POST", connect_path, bytes.NewReader(body))
 	if err != nil {

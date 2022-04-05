@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"runtime"
 	"strings"
+	"unicode"
 
 	types "github.com/docker/docker/api/types"
 	containertypes "github.com/docker/docker/api/types/container"
@@ -131,8 +132,10 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 
 	logs := string(readerContent)
 
-	logs = strings.ReplaceAll(logs, "\x00", "")
 	logs = strings.ReplaceAll(logs, "\r", "\n")
+	logs = strings.TrimFunc(logs, func(r rune) bool {
+		return !unicode.IsGraphic(r)
+	})
 
 	return logs, nil
 }
