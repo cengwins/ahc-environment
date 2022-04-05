@@ -26,16 +26,20 @@ type ExperimentResponse struct {
 	Repository RepositoryResponse `json:"repository"`
 }
 
-type SubmitRunnerJobRequestRun struct {
+type RunnerJobResponse struct {
+	Experiment ExperimentResponse `json:"experiment"`
+}
+
+type SubmitJobResultRequestRun struct {
 	StartedAt  string `json:"started_at"`
 	FinishedAt string `json:"finished_at"`
 	Logs       string `json:"logs"`
 	ExitCode   int    `json:"exit_code"`
 }
 
-type SubmitRunnerJobRequest struct {
+type SubmitJobResultRequest struct {
 	ExperimentId int                         `json:"experiment_id"`
-	Runs         []SubmitRunnerJobRequestRun `json:"runs"`
+	Runs         []SubmitJobResultRequestRun `json:"runs"`
 }
 
 var serverUrl string
@@ -88,8 +92,8 @@ func checkRunner() error {
 	return nil
 }
 
-func submitRunnerJobResult(experimentId int, result []SubmitRunnerJobRequestRun) error {
-	data := SubmitRunnerJobRequest{
+func submitRunnerJobResult(experimentId int, result []SubmitJobResultRequestRun) error {
+	data := SubmitJobResultRequest{
 		ExperimentId: experimentId,
 		Runs:         result,
 	}
@@ -143,20 +147,22 @@ func checkForNewJob() error {
 		return nil
 	}
 
-	var data ExperimentResponse
+	var data RunnerJobResponse
 	json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Repository.Name, data.Repository.Upstream, data.Commit)
+	experiment := data.Experiment
 
-	result, err := runJob(data.Repository.Upstream)
+	fmt.Printf("Found job from repository %s from upstream %s commit %s\n", experiment.Repository.Name, experiment.Repository.Upstream, experiment.Commit)
+
+	result, err := runJob(experiment.Repository.Upstream)
 	if err != nil {
 		return err
 	}
 
-	submitRunnerJobResult(data.Id, result)
+	submitRunnerJobResult(experiment.Id, result)
 
 	return nil
 }

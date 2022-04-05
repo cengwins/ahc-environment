@@ -18,10 +18,10 @@ import (
 var containerBindPath string
 var hostBindPath string
 
-func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
+func runJob(upstream_url string) ([]SubmitJobResultRequestRun, error) {
 	var resultBuffer bytes.Buffer
 
-	result := make([]SubmitRunnerJobRequestRun, 0)
+	result := make([]SubmitJobResultRequestRun, 0)
 
 	volumeId := uuid.NewString()
 	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
@@ -76,7 +76,7 @@ func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
 		totalRuns += run.SamplingCount
 	}
 
-	result = make([]SubmitRunnerJobRequestRun, totalRuns)
+	result = make([]SubmitJobResultRequestRun, totalRuns)
 
 	prelogs := resultBuffer.String()
 	prelogs = strings.ReplaceAll(prelogs, "\x00", "")
@@ -100,7 +100,7 @@ func runJob(upstream_url string) ([]SubmitRunnerJobRequestRun, error) {
 			}
 			endTime := time.Now()
 
-			result[k] = SubmitRunnerJobRequestRun{
+			result[k] = SubmitJobResultRequestRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
@@ -121,7 +121,7 @@ func startDaemon() {
 			r = checkForNewJob()
 
 			if r != nil {
-				break
+				fmt.Println(r)
 			}
 		}
 	}
