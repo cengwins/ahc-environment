@@ -18,10 +18,10 @@ import (
 var containerBindPath string
 var hostBindPath string
 
-func runJob(upstream_url string) ([]SubmitJobResultRequestRun, error) {
+func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) {
 	var resultBuffer bytes.Buffer
 
-	result := make([]SubmitJobResultRequestRun, 0)
+	result := make([]SubmitJobResultRequestExperimentRun, 0)
 
 	volumeId := uuid.NewString()
 	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
@@ -66,7 +66,7 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestRun, error) {
 	ahc_run_seq_env_index := i + 1
 
 	if len(config.Experiment.Runs) == 0 {
-		fmt.Printf("No run configuration found for experiment, exiting...\n")
+		fmt.Printf("No run configuration found for experiment\n")
 
 		return result, err
 	}
@@ -76,7 +76,7 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestRun, error) {
 		totalRuns += run.SamplingCount
 	}
 
-	result = make([]SubmitJobResultRequestRun, totalRuns)
+	result = make([]SubmitJobResultRequestExperimentRun, totalRuns)
 
 	prelogs := resultBuffer.String()
 	prelogs = strings.ReplaceAll(prelogs, "\x00", "")
@@ -100,7 +100,7 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestRun, error) {
 			}
 			endTime := time.Now()
 
-			result[k] = SubmitJobResultRequestRun{
+			result[k] = SubmitJobResultRequestExperimentRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
@@ -118,10 +118,19 @@ func startDaemon() {
 
 	if r == nil {
 		for range time.Tick(5 * time.Second) {
-			r = checkForNewJob()
-
+			data, r := checkForNewJob()
 			if r != nil {
 				fmt.Println(r)
+				continue
+			}
+
+			fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Experiment.Repository.Name, data.Experiment.Repository.Upstream, data.Experiment.Commit)
+
+			submitRunnerJobResult(data.Id, data.Experiment.Id, nil, true, false)
+
+			result, err := runJob(data.Experiment.Repository.Upstream)
+			if err == nil {
+				submitRunnerJobResult(data.Id, data.Experiment.Id, result, false, true)
 			}
 		}
 	}

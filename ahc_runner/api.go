@@ -27,19 +27,27 @@ type ExperimentResponse struct {
 }
 
 type RunnerJobResponse struct {
+	Id         int                `json:"id"`
 	Experiment ExperimentResponse `json:"experiment"`
 }
 
-type SubmitJobResultRequestRun struct {
+type SubmitJobResultRequestExperimentRun struct {
 	StartedAt  string `json:"started_at"`
 	FinishedAt string `json:"finished_at"`
 	Logs       string `json:"logs"`
 	ExitCode   int    `json:"exit_code"`
 }
 
+type SubmitJobResultRequestExperiment struct {
+	Runs []SubmitJobResultRequestExperimentRun `json:"runs"`
+}
+
 type SubmitJobResultRequest struct {
-	ExperimentId int                         `json:"experiment_id"`
-	Runs         []SubmitJobResultRequestRun `json:"runs"`
+	Id         int                              `json:"id"`
+	Experiment SubmitJobResultRequestExperiment `json:"experiment"`
+	IsRunning  bool                             `json:"is_running"`
+	IsFinished bool                             `json:"is_finished"`
+	WillCancel bool                             `json:"will_cancel"`
 }
 
 var serverUrl string
@@ -77,7 +85,7 @@ func checkRunner() error {
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		fmt.Println("Could not connect to server, exiting...")
+		fmt.Println("Could not connect to server")
 		return errors.New("Could not connect to server")
 	}
 
@@ -92,11 +100,19 @@ func checkRunner() error {
 	return nil
 }
 
-func submitRunnerJobResult(experimentId int, result []SubmitJobResultRequestRun) error {
+func submitRunnerJobResult(jobId int, experimentId int, result []SubmitJobResultRequestExperimentRun, isRunning bool, isFinished bool) error {
 	data := SubmitJobResultRequest{
-		ExperimentId: experimentId,
-		Runs:         result,
+		Id:         jobId,
+		IsRunning:  isRunning,
+		IsFinished: isFinished,
 	}
+
+	if result != nil {
+		data.Experiment = SubmitJobResultRequestExperiment{
+			Runs: result,
+		}
+	}
+
 	body, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -116,53 +132,41 @@ func submitRunnerJobResult(experimentId int, result []SubmitJobResultRequestRun)
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		fmt.Println("Could not connect to server, exiting...")
+		fmt.Println("Could not connect to server")
 		return errors.New("Could not connect to server")
 	}
 
 	return nil
 }
 
-func checkForNewJob() error {
+func checkForNewJob() (RunnerJobResponse, error) {
 	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/", serverUrl)
 
 	req, err := http.NewRequest("GET", connect_path, nil)
 	if err != nil {
-		return err
+		return RunnerJobResponse{}, err
 	}
 
 	res, err := makeRequest(req)
 	if err != nil {
-		return err
+		return RunnerJobResponse{}, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 && res.StatusCode != 204 {
-		fmt.Println("Could not connect to server, exiting...")
-		return errors.New("Could not connect to server")
+		fmt.Println("Could not connect to server")
+		return RunnerJobResponse{}, errors.New("Could not connect to server")
 	}
 
 	if res.StatusCode == 204 {
-		fmt.Println("No new job found, skipping...")
-		return nil
+		return RunnerJobResponse{}, errors.New("No new job found, skipping...")
 	}
 
 	var data RunnerJobResponse
 	json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		return err
+		return RunnerJobResponse{}, err
 	}
 
-	experiment := data.Experiment
-
-	fmt.Printf("Found job from repository %s from upstream %s commit %s\n", experiment.Repository.Name, experiment.Repository.Upstream, experiment.Commit)
-
-	result, err := runJob(experiment.Repository.Upstream)
-	if err != nil {
-		return err
-	}
-
-	submitRunnerJobResult(experiment.Id, result)
-
-	return nil
+	return data, nil
 }
