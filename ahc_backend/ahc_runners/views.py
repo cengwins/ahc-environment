@@ -60,32 +60,45 @@ class FetchRunnerJobAPIView(APIView):
         return Response(RunnerJobSerializer(job).data)
 
 
-class FinishRunnerJobAPIView(APIView):
+class SubmitRunnerJobResultAPIView(APIView):
     def post(self, request: Request):
         runner = fetch_runner_from_request(request)
 
-        experiment_id = request.data["experiment_id"]
-        runs = request.data["runs"]
+        job_id = request.data["id"]
+        job = RunnerJob.objects.filter(id=job_id).first()
+        if job is None or job.runner.id != runner.id:
+            raise unauthorized("wrong_job")
 
-        experiment = Experiment.objects.filter(id=int(experiment_id)).first()
+        if "runs" in request.data:
+            runs = request.data["runs"]
 
-        if experiment is None:
-            raise unauthorized("no_experiment")
+            experiment = job.experiment
 
-        for run in runs:
-            file_name = generate_uuid()
-            file = log_storage.open(file_name, "w")
+            if experiment is None:
+                raise unauthorized("no_experiment")
 
-            file.write(run["logs"])
-            file.close()
+            for run in runs:
+                file_name = generate_uuid()
+                file = log_storage.open(file_name, "w")
 
-            experiment_run = ExperimentRun.objects.create(
-                experiment=experiment,
-                started_at=run["started_at"],
-                finished_at=run["finished_at"],
-                exit_code=run["exit_code"],
-                log_path=file_name,
-            )
-            experiment_run.save()
+                file.write(run["logs"])
+                file.close()
+
+                experiment_run = ExperimentRun.objects.create(
+                    experiment=experiment,
+                    started_at=run["started_at"],
+                    finished_at=run["finished_at"],
+                    exit_code=run["exit_code"],
+                    log_path=file_name,
+                )
+                experiment_run.save()
+
+        if "is_running" in request.data:
+            job.is_running = request.data["is_running"]
+            job.save()
+
+        if "is_finished" in request.data:
+            job.is_finished = request.data["is_finished"]
+            job.save()
 
         return Response(None, 200)
