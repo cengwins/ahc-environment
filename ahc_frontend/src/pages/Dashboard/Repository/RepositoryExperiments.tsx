@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
@@ -8,11 +8,11 @@ import {
 } from '@mui/material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
+import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 
-const RepositoryExperiments = observer(() => {
+const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();
-  const { repositoryId } = useParams();
-  const { dashboardNavigationStore, experimentStore } = useStores();
+  const { experimentStore, notificationStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const [runningExperiment, setRunningExperiment] = useState(false);
@@ -20,17 +20,9 @@ const RepositoryExperiments = observer(() => {
   const { currentExperiments: experiments } = experimentStore;
 
   useEffect(() => {
-    const fetchFunction = async () => {
-      if (repositoryId) await dashboardNavigationStore.setRepositoryId(repositoryId);
-    };
-
-    fetchFunction()
-      .then(() => {
-        experimentStore.getExperiments()
-          .catch(() => setFailed(true))
-          .finally(() => setLoading(false));
-      })
-      .catch(() => { setFailed(true); setLoading(false); });
+    experimentStore.getExperiments()
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -43,6 +35,8 @@ const RepositoryExperiments = observer(() => {
         onClick={() => {
           setRunningExperiment(true);
           experimentStore.createExperiment()
+            .then(() => notificationStore.set('success', 'Experiment created'))
+            .catch(() => notificationStore.set('error', 'Failed to create experiment'))
             .finally(() => setRunningExperiment(false));
         }}
       >
@@ -61,7 +55,7 @@ const RepositoryExperiments = observer(() => {
             {experiments && experiments.map((experiment) => (
               <TableRow
                 key={experiment.id}
-                onClick={() => { navigate(`/dashboard/${repositoryId}/${experiment.id}`); }}
+                onClick={() => { navigate(`/dashboard/${repository.id}/${experiment.id}`); }}
                 className="experiment-item clickable"
               >
                 <TableCell>

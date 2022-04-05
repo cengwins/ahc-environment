@@ -1561,6 +1561,11 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
+"@mantine/hooks@^4.0.9":
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-4.0.9.tgz#63af01e64955f8589f037fdab414f6c62223da98"
+  integrity sha512-b+IrevT05/nAM2H0iKWC9BP0gr/U8kF3U8Ge+EnvSFeSOWp/exm/Wy5toorQ83nQbmfCjkSAL5WDb6Jx0gI/Fg==
+
 "@mui/base@5.0.0-alpha.71":
   version "5.0.0-alpha.71"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.71.tgz#628f5ae10a8c015d61d3d1e6f04d66afc7500b90"

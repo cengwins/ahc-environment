@@ -1,21 +1,36 @@
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, TextField, Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormGroup,
+  TextField,
+  Typography,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
+import PropertyList from '../../components/PropertyList';
 import GithubStore from '../../stores/GithubStore';
 import { useStores } from '../../stores/MainStore';
 
-const DashboardSettings = observer(() => {
+const GitHubSettings = observer(() => {
   const { userStore, notificationStore } = useStores();
   const [showEditToken, setShowEditToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
 
-  if (!userStore.username) {
-    userStore.getProfile();
-  }
-
+  const properties = [
+    { title: 'Username', value: userStore.username },
+    {
+      title: 'Set GitHub Token',
+      value: (
+        <Button variant="contained" onClick={() => setShowEditToken(true)}>
+          Set GitHub Token
+        </Button>),
+    },
+  ];
   return (
     <>
       <Dialog fullWidth open={showEditToken} onClose={() => setShowEditToken(false)}>
@@ -30,14 +45,25 @@ const DashboardSettings = observer(() => {
               GithubStore.setGithubToken({ access_token: githubToken }).then(() => {
                 notificationStore.set('success', 'Token is saved!');
               }).catch((result) => {
-                notificationStore.set('error', '', result.message);
+                notificationStore.set('error', result.message);
               }).finally(() => {
                 setWaitingResponse(false);
               });
             }}
           >
-            <FormGroup sx={{ mb: 2, pt: 1 }}>
-              <TextField label="GitHub Token" type="text" placeholder="Github Token" onChange={(e) => setGithubToken(e.target.value)} />
+            <FormGroup sx={{
+              mb: 2, pt: 1, display: 'flex', flexDirection: 'row',
+            }}
+            >
+              <TextField sx={{ flexGrow: 1 }} label="GitHub Token" type="text" placeholder="Github Token" onChange={(e) => setGithubToken(e.target.value)} />
+              <Button
+                variant="outlined"
+                sx={{ ml: 2 }}
+                target="_blank"
+                href="https://github.com/settings/tokens/new?description=AHC%20Experiment%20Environment&scopes=repo"
+              >
+                Generate
+              </Button>
             </FormGroup>
 
             <DialogActions>
@@ -48,16 +74,12 @@ const DashboardSettings = observer(() => {
           </form>
         </DialogContent>
       </Dialog>
-      <div>
-        <Typography component="h4" variant="h5">
-          Github Account:
-          {' '}
-          <a href={`https://github.com/${userStore.username}`}>{userStore.username}</a>
-        </Typography>
-        <Button sx={{ mt: 2 }} variant="contained" onClick={() => setShowEditToken(true)}>Replace</Button>
-      </div>
+      <Typography component="h2" variant="h5" sx={{ color: `${blue[700]}`, my: 2 }}>
+        GitHub Integration
+      </Typography>
+      <PropertyList properties={properties} />
     </>
   );
 });
 
-export default DashboardSettings;
+export default GitHubSettings;

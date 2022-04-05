@@ -8,6 +8,7 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Loading from '../../../components/Loading';
 
 import { useStores } from '../../../stores/MainStore';
+import PageNotFound from '../../PageNotFound';
 import '../DashboardHome.css';
 
 const metrics = [
@@ -46,14 +47,13 @@ const ExperimentField = (title: string, value: string) => (
 );
 
 const Experiment = () => {
-  const { repositoryId, experimentId } = useParams();
+  const { experimentId } = useParams();
   const { dashboardNavigationStore, experimentStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
 
   useEffect(() => {
     const fetchFunction = async () => {
-      if (repositoryId) await dashboardNavigationStore.setRepositoryId(repositoryId);
       if (experimentId) await dashboardNavigationStore.setExperimentId(experimentId);
     };
 
@@ -64,7 +64,11 @@ const Experiment = () => {
 
   const { currentExperiment: experiment } = experimentStore;
 
-  if (!experiment || loading || failedToLoad) {
+  if (!experiment && failedToLoad) {
+    return (<PageNotFound />);
+  }
+
+  if (!experiment || loading) {
     return (
       <Loading loading={loading} failed={failedToLoad || !experiment} />
     );

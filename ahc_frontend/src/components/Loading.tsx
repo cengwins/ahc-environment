@@ -1,7 +1,6 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 
-const Loading = (props : {loading: boolean, failed: boolean}) => {
-  const { loading, failed } = props;
+const Loading = ({ loading, failed } : {loading: boolean, failed: boolean}) => {
   if (loading || failed) {
     return (
       <>

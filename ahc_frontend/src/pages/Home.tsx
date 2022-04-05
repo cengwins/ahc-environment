@@ -1,7 +1,13 @@
 import {
   Box,
-  Container, List, ListItem, Stack, Typography,
+  Container,
+  List,
+  ListItem,
+  Stack,
+  Typography,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
+import Team from './Team';
 
 const Home = () => {
   const text = 'The overall goal of the AHC project is to develop an open-source education and research software framework that facilitates the development of distributed algorithms on wireless networks considering the impairments of wireless channels. The framework will be used as a learning and prompt-prototyping tool. The expected result will be published as open-source software for broad reach. The users of the AHC framework will be students, teachers, researchers and engineers working in the fields of digital communication, networking or distributed computing. The developed framework will be available to all these user groups as open-source software.';
@@ -21,17 +27,19 @@ const Home = () => {
     <Container sx={{ mt: 5 }}>
       <Stack direction="column" spacing={4} sx={{ my: 5 }}>
         <Box sx={{ mb: 3 }}>
-          <Typography component="h1" variant="h3">AHC</Typography>
-          <Typography component="h2" variant="h5" sx={{ maxWidth: '480px' }}>
+          <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
+            AHC Experimentation Environment
+          </Typography>
+          <Typography component="h2" variant="h5" sx={{ maxWidth: '480px', color: `${blue[400]}` }}>
             Wireless Ad Hoc Cloud Computing, Learning and Experimentation Environment
           </Typography>
         </Box>
         <div>
-          <Typography component="h3" variant="h4" sx={{ mb: 2 }}>About</Typography>
+          <Typography component="h3" variant="h4" sx={{ mb: 2, color: `${blue[700]}` }}>About</Typography>
           <Typography component="p" variant="body1">{text}</Typography>
         </div>
         <div>
-          <Typography component="h3" variant="h4" sx={{ mb: 2 }}>Objectives</Typography>
+          <Typography component="h3" variant="h4" sx={{ mb: 2, color: `${blue[700]}` }}>Objectives</Typography>
           <List>
             {objectives.map((objective) => (
               <ListItem key={objective}>
@@ -40,6 +48,7 @@ const Home = () => {
             ))}
           </List>
         </div>
+        <Team />
       </Stack>
     </Container>
   );
