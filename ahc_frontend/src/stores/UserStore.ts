@@ -24,7 +24,7 @@ export default class UserStore implements UserStoreInterface {
 
   token: string = '';
 
-  activated: boolean = false;
+  activated: boolean = true;
 
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
