@@ -29,6 +29,9 @@ type ExperimentResponse struct {
 type RunnerJobResponse struct {
 	Id         int                `json:"id"`
 	Experiment ExperimentResponse `json:"experiment"`
+	IsRunning  bool               `json:"is_running"`
+	IsFinished bool               `json:"is_finished"`
+	WillCancel bool               `json:"will_cancel"`
 }
 
 type SubmitJobResultRequestExperimentRun struct {
@@ -160,6 +163,34 @@ func checkForNewJob() (RunnerJobResponse, error) {
 
 	if res.StatusCode == 204 {
 		return RunnerJobResponse{}, errors.New("No new job found, skipping...")
+	}
+
+	var data RunnerJobResponse
+	json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
+		return RunnerJobResponse{}, err
+	}
+
+	return data, nil
+}
+
+func fetchJob(jobId int) (RunnerJobResponse, error) {
+	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/", serverUrl, jobId)
+
+	req, err := http.NewRequest("GET", connect_path, nil)
+	if err != nil {
+		return RunnerJobResponse{}, err
+	}
+
+	res, err := makeRequest(req)
+	if err != nil {
+		return RunnerJobResponse{}, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		fmt.Println("Could not connect to server")
+		return RunnerJobResponse{}, errors.New("Could not connect to server")
 	}
 
 	var data RunnerJobResponse

@@ -19,6 +19,24 @@ import (
 var containerBindPath string
 var hostBindPath string
 
+func startJobStatusUpdateService(jobId int) {
+	for range time.Tick(5 * time.Second) {
+		job, err := fetchJob(jobId)
+		if err != nil {
+			fmt.Println(job)
+			continue
+		}
+
+		if job.IsFinished {
+			fmt.Printf("Job with id %d finished, exiting from update status service\n", job.Id)
+
+			break
+		}
+
+		fmt.Printf("Job with id %d still want to continue: %t\n", job.Id, !job.WillCancel)
+	}
+}
+
 func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) {
 	var resultBuffer bytes.Buffer
 
@@ -130,6 +148,8 @@ func startDaemon() {
 			fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Experiment.Repository.Name, data.Experiment.Repository.Upstream, data.Experiment.Commit)
 
 			submitRunnerJobResult(data.Id, data.Experiment.Id, nil, true, false)
+
+			go startJobStatusUpdateService(data.Id)
 
 			result, err := runJob(data.Experiment.Repository.Upstream)
 			if err == nil {
