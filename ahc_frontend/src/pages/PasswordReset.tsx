@@ -7,6 +7,7 @@ import {
   FormGroup,
   TextField,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
@@ -21,8 +22,10 @@ const PasswordReset = () => {
   return (
     <Container sx={{ mt: 5 }}>
       <Stack direction="column" spacing={4} sx={{ mt: 5 }}>
-        <Typography component="h1" variant="h2">Password Reset</Typography>
-        <Typography component="h2" variant="h6">
+        <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
+          Password Reset
+        </Typography>
+        <Typography component="h2" variant="h6" sx={{ color: `${blue[700]}` }}>
           Enter the new password below.
         </Typography>
 
@@ -39,7 +42,7 @@ const PasswordReset = () => {
             });
           }}
         >
-          <FormGroup sx={{ mb: 2, pt: 1 }}>
+          <FormGroup sx={{ mb: 2 }}>
             <TextField
               label="New Password"
               type="password"
