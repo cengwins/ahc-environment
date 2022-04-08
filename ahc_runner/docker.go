@@ -137,5 +137,7 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 		return !unicode.IsGraphic(r)
 	})
 
+	fmt.Println(logs)
+
 	return logs, nil
 }
