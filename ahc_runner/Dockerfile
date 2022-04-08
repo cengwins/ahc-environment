@@ -5,7 +5,7 @@ WORKDIR /app
 COPY go.mod go.sum /app/
 RUN go mod download
 
-COPY *.go .
+COPY *.go ./
 
 RUN CGO_ENABLED=0 go build -o /ahc_runner
 
