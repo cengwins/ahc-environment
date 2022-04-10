@@ -17,7 +17,7 @@ const Profile = observer(() => {
   const [failedToLoad, setFailed] = useState(false);
 
   const {
-    username, email, name, surname,
+    username, email, name, surname, activated,
   } = userStore;
 
   useEffect(() => {
@@ -31,6 +31,7 @@ const Profile = observer(() => {
     { title: 'Email', value: email },
     { title: 'Name', value: name },
     { title: 'Surname', value: surname },
+    { title: 'Activated', value: activated ? 'Yes' : 'No' },
   ];
 
   const securityProperties = [
@@ -58,8 +59,8 @@ const Profile = observer(() => {
   ];
 
   return (
-    <Container sx={{ py: 5 }}>
-      <Typography component="h1" variant="h3" sx={{ my: 5, color: `${blue[700]}` }}>
+    <Container sx={{ py: 5 }} maxWidth="md">
+      <Typography component="h1" variant="h3" sx={{ my: 5, color: `${blue[600]}` }}>
         Profile
       </Typography>
       <div>

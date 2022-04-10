@@ -3,14 +3,13 @@ import {
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
 
-const MemberCard = (props : {member: {name: string, details: string, role: 'member' | 'supervisor'}}) => {
-  const { member } = props;
+const MemberCard = ({ member } : {member: {name: string, details: string, role: 'member' | 'supervisor'}}) => {
   const { role, name, details } = member;
   const title = role === 'member' ? '' : 'Supervisor, ';
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography variant={role === 'supervisor' ? 'h4' : 'h6'} component="h2" sx={{ mb: 2, color: `${blue[800]}` }}>
+        <Typography variant={role === 'supervisor' ? 'h4' : 'h6'} component="h2" sx={{ mb: 2, color: `${blue[700]}` }}>
           {`${title}${name}`}
         </Typography>
         <Typography component="span" sx={{ flexGrow: 1, alignSelf: 'center' }}>
@@ -54,8 +53,10 @@ const Team = () => {
   return (
     <div>
       <Typography component="h3" variant="h4" sx={{ mb: 2, color: `${blue[700]}` }}>Team</Typography>
-      <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
       <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid item sm={12}>
+          <MemberCard member={{ ...supervisor, role: 'supervisor' }} />
+        </Grid>
         {members.map((member) => (
           <Grid item sm={6} md={4} key={member.name}>
             <MemberCard member={{ ...member, role: 'member' }} />

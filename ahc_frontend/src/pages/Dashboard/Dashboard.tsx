@@ -1,37 +1,25 @@
 import {
-  Location, Route, Routes, useLocation, useNavigate,
+  Route, Routes, useLocation, useNavigate,
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
+  Alert,
   Box,
-  Breadcrumbs, Button, Container, Stack,
+  Breadcrumbs,
+  Button,
+  Link,
+  Container,
+  Stack,
 } from '@mui/material';
-import { useState } from 'react';
 import DashboardHome from './DashboardHome';
 import { useStores } from '../../stores/MainStore';
-import { DashboardNavigationInterface } from '../../stores/DashboardNavigationStore';
 import RepositoryNavigator from './Repository/RepositoryNavigator';
 import PageNotFound from '../PageNotFound';
-
-const getInitialValue = (
-  location: Location,
-  dashboardNavigationStore: DashboardNavigationInterface,
-) => {
-  const pathName = location.pathname.replace(/\/+$/, '');
-  if (location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`)) {
-    return `/dashboard/${dashboardNavigationStore.repositoryId}` === pathName ? 0 : 1;
-  }
-  return pathName === '/dashboard' ? 0 : 1;
-};
 
 const Dashboard = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dashboardNavigationStore } = useStores();
-  const initialValue = getInitialValue(location, dashboardNavigationStore);
-  const [value, setValue] = useState(initialValue);
-
-  if (initialValue !== value) setValue(initialValue);
+  const { dashboardNavigationStore, userStore } = useStores();
 
   const routes : {
     path: string;
@@ -51,9 +39,32 @@ const Dashboard = observer(() => {
       name: `Repository: ${dashboardNavigationStore.repositoryId}`,
       Component: <RepositoryNavigator />,
     },
+    {
+      path: '*',
+      currentPath: '*',
+      name: '404',
+      Component: <PageNotFound />,
+    },
   ];
 
-  const crumbs = routes
+  const breadcrumbRoutes: {
+    path: string;
+    currentPath: string;
+    name: string;
+  }[] = [
+    {
+      path: '/:repositoryId/experiments',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
+      name: 'Experiments',
+    },
+    {
+      path: '/:repositoryId/:experimentId',
+      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
+      name: `Experiment: ${dashboardNavigationStore.experimentId}`,
+    },
+  ];
+
+  const crumbs = ([...routes, ...breadcrumbRoutes])
     .filter(({ currentPath: pathCheck }) => location.pathname.includes(pathCheck))
     .map(({ currentPath, ...rest }) => ({
       currentPath: `/dashboard${currentPath}`,
@@ -73,12 +84,19 @@ const Dashboard = observer(() => {
               ))}
             </Breadcrumbs>
           </Box>
-
+          {!userStore.activated && (
+          <Alert sx={{ mb: 2 }} severity="error">
+            {'Your account is not yet activated. Please '}
+            <Link href="mailto:ahc@ceng.metu.edu.tr">
+              send a mail
+            </Link>
+            {' if your account is not activated after some time.'}
+          </Alert>
+          )}
           <Routes>
-            {routes.map(({ path, Component, name }) => (
+            {userStore.activated && (routes.map(({ path, Component, name }) => (
               <Route path={path} key={name} element={Component} />
-            ))}
-            <Route path="*" element={<PageNotFound />} />
+            )))}
           </Routes>
         </Box>
       </Stack>
