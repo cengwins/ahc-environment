@@ -4,6 +4,7 @@ import {
 import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
+import { CheckCircle, Cancel } from '@mui/icons-material';
 import Loading from '../../components/Loading';
 import PropertyList from '../../components/PropertyList';
 import { useStores } from '../../stores/MainStore';
@@ -31,7 +32,7 @@ const Profile = observer(() => {
     { title: 'Email', value: email },
     { title: 'Name', value: name },
     { title: 'Surname', value: surname },
-    { title: 'Activated', value: activated ? 'Yes' : 'No' },
+    { title: 'Activated', value: activated ? <CheckCircle color="success" /> : <Cancel color="error" /> },
   ];
 
   const securityProperties = [
