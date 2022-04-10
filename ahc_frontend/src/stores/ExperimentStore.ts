@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
-interface RunInfo {
+export interface RunInfo {
   id: string,
   sequence_id: number,
   created_at: Date,
