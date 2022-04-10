@@ -55,7 +55,9 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
             {experiments && experiments.map((experiment) => (
               <TableRow
                 key={experiment.id}
-                onClick={() => { navigate(`/dashboard/${repository.id}/${experiment.id}`); }}
+                onClick={() => {
+                  navigate(`/dashboard/${repository.id}/experiments/${experiment.id}`);
+                }}
                 className="experiment-item clickable"
               >
                 <TableCell>
