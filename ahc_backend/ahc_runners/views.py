@@ -89,6 +89,9 @@ class SubmitRunnerJobResultAPIView(APIView):
                     )
                     experiment_run.save()
 
+                    job.experiment_runs.add(experiment_run)
+                    job.save()
+
         if "is_running" in request.data:
             job.is_running = request.data["is_running"]
             job.save()
