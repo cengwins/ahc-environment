@@ -23,17 +23,10 @@ const RepositoryCard = ({
 }:
   {repository: RepositoryInfo, navigate: any, chosen: boolean, onValueChange: any}) => (
     <Grid item md={6} xs={12}>
-      <Card variant="outlined">
-        <CardActionArea onClick={() => navigate(`/dashboard/${repository.id}`)}>
+      <Card variant="outlined" sx={{ height: '100%' }}>
+        <CardActionArea onClick={() => navigate(`/dashboard/${repository.id}`)} sx={{ height: '100%' }}>
           <CardHeader
-            title={(
-              <Tooltip
-                title={`/dashboard/${repository.id}`}
-                sx={{ width: 'auto' }}
-              >
-                <Box>{repository.name}</Box>
-              </Tooltip>
-)}
+            title={repository.name}
             action={(
               <Checkbox
                 value={chosen}
@@ -41,14 +34,14 @@ const RepositoryCard = ({
                 onClick={(e) => e.stopPropagation()}
                 onChange={() => onValueChange(repository.id, !chosen)}
               />
-              )}
+  )}
           />
-          <CardContent>
-            <Typography>{repository.description}</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+          <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography>{repository.description || 'No description'}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', mt: 'auto' }}>
               <Tooltip
                 title={repository.upstream}
-                sx={{ ml: 'auto' }}
+                sx={{ ml: 'auto', mt: 'auto' }}
               >
                 <Button
                   target="_blank"
