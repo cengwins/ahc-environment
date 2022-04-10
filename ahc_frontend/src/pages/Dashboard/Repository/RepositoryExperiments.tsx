@@ -4,11 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
   Box,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
 } from '@mui/material';
 import Loading from '../../../components/Loading';
 import { useStores } from '../../../stores/MainStore';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
+import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
+import { ExperimentStatus } from '../../../stores/ExperimentStore';
+
+const statuses: ExperimentStatus[] = ['completed', 'failed', 'running', 'pending', 'canceled'];
 
 const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();
@@ -61,7 +65,10 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
                 className="experiment-item clickable"
               >
                 <TableCell>
-                  {`Run #${experiment.sequence_id}`}
+                  <Box sx={{ display: 'flex' }}>
+                    <ExperimentStatusIcon status={statuses[experiment.sequence_id % 5]} />
+                    <Typography sx={{ ml: 1 }}>{`Run #${experiment.sequence_id}`}</Typography>
+                  </Box>
                 </TableCell>
                 <TableCell align="right">
                   {`${new Date(experiment.updated_at).toLocaleString('tr-TR')}`}

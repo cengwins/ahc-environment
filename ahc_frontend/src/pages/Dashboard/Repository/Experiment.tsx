@@ -13,7 +13,10 @@ import { useStores } from '../../../stores/MainStore';
 import PageNotFound from '../../PageNotFound';
 import '../DashboardHome.css';
 import RunsAccordion from './RunsAccordion';
+import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
+import { ExperimentStatus } from '../../../stores/ExperimentStore';
 
+const statuses: ExperimentStatus[] = ['completed', 'failed', 'running', 'pending', 'canceled'];
 const Experiment = () => {
   const { experimentId } = useParams();
   const { dashboardNavigationStore, experimentStore } = useStores();
@@ -51,6 +54,7 @@ const Experiment = () => {
 
   const properties: {title: string, value: any}[] = [
     { title: 'Title', value: `Run #${experiment.sequence_id}` },
+    { title: 'Status', value: (<ExperimentStatusIcon status={statuses[experiment.sequence_id % 5]} />) },
     {
       title: 'Creation Time',
       value: `${new Date(experiment.created_at).toLocaleDateString('tr-TR', {
