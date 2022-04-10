@@ -10,7 +10,7 @@ const Loading = ({ loading, failed } : {loading: boolean, failed: boolean}) => {
           <Typography sx={{ mx: 'auto', mt: 1 }}>Loading..</Typography>
         </Box>
         )}
-        {failed && (
+        {failed && !loading && (
           <div>
             Failed to load. Please try again.
           </div>
