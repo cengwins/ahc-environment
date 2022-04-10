@@ -5,17 +5,21 @@ import { observer } from 'mobx-react';
 import {
   Box, Button, Tab, Tabs, Typography,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { GitHub } from '@mui/icons-material';
+import {
+  useState, useEffect, lazy,
+} from 'react';
 import { blue, grey } from '@mui/material/colors';
+import { GitHub } from '@mui/icons-material';
 import { useStores } from '../../../stores/MainStore';
 
-import RepositoryExperiments from './RepositoryExperiments';
-import Experiment from './Experiment';
-import RepositoryHome from './RepositoryHome';
 import Loading from '../../../components/Loading';
-import PageNotFound from '../../PageNotFound';
-import RepositoryConfig from './RepositoryConfig';
+import WrapWithSuspense from '../../../utils/WrapWithSuspense';
+
+const RepositoryExperiments = lazy(() => import('./RepositoryExperiments'));
+const Experiment = lazy(() => import('./Experiment'));
+const RepositoryHome = lazy(() => import('./RepositoryHome'));
+const PageNotFound = lazy(() => import('../../PageNotFound'));
+const RepositoryConfig = lazy(() => import('./RepositoryConfig'));
 
 const getInitialValue = (
   location: Location,
@@ -113,6 +117,7 @@ const RepositoryNavigator = observer(() => {
             Open in GitHub.dev
           </Button>
         </Box>
+        ,
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs
@@ -133,7 +138,11 @@ const RepositoryNavigator = observer(() => {
       </Box>
       <Routes>
         {routes.map(({ path, Component, name }) => (
-          <Route path={path} key={name} element={Component} />
+          <Route
+            path={path}
+            key={name}
+            element={(<WrapWithSuspense component={Component} />)}
+          />
         ))}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

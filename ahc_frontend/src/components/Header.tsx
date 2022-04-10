@@ -1,17 +1,19 @@
 import {
   AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { lazy, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   blue, deepPurple, green, red,
 } from '@mui/material/colors';
-import LogInDialog from './Login';
-import RegisterDialog from './Register';
 import { useStores } from '../stores/MainStore';
 import Notification from './Notification';
-import ForgotPasswordDialog from './ForgotPassword';
+import WrapWithSuspense from '../utils/WrapWithSuspense';
+
+const ForgotPasswordDialog = lazy(() => import('./ForgotPassword'));
+const LogInDialog = lazy(() => import('./Login'));
+const RegisterDialog = lazy(() => import('./Register'));
 
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -111,33 +113,42 @@ const Header = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <LogInDialog
-        open={logInOpen}
-        onClose={() => setLogInOpen(false)}
-        dontHaveAccount={() => {
-          setLogInOpen(false);
-          setRegisterOpen(true);
-        }}
-        forgotPassword={() => {
-          setLogInOpen(false);
-          setForgotPasswordOpen(true);
-        }}
+      <WrapWithSuspense component={(
+        <LogInDialog
+          open={logInOpen}
+          onClose={() => setLogInOpen(false)}
+          dontHaveAccount={() => {
+            setLogInOpen(false);
+            setRegisterOpen(true);
+          }}
+          forgotPassword={() => {
+            setLogInOpen(false);
+            setForgotPasswordOpen(true);
+          }}
+        />
+      )}
       />
-      <RegisterDialog
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        haveAccount={() => {
-          setLogInOpen(true);
-          setRegisterOpen(false);
-        }}
+      <WrapWithSuspense component={(
+        <RegisterDialog
+          open={registerOpen}
+          onClose={() => setRegisterOpen(false)}
+          haveAccount={() => {
+            setLogInOpen(true);
+            setRegisterOpen(false);
+          }}
+        />
+      )}
       />
-      <ForgotPasswordDialog
-        open={forgotPasswordOpen}
-        onClose={() => setForgotPasswordOpen(false)}
-        loginInstead={() => {
-          setForgotPasswordOpen(false);
-          setLogInOpen(true);
-        }}
+      <WrapWithSuspense component={(
+        <ForgotPasswordDialog
+          open={forgotPasswordOpen}
+          onClose={() => setForgotPasswordOpen(false)}
+          loginInstead={() => {
+            setForgotPasswordOpen(false);
+            setLogInOpen(true);
+          }}
+        />
+      )}
       />
 
       {notifications && <Notification />}

@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
-interface RunInfo {
+export interface RunInfo {
   id: string,
   sequence_id: number,
   created_at: Date,
@@ -37,6 +37,8 @@ export default class ExperimentStore implements ExperimentStoreInterface {
 
   currentExperiment: ExperimentInfo | undefined;
 
+  currentExperimentRuns: any;
+
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
     this.mainStore = mainStore;
@@ -55,6 +57,13 @@ export default class ExperimentStore implements ExperimentStoreInterface {
     if (!currentRepository) throw Error('You are not in a repository');
     const response = await (new RequestHandler()).request(`/repositories/${currentRepository.id}/experiments/${id}`, 'get');
     this.currentExperiment = response;
+  }
+
+  async getExperimentRuns(id: string) {
+    const { currentRepository } = this.mainStore.repositoriesStore;
+    if (!currentRepository) throw Error('You are not in a repository');
+    const response = await (new RequestHandler()).request(`/repositories/${currentRepository.id}/experiments/${id}/runs`, 'get');
+    this.currentExperimentRuns = response;
   }
 
   async createExperiment() {
