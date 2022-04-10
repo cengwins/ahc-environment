@@ -23,7 +23,6 @@ const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) =
   const properties = [
     { title: 'Name', value: repository.name },
     { title: 'Description', value: repository.description || 'None' },
-    { title: 'Identifier', value: repository.id },
     { title: 'Upstream', value: repository.upstream },
   ];
 

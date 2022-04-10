@@ -50,6 +50,7 @@ const Experiment = () => {
   }
 
   const properties: {title: string, value: any}[] = [
+    { title: 'Title', value: `Run #${experiment.sequence_id}` },
     {
       title: 'Creation Time',
       value: `${new Date(experiment.created_at).toLocaleDateString('tr-TR', {
@@ -66,8 +67,6 @@ const Experiment = () => {
         second: '2-digit',
       })}`,
     },
-    { title: 'ID', value: experiment.id },
-    { title: 'Sequence ID', value: `${experiment.sequence_id}` },
     { title: 'Reference', value: experiment.reference },
     { title: 'Reference Type', value: experiment.reference_type },
   ];
@@ -99,7 +98,12 @@ const Experiment = () => {
           sx={{ borderRight: 1, borderColor: 'divider' }}
         >
           {experiment.runs?.map((run, i) => (
-            <Tab label={run.sequence_id} id={run.id} value={i} />
+            <Tab
+              key={run.sequence_id}
+              label={run.sequence_id}
+              id={run.id}
+              value={i}
+            />
           ))}
         </Tabs>
         <Box sx={{ flexGrow: 1 }}>
