@@ -9,7 +9,9 @@ import {
   Grid,
   Typography,
   CardActionArea,
+  Stack,
 } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -91,6 +93,16 @@ const RepositoriesList = observer(({ chosens, setChosens }
           />
         ))}
       </Grid>
+      {repositoriesStore.repositories && repositoriesStore.repositories?.length === 0 && (
+      <Stack direction="column" spacing={1} sx={{ mt: 5 }}>
+        <Typography alignSelf="center" sx={{ color: `${blue[800]}` }} component="h2" variant="h4">
+          You have no repositories.
+        </Typography>
+        <Typography alignSelf="center" component="h3" variant="h6">
+          Add a repository to see it here.
+        </Typography>
+      </Stack>
+      )}
     </div>
   );
 });
