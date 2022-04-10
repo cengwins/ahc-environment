@@ -1,4 +1,3 @@
-import { TabPanel } from '@mui/lab';
 import {
   Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, Box, Tabs, Tab,
 } from '@mui/material';
@@ -119,26 +118,36 @@ const Experiment = () => {
         Logs
       </Typography>
 
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={shownLog}
-        onChange={(_, newValue: number) => setShownLog(newValue)}
-        aria-label="Log tabs"
-        sx={{ borderRight: 1, borderColor: 'divider' }}
+      <Box sx={{
+        display: 'flex', mb: 2,
+      }}
       >
-        {experiment.runs?.map((run) => (
-          <Tab label={run.sequence_id} id={run.id} />
-        ))}
-      </Tabs>
-      <Box sx={{ mb: 2 }}>
-        {experiment.runs?.map((run, i) => (
-          <TabPanel key={run.id} value={`${i}`}>
-            <SyntaxHighlighter key={run.id} language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-              {run.logs}
-            </SyntaxHighlighter>
-          </TabPanel>
-        ))}
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={shownLog}
+          onChange={(_, newValue: number) => setShownLog(newValue)}
+          aria-label="Log tabs"
+          sx={{ borderRight: 1, borderColor: 'divider' }}
+        >
+          {experiment.runs?.map((run, i) => (
+            <Tab label={run.sequence_id} id={run.id} value={i} />
+          ))}
+        </Tabs>
+        <Box sx={{ flexGrow: 1 }}>
+          {experiment.runs?.map((run, index) => (
+            <div
+              key={run.id}
+              role="tabpanel"
+              id={`vertical-tabpanel-${index}`}
+              hidden={index !== shownLog}
+            >
+              <SyntaxHighlighter key={run.id} language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+                {run.logs}
+              </SyntaxHighlighter>
+            </div>
+          ))}
+        </Box>
       </Box>
       <Button variant="contained">
         Download logs
