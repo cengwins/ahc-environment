@@ -21,11 +21,10 @@ const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) =
   }, [repository]);
 
   const properties = [
-    { title: 'Identifier', value: repository.id },
     { title: 'Name', value: repository.name },
-    { title: 'Slug', value: repository.slug },
+    { title: 'Description', value: repository.description || 'None' },
+    { title: 'Identifier', value: repository.id },
     { title: 'Upstream', value: repository.upstream },
-    { title: 'Upstream Type', value: repository.upstream_type },
   ];
 
   return (
