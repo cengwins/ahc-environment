@@ -16,7 +16,11 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
     if (repository.upstream) {
       axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yml`)
         .then((response) => setAhcymlContent(response.data))
-        .catch(() => setAhcymlContent('Failed to fetch ahc.yml.'));
+        .catch(() => {
+          axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
+            .then((response) => setAhcymlContent(response.data))
+            .catch(() => setAhcymlContent('Failed to fetch ahc.yml or .ahc.yml.'));
+        });
     }
   }, [repository]);
 

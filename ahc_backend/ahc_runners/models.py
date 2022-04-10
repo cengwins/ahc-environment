@@ -2,7 +2,7 @@ import uuid
 
 from django.db import models
 
-from ahc_experiments.models import Experiment
+from ahc_experiments.models import Experiment, ExperimentRun
 
 
 def generate_random_runner_secret():
@@ -23,6 +23,11 @@ class Runner(models.Model):
 class RunnerJob(models.Model):
     experiment = models.ForeignKey(
         Experiment, related_name="jobs", on_delete=models.CASCADE
+    )
+
+    experiment_runs = models.ManyToManyField(
+        ExperimentRun,
+        related_name="jobs",
     )
 
     runner = models.ForeignKey(

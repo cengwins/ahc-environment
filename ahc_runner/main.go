@@ -84,18 +84,24 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 	ahc_run_name_env_index := i
 	ahc_run_seq_env_index := i + 1
 
-	if len(config.Experiment.Runs) == 0 {
-		fmt.Printf("No run configuration found for experiment\n")
+	runs := config.Experiment.Runs
 
-		return result, err
+	if len(runs) == 0 {
+		runs = make([]ExperimentRunConfiguration, 1)
+
+		runs[0] = ExperimentRunConfiguration{
+			Name:          "run1",
+			Topology:      "sample",
+			SamplingCount: 1,
+		}
 	}
 
-	totalRuns := 0
-	for _, run := range config.Experiment.Runs {
-		totalRuns += run.SamplingCount
+	resultLength := 0
+	for _, run := range runs {
+		resultLength += run.SamplingCount
 	}
 
-	result = make([]SubmitJobResultRequestExperimentRun, totalRuns)
+	result = make([]SubmitJobResultRequestExperimentRun, resultLength)
 
 	prelogs := resultBuffer.String()
 	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
@@ -104,7 +110,7 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 	})
 
 	k := 0
-	for _, run := range config.Experiment.Runs {
+	for _, run := range runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
 		env[ahc_run_name_env_index] = fmt.Sprintf("AHC_RUN_NAME=%s", run.Name)
