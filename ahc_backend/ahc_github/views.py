@@ -1,5 +1,4 @@
-import github.GithubException
-from github import Github
+from github import Github, AuthenticatedUser, BadCredentialsException
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
@@ -27,14 +26,9 @@ class ListGithubRepositoriesAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        search = request.query_params.get("search") or ""
-
-        if len(search) < 3:
-            raise ValidationError({"search": "length must be at least 3"})
-
         github_profile: GithubProfile = request.user.github_profile
-        github_repositories = github_profile.search_repos(search)
-
+        github_repositories = github_profile.get_repos()
+        gh = GithubRepositorySerializer(github_repositories, many=True)
         return Response(GithubRepositorySerializer(github_repositories, many=True).data)
 
 
@@ -65,20 +59,37 @@ class GithubProfileAPIView(CreateAPIView):
     def perform_create(self, serializer: GithubProfileSerializer):
         access_token = serializer.validated_data["access_token"]
 
+        # (DK): g.get_user() does not raise any exceptions, invoking methods of the
+        # returned object does. Instead, we should check the oauth_scopes property of
+        # the Github object.
         g = Github(access_token)
-        try:
-            g.get_user()
-        except github.GithubException:
-            raise ValidationError({"access_token": "Access token is invalid."})
+        g_user: AuthenticatedUser = g.get_user()
 
+        try:
+            _ = g_user.name  # TERRIBLE
+
+        except BadCredentialsException:
+            if g.oauth_scopes is None:
+                raise ValidationError({"access_token": "Access token is invalid."})
+
+        if "repo" not in g.oauth_scopes:
+            raise ValidationError(
+                {"access_token": "Access token should have " "scope `repo`."}
+            )
+
+        # Overrides previous token if exists.
         try:
             github_profile = GithubProfile.objects.get(user=self.request.user)
             github_profile.access_token = access_token
+            github_profile.github_username = g_user.login
             github_profile.save()
-        except:
+        except:  # TODO: (DK) Do not swallow the exception.
             github_profile = GithubProfile.objects.create(
-                user=self.request.user, access_token=access_token
+                user=self.request.user,
+                access_token=access_token,
+                github_username=g_user.login,
             )
+            github_profile.save()
 
         return github_profile
 

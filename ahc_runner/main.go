@@ -1,153 +1,168 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"path"
+	"strings"
+	"time"
+	"unicode"
 
 	types "github.com/docker/docker/api/types"
-	containertypes "github.com/docker/docker/api/types/container"
-	mounttypes "github.com/docker/docker/api/types/mount"
-	docker "github.com/docker/docker/client"
-	git "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/google/uuid"
 	cli "github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v3"
 )
 
-const AHC_FILENAME = ".ahc.yml"
-
-type AHCConfiguration struct {
-	Image   string
-	Command string
-	Env     map[string]string
-}
-
-var volumeId string
 var containerBindPath string
 var hostBindPath string
-var containerVolumePath string
-var hostVolumePath string
 
-var ahcConfiguration AHCConfiguration
-var dockerClient docker.APIClient
+func startJobStatusUpdateService(jobId int) {
+	for range time.Tick(5 * time.Second) {
+		job, err := fetchJob(jobId)
+		if err != nil {
+			fmt.Println(job)
+			continue
+		}
 
-func clone(url string) error {
-	repo, err := git.PlainClone(containerVolumePath, false, &git.CloneOptions{
-		InsecureSkipTLS: true,
-		Depth:           1,
-		URL:             url,
-		ReferenceName:   plumbing.NewBranchReferenceName("main"),
-		SingleBranch:    true,
-		Progress:        os.Stdout,
+		if job.IsFinished {
+			fmt.Printf("Job with id %d finished, exiting from update status service\n", job.Id)
+
+			break
+		}
+
+		fmt.Printf("Job with id %d still want to continue: %t\n", job.Id, !job.WillCancel)
+	}
+}
+
+func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) {
+	var resultBuffer bytes.Buffer
+
+	result := make([]SubmitJobResultRequestExperimentRun, 0)
+
+	volumeId := uuid.NewString()
+	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
+	hostVolumePath := fmt.Sprintf("%s/%s", hostBindPath, volumeId)
+
+	fmt.Printf("Using directory %s\n", containerVolumePath)
+
+	err := gitClone(containerVolumePath, upstream_url, &resultBuffer)
+	if err != nil {
+		return result, err
+	}
+
+	config, err := readAHCConfig(containerVolumePath)
+	if err != nil {
+		return result, err
+	}
+
+	containerImage := config.Image
+
+	if containerImage == "." {
+		containerImage, err = buildImage(containerVolumePath, &resultBuffer)
+		if err != nil {
+			return result, err
+		}
+	} else {
+		err = pullImage(config.Image, &resultBuffer)
+		if err != nil {
+			return result, err
+		}
+	}
+
+	env := make([]string, len(config.Env)+3)
+	env[0] = fmt.Sprintf("AHC_TOKEN=%s", "DEFAULT_TOKEN")
+	i := 1
+
+	for k, s := range config.Env {
+		env[i] = fmt.Sprintf("%s=%s", k, s)
+		i += 1
+	}
+
+	ahc_run_name_env_index := i
+	ahc_run_seq_env_index := i + 1
+
+	runs := config.Experiment.Runs
+
+	if len(runs) == 0 {
+		runs = make([]ExperimentRunConfiguration, 1)
+
+		runs[0] = ExperimentRunConfiguration{
+			Name:          "run1",
+			Topology:      "sample",
+			SamplingCount: 1,
+		}
+	}
+
+	resultLength := 0
+	for _, run := range runs {
+		resultLength += run.SamplingCount
+	}
+
+	result = make([]SubmitJobResultRequestExperimentRun, resultLength)
+
+	prelogs := resultBuffer.String()
+	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
+	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
+		return !unicode.IsGraphic(r)
 	})
 
-	if err != nil {
-		return err
+	k := 0
+	for _, run := range runs {
+		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
+
+		env[ahc_run_name_env_index] = fmt.Sprintf("AHC_RUN_NAME=%s", run.Name)
+
+		for i := 0; i < run.SamplingCount; i++ {
+			fmt.Printf("Running for run %s sampling id %d\n", run.Name, i)
+
+			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
+
+			startTime := time.Now()
+			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env)
+			if err != nil {
+				return result, err
+			}
+			endTime := time.Now()
+
+			result[k] = SubmitJobResultRequestExperimentRun{
+				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
+				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
+				ExitCode:   0,
+				Logs:       fmt.Sprintf("Run: %s\nSampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+			}
+			k += 1
+		}
 	}
 
-	hash, err := repo.ResolveRevision(plumbing.Revision("main"))
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Successfully checkout %s\n", hash)
-
-	return nil
+	return result, nil
 }
 
-func initDocker() error {
-	var err error
-	dockerClient, err = docker.NewClientWithOpts(docker.FromEnv)
-	if err != nil {
-		return err
+func startDaemon() {
+	r := checkRunner()
+
+	if r == nil {
+		for range time.Tick(5 * time.Second) {
+			data, r := checkForNewJob()
+			if r != nil {
+				fmt.Println(r)
+				continue
+			}
+
+			fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Experiment.Repository.Name, data.Experiment.Repository.Upstream, data.Experiment.Commit)
+
+			submitRunnerJobResult(data.Id, data.Experiment.Id, nil, true, false)
+
+			go startJobStatusUpdateService(data.Id)
+
+			result, err := runJob(data.Experiment.Repository.Upstream)
+			if err == nil {
+				submitRunnerJobResult(data.Id, data.Experiment.Id, result, false, true)
+			}
+		}
 	}
-
-	return nil
-}
-
-func readConfig() (AHCConfiguration, error) {
-	buf, err := ioutil.ReadFile(path.Join(containerVolumePath, AHC_FILENAME))
-	if err != nil {
-		return AHCConfiguration{}, err
-	}
-
-	c := AHCConfiguration{}
-	err = yaml.Unmarshal(buf, &c)
-	if err != nil {
-		return AHCConfiguration{}, err
-	}
-
-	return c, nil
-}
-
-func pullImage(image string) error {
-	ctx := context.Background()
-	_, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func runContainer(image string, command string, env []string) error {
-	ctx := context.Background()
-	c, err := dockerClient.ContainerCreate(
-		ctx,
-		&containertypes.Config{
-			Image:      image,
-			Cmd:        []string{"/bin/sh", "-c", command},
-			Env:        env,
-			WorkingDir: "/app",
-		},
-		&containertypes.HostConfig{
-			Mounts: []mounttypes.Mount{
-				{
-					Type:   mounttypes.TypeBind,
-					Source: hostVolumePath,
-					Target: "/app",
-				},
-				{
-					Type:   mounttypes.TypeBind,
-					Source: "/dev/bus/usb",
-					Target: "/dev/bus/usb",
-				},
-			},
-			Privileged: true,
-		},
-		nil,
-		nil,
-		"",
-	)
-	if err != nil {
-		return err
-	}
-
-	err = dockerClient.ContainerStart(ctx, c.ID, types.ContainerStartOptions{})
-	if err != nil {
-		return err
-	}
-
-	reader, _ := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-		Follow:     true,
-	})
-	defer reader.Close()
-	content, _ := ioutil.ReadAll(reader)
-	fmt.Print(string(content))
-
-	err = dockerClient.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func main() {
@@ -161,7 +176,7 @@ func main() {
 
 			containerBindPath = os.Getenv("AHC_DATA_VOLUME")
 			if containerBindPath == "" {
-				containerBindPath = hostBindPath
+				containerBindPath = "/tmp/ahc-runner"
 			}
 
 			var err error
@@ -170,12 +185,25 @@ func main() {
 			if err != nil {
 				return err
 			}
-			volumeId = uuid.NewString()
-			containerVolumePath = fmt.Sprintf("%s/%s", containerBindPath, volumeId)
-			hostVolumePath = fmt.Sprintf("%s/%s", hostBindPath, volumeId)
 
-			fmt.Printf("Using directory %s\n", containerVolumePath)
+			return nil
+		},
+		After: func(c *cli.Context) error {
+			ctx := context.Background()
 
+			fmt.Printf("Cleaning leftovers\n")
+
+			_, err := dockerClient.BuildCachePrune(ctx, types.BuildCachePruneOptions{All: true})
+			if err != nil {
+				return err
+			}
+
+			pruneFilters := filters.NewArgs()
+			pruneFilters.Add("dangling", "false")
+			_, err = dockerClient.ImagesPrune(ctx, pruneFilters)
+			if err != nil {
+				return err
+			}
 			return nil
 		},
 		Commands: []*cli.Command{
@@ -191,31 +219,36 @@ func main() {
 				Action: func(c *cli.Context) error {
 					upstream_url := c.String("url")
 
-					clone(upstream_url)
-
-					config, err := readConfig()
+					_, err := runJob(upstream_url)
 					if err != nil {
-						return err
+						fmt.Printf("%s\n", err)
 					}
 
-					if config.Image != "." {
-						err = pullImage(config.Image)
-						if err != nil {
-							return err
-						}
-					}
+					return err
+				},
+			},
+			{
+				Name:  "daemon",
+				Usage: "Start daemon",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "url",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "secret",
+						Required: true,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					serverUrl := c.String("url")
+					serverSecret := c.String("secret")
 
-					env := make([]string, len(config.Env))
-					i := 0
-					for k, s := range config.Env {
-						env[i] = fmt.Sprintf("%s=%s", k, s)
-						i += 1
-					}
+					setServerCredentials(serverUrl, serverSecret)
 
-					err = runContainer(config.Image, config.Command, env)
-					if err != nil {
-						return err
-					}
+					fmt.Printf("Starting daemon for %s\n", serverUrl)
+
+					startDaemon()
 
 					return nil
 				},

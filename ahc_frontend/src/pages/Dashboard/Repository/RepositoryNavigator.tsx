@@ -5,27 +5,33 @@ import { observer } from 'mobx-react';
 import {
   Box, Button, Tab, Tabs, Typography,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { GitHub } from '@mui/icons-material';
+import {
+  useState, useEffect, lazy,
+} from 'react';
 import { blue, grey } from '@mui/material/colors';
+import { GitHub } from '@mui/icons-material';
 import { useStores } from '../../../stores/MainStore';
-import { DashboardNavigationInterface } from '../../../stores/DashboardNavigationStore';
 
-import RepositoryExperiments from './RepositoryExperiments';
-import Experiment from './Experiment';
-import RepositoryHome from './RepositoryHome';
 import Loading from '../../../components/Loading';
-import PageNotFound from '../../PageNotFound';
+import WrapWithSuspense from '../../../utils/WrapWithSuspense';
+
+const RepositoryExperiments = lazy(() => import('./RepositoryExperiments'));
+const Experiment = lazy(() => import('./Experiment'));
+const RepositoryHome = lazy(() => import('./RepositoryHome'));
+const PageNotFound = lazy(() => import('../../PageNotFound'));
+const RepositoryConfig = lazy(() => import('./RepositoryConfig'));
 
 const getInitialValue = (
   location: Location,
-  dashboardNavigationStore: DashboardNavigationInterface,
+  repositoryId: string,
 ) => {
   const pathName = location.pathname.replace(/\/+$/, '');
-  if (location.pathname.startsWith(`/dashboard/${dashboardNavigationStore.repositoryId}`)) {
-    return `/dashboard/${dashboardNavigationStore.repositoryId}` === pathName ? 0 : 1;
+  if (pathName === `/dashboard/${repositoryId}`) {
+    return 0;
+  } if (pathName === `/dashboard/${repositoryId}/config`) {
+    return 1;
   }
-  return pathName === '/dashboard' ? 0 : 1;
+  return 2;
 };
 
 const RepositoryNavigator = observer(() => {
@@ -33,7 +39,7 @@ const RepositoryNavigator = observer(() => {
   const { repositoryId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const initialValue = getInitialValue(location, dashboardNavigationStore);
+  const initialValue = getInitialValue(location, repositoryId as string);
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const [value, setValue] = useState(initialValue);
@@ -62,25 +68,26 @@ const RepositoryNavigator = observer(() => {
 
   const routes : {
   path: string;
-  currentPath: string;
   Component: any;
   name: string;
 }[] = [
   {
     path: '/',
-    currentPath: `/${dashboardNavigationStore.repositoryId}`,
     name: `Repository: ${dashboardNavigationStore.repositoryId}`,
     Component: <RepositoryHome repository={repository} />,
   },
   {
+    path: '/config',
+    name: `Repository Config: ${dashboardNavigationStore.repositoryId}`,
+    Component: <RepositoryConfig repository={repository} />,
+  },
+  {
     path: '/experiments',
-    currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
     name: 'Experiments',
     Component: <RepositoryExperiments repository={repository} />,
   },
   {
     path: '/:experimentId',
-    currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
     name: `Experiment: ${dashboardNavigationStore.experimentId}`,
     Component: <Experiment />,
   },
@@ -110,6 +117,7 @@ const RepositoryNavigator = observer(() => {
             Open in GitHub.dev
           </Button>
         </Box>
+        ,
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs
@@ -118,17 +126,23 @@ const RepositoryNavigator = observer(() => {
           onChange={(_, val) => {
             setValue(val);
             if (val === 0) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}`);
+            else if (val === 1) navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/config`);
             else navigate(`/dashboard/${dashboardNavigationStore.repositoryId}/experiments`);
           }}
           aria-label="basic tabs example"
         >
           <Tab label="Overview" />
+          <Tab label="Configure" />
           <Tab label="Experiments" />
         </Tabs>
       </Box>
       <Routes>
         {routes.map(({ path, Component, name }) => (
-          <Route path={path} key={name} element={Component} />
+          <Route
+            path={path}
+            key={name}
+            element={(<WrapWithSuspense component={Component} />)}
+          />
         ))}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

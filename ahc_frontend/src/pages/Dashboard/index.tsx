@@ -11,10 +11,13 @@ import {
   Container,
   Stack,
 } from '@mui/material';
-import DashboardHome from './DashboardHome';
+import { lazy } from 'react';
 import { useStores } from '../../stores/MainStore';
-import RepositoryNavigator from './Repository/RepositoryNavigator';
-import PageNotFound from '../PageNotFound';
+import WrapWithSuspense from '../../utils/WrapWithSuspense';
+
+const DashboardHome = lazy(() => import('./DashboardHome'));
+const RepositoryNavigator = lazy(() => import('./Repository/RepositoryNavigator'));
+const PageNotFound = lazy(() => import('../PageNotFound'));
 
 const Dashboard = observer(() => {
   const navigate = useNavigate();
@@ -95,7 +98,11 @@ const Dashboard = observer(() => {
           )}
           <Routes>
             {userStore.activated && (routes.map(({ path, Component, name }) => (
-              <Route path={path} key={name} element={Component} />
+              <Route
+                path={path}
+                key={name}
+                element={(<WrapWithSuspense component={Component} />)}
+              />
             )))}
           </Routes>
         </Box>

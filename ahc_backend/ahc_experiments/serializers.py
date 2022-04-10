@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
+from ahc_repositories.serializers import RepositorySerializer
 from ahc_utils.helpers import BasicException
+
+
 from .models import Experiment, ExperimentRun, ExperimentMetric
 from .custom_storage import LogStorage
 
@@ -86,3 +89,24 @@ class ExperimentMetricSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = "__all__"
+
+
+class ExperimentWithRepositorySerializer(serializers.ModelSerializer):
+    reference_type = serializers.ChoiceField(
+        choices=Experiment.ExperimentReferenceTypes.choices
+    )
+    repository = RepositorySerializer(required=False, read_only=True)
+
+    class Meta:
+        model = Experiment
+        fields = (
+            "id",
+            "sequence_id",
+            "commit",
+            "reference",
+            "reference_type",
+            "repository",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("sequence_id", "commit")

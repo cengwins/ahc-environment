@@ -27,7 +27,7 @@ const Home = () => {
     <Container sx={{ mt: 5 }}>
       <Stack direction="column" spacing={4} sx={{ my: 5 }}>
         <Box sx={{ mb: 3 }}>
-          <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
+          <Typography component="h1" variant="h3" sx={{ color: `${blue[600]}` }}>
             AHC Experimentation Environment
           </Typography>
           <Typography component="h2" variant="h5" sx={{ maxWidth: '480px', color: `${blue[400]}` }}>
