@@ -28,7 +28,6 @@ class RunnerJob(models.Model):
     experiment_runs = models.ManyToManyField(
         ExperimentRun,
         related_name="jobs",
-        null=True,
         blank=True,
     )
 
