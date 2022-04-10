@@ -61,7 +61,7 @@ func setServerCredentials(url string, secret string) {
 	serverSecret = secret
 }
 
-func makeRequest(req *http.Request) (*http.Response, error) {
+func makeHttpRequest(req *http.Request) (*http.Response, error) {
 	client := http.Client{}
 	req.Header = http.Header{
 		"Authorization": []string{fmt.Sprintf("Runner %s", serverSecret)},
@@ -73,7 +73,7 @@ func makeRequest(req *http.Request) (*http.Response, error) {
 	return res, err
 }
 
-func checkRunner() error {
+func fetchRunnerInfo() error {
 	connect_path := fmt.Sprintf("http://%s/api/runner/", serverUrl)
 
 	req, err := http.NewRequest("GET", connect_path, nil)
@@ -81,7 +81,7 @@ func checkRunner() error {
 		return err
 	}
 
-	res, err := makeRequest(req)
+	res, err := makeHttpRequest(req)
 	if err != nil {
 		return err
 	}
@@ -103,9 +103,9 @@ func checkRunner() error {
 	return nil
 }
 
-func submitRunnerJobResult(jobId int, experimentId int, result []SubmitJobResultRequestExperimentRun, isRunning bool, isFinished bool) error {
+func submitJobResult(job *RunnerJobResponse, result []SubmitJobResultRequestExperimentRun, isRunning bool, isFinished bool) error {
 	data := SubmitJobResultRequest{
-		Id:         jobId,
+		Id:         job.Id,
 		IsRunning:  isRunning,
 		IsFinished: isFinished,
 	}
@@ -121,14 +121,14 @@ func submitRunnerJobResult(jobId int, experimentId int, result []SubmitJobResult
 		return err
 	}
 
-	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/submit/", serverUrl, jobId)
+	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/submit/", serverUrl, job.Id)
 
 	req, err := http.NewRequest("POST", connect_path, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
 
-	res, err := makeRequest(req)
+	res, err := makeHttpRequest(req)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func checkForNewJob() (RunnerJobResponse, error) {
 		return RunnerJobResponse{}, err
 	}
 
-	res, err := makeRequest(req)
+	res, err := makeHttpRequest(req)
 	if err != nil {
 		return RunnerJobResponse{}, err
 	}
@@ -174,7 +174,7 @@ func checkForNewJob() (RunnerJobResponse, error) {
 	return data, nil
 }
 
-func fetchJob(jobId int) (RunnerJobResponse, error) {
+func fetchJobWithId(jobId int) (RunnerJobResponse, error) {
 	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/", serverUrl, jobId)
 
 	req, err := http.NewRequest("GET", connect_path, nil)
@@ -182,7 +182,7 @@ func fetchJob(jobId int) (RunnerJobResponse, error) {
 		return RunnerJobResponse{}, err
 	}
 
-	res, err := makeRequest(req)
+	res, err := makeHttpRequest(req)
 	if err != nil {
 		return RunnerJobResponse{}, err
 	}

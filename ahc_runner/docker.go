@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"runtime"
 	"strings"
+	"time"
 	"unicode"
 
 	types "github.com/docker/docker/api/types"
@@ -67,7 +68,7 @@ func buildImage(contextPath string, outStream io.Writer) (string, error) {
 	return imageId, nil
 }
 
-func runContainer(hostVolumePath string, image string, command string, env []string) (string, error) {
+func runContainer(hostVolumePath string, image string, command string, env []string, cancelChannel *chan bool) (string, error) {
 	dockerHostConfig := containertypes.HostConfig{
 		Mounts: []mounttypes.Mount{
 			{
@@ -103,20 +104,36 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 		"",
 	)
 	if err != nil {
-		fmt.Printf("%s\n", err)
+		fmt.Println(err)
 		return "", err
 	}
 
 	err = dockerClient.ContainerStart(ctx, c.ID, types.ContainerStartOptions{})
 	if err != nil {
-		fmt.Printf("%s\n", err)
+		fmt.Println(err)
 		return "", err
 	}
 
+	finishContainerChannel := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-finishContainerChannel:
+				break
+			case <-*cancelChannel:
+				timeout := 2 * time.Second
+
+				dockerClient.ContainerStop(context.Background(), c.ID, &timeout)
+
+				break
+			}
+		}
+	}()
 	reader, err := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Follow:     true,
+		Details:    true,
 	})
 	if err != nil {
 		return "", err
@@ -125,7 +142,9 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 
 	readerContent, _ := ioutil.ReadAll(reader)
 
-	err = dockerClient.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{})
+	err = dockerClient.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{
+		Force: true,
+	})
 	if err != nil {
 		return "", err
 	}
@@ -138,6 +157,8 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	})
 
 	fmt.Println(logs)
+
+	finishContainerChannel <- true
 
 	return logs, nil
 }
