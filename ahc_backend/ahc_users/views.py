@@ -88,7 +88,7 @@ class ActivateUserAPIView(APIView):
         if not code:
             return serializers.ValidationError("code should not be empty")
 
-        confirmation_code = UserConfirmationCode.objects.filter(code=code).get()
+        confirmation_code = UserConfirmationCode.objects.filter(code=code).first()
 
         if not confirmation_code:
             return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
