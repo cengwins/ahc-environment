@@ -2,8 +2,11 @@ import { makeAutoObservable } from 'mobx';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
+export type ExperimentStatus = 'completed' | 'failed' | 'running' | 'pending' | 'canceled';
+
 export interface RunInfo {
   id: string,
+  status: ExperimentStatus,
   sequence_id: number,
   created_at: Date,
   updated_at: Date,

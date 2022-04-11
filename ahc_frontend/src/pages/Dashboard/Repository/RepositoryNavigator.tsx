@@ -30,8 +30,10 @@ const getInitialValue = (
     return 0;
   } if (pathName === `/dashboard/${repositoryId}/config`) {
     return 1;
+  } if (pathName === `/dashboard/${repositoryId}/experiments`) {
+    return 2;
   }
-  return 2;
+  return false;
 };
 
 const RepositoryNavigator = observer(() => {
@@ -42,7 +44,7 @@ const RepositoryNavigator = observer(() => {
   const initialValue = getInitialValue(location, repositoryId as string);
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState<number | false>(initialValue);
 
   const { currentRepository: repository } = repositoriesStore;
 
@@ -87,7 +89,7 @@ const RepositoryNavigator = observer(() => {
     Component: <RepositoryExperiments repository={repository} />,
   },
   {
-    path: '/:experimentId',
+    path: '/experiments/:experimentId',
     name: `Experiment: ${dashboardNavigationStore.experimentId}`,
     Component: <Experiment />,
   },

@@ -18,7 +18,7 @@ const ListField = ({ title, value }: {title: string, value: any}) => (
 
 const PropertyList = ({ properties } : {properties: {title: string, value: any}[]}) => (
   <List sx={{ width: '%100' }}>
-    {properties.map(({ title, value }) => (<ListField title={title} value={value} />))}
+    {properties.map(({ title, value }) => (<ListField key={title} title={title} value={value} />))}
   </List>
 );
 

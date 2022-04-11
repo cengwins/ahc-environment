@@ -8,7 +8,14 @@ import PropertyList from '../../../components/PropertyList';
 
 const RunDetails = ({ run }: {run:RunInfo}) => {
   const properties: {title: string, value: any}[] = [
-    { title: 'Sequence ID', value: `${run.sequence_id}` },
+    {
+      title: 'Started at',
+      value: `${new Date(run.started_at).toLocaleDateString('tr-TR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })}`,
+    },
     {
       title: 'Finished at',
       value: `${new Date(run.finished_at).toLocaleDateString('tr-TR', {
@@ -17,7 +24,6 @@ const RunDetails = ({ run }: {run:RunInfo}) => {
         second: '2-digit',
       })}`,
     },
-    { title: 'ID', value: run.id },
   ];
 
   return (
@@ -46,7 +52,7 @@ const RunsAccordion = ({ runs }: {runs: RunInfo[]}) => {
             aria-controls="panel1a-content"
             id="panel1a-header"
           >
-            <Typography>{`Run ${run.sequence_id}`}</Typography>
+            <Typography>{`Run #${run.sequence_id}`}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <RunDetails run={run} />

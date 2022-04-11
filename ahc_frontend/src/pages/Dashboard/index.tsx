@@ -24,6 +24,8 @@ const Dashboard = observer(() => {
   const location = useLocation();
   const { dashboardNavigationStore, userStore } = useStores();
 
+  const { repositoryId, experimentId } = dashboardNavigationStore;
+
   const routes : {
     path: string;
     currentPath: string;
@@ -38,8 +40,8 @@ const Dashboard = observer(() => {
     },
     {
       path: '/:repositoryId/*',
-      currentPath: `/${dashboardNavigationStore.repositoryId}`,
-      name: `Repository: ${dashboardNavigationStore.repositoryId}`,
+      currentPath: `/${repositoryId}`,
+      name: `Repository: ${repositoryId}`,
       Component: <RepositoryNavigator />,
     },
     {
@@ -57,13 +59,13 @@ const Dashboard = observer(() => {
   }[] = [
     {
       path: '/:repositoryId/experiments',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/experiments`,
+      currentPath: `/${repositoryId}/experiments`,
       name: 'Experiments',
     },
     {
-      path: '/:repositoryId/:experimentId',
-      currentPath: `/${dashboardNavigationStore.repositoryId}/${dashboardNavigationStore.experimentId}`,
-      name: `Experiment: ${dashboardNavigationStore.experimentId}`,
+      path: '/:repositoryId/experiments/:experimentId',
+      currentPath: `/${repositoryId}/experiments/${experimentId}`,
+      name: `Experiment: ${experimentId}`,
     },
   ];
 
