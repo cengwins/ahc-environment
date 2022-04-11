@@ -14,7 +14,7 @@ class ExperimentRunTabularInline(nested_admin.NestedTabularInline):
 class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
     model = ExperimentRun
     readonly_fields = (
-        "get_log_url",
+        "log_url_as_link",
         "sequence_id",
         "exit_code",
     )
@@ -25,7 +25,7 @@ class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
                 "fields": (
                     ("sequence_id", "exit_code"),
                     ("finished_at", "started_at"),
-                    ("get_log_url",),
+                    ("log_url_as_link",),
                 ),
             },
         ),
@@ -78,7 +78,7 @@ class ExperimentRunAdmin(ImportExportModelAdmin):
         "finished_at",
         "exit_code",
         "log_path",
-        "get_log_url",
+        "log_url_as_link",
     ]
 
 

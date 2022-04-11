@@ -130,6 +130,9 @@ class Experiment(models.Model):
         5) finished: is_finished == True and will_cancel == False
         """
         qs = self.jobs
+
+        if qs.count() == 0:
+            return ExperimentStatus.WILL_RUN
         if qs.filter(Q(is_running=False) & Q(is_finished=False)).exists():
             return ExperimentStatus.WILL_RUN
         if qs.filter(Q(is_running=True) & Q(will_cancel=False)).exists():
@@ -193,13 +196,24 @@ class ExperimentRun(models.Model):
     def __str__(self):
         return f"Experiment {self.experiment.id} - Run #{self.sequence_id}"
 
-    def get_log_url(self):
+    @property
+    def log_url(self):
         try:
-            return format_html(
-                "<a href='{url}'>Download logs</a>", url=log_storage.url(self.log_path)
-            )
+            return log_storage.url(self.log_path)
         except:
             return None
+
+    @property
+    def log_url_as_link(self):
+        url = self.log_url
+
+        if not url:
+            return None
+
+        return format_html(
+            "<a href='{url}'>Download logs</a>",
+            url=url,
+        )
 
     class Meta:
         ordering = ("-sequence_id", "-created_at")

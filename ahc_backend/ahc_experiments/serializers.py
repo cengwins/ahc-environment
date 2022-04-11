@@ -11,20 +11,6 @@ log_storage_inst = LogStorage()
 
 
 class ExperimentRunSerializer(serializers.ModelSerializer):
-    logs = serializers.SerializerMethodField()
-
-    def get_logs(self, obj: ExperimentRun):
-        if not obj.log_path:
-            return None
-        try:
-            file = log_storage_inst.open(obj.log_path, "r")
-        except Exception as e:
-            raise BasicException(e)
-
-        content = file.read()
-        file.close()
-        return content
-
     class Meta:
         model = ExperimentRun
         fields = (
@@ -34,7 +20,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "finished_at",
             "exit_code",
             "log_path",
-            "logs",
+            "log_url",
             "created_at",
             "updated_at",
         )
@@ -45,7 +31,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
             "finished_at",
             "exit_code",
             "log_path",
-            "logs",
+            "log_url",
             "created_at",
             "updated_at",
         )
@@ -65,6 +51,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
             "commit",
             "reference",
             "reference_type",
+            "status",
             "created_at",
             "updated_at",
             "runs",
@@ -105,6 +92,7 @@ class ExperimentWithRepositorySerializer(serializers.ModelSerializer):
             "commit",
             "reference",
             "reference_type",
+            "status",
             "repository",
             "created_at",
             "updated_at",

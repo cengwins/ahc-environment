@@ -16,7 +16,7 @@ import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentStatus } from '../../../stores/ExperimentStore';
 
-const statuses: ExperimentStatus[] = ['completed', 'failed', 'running', 'pending', 'canceled'];
+const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed'];
 const Experiment = () => {
   const { experimentId } = useParams();
   const { dashboardNavigationStore, experimentStore } = useStores();
@@ -54,7 +54,7 @@ const Experiment = () => {
 
   const properties: {title: string, value: any}[] = [
     { title: 'Title', value: `Run #${experiment.sequence_id}` },
-    { title: 'Status', value: (<ExperimentStatusIcon status={statuses[experiment.sequence_id % 5]} />) },
+    { title: 'Status', value: (<ExperimentStatusIcon status={statuses[experiment.status - 1]} />) },
     {
       title: 'Creation Time',
       value: `${new Date(experiment.created_at).toLocaleDateString('tr-TR', {
@@ -121,13 +121,13 @@ const Experiment = () => {
               <SyntaxHighlighter key={run.id} language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
                 {run.logs}
               </SyntaxHighlighter>
+              <Button variant="contained" href={run.log_url}>
+                Download log
+              </Button>
             </div>
           ))}
         </Box>
       </Box>
-      <Button variant="contained">
-        Download logs
-      </Button>
     </Box>
   );
 };

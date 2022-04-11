@@ -1,4 +1,6 @@
 import { makeAutoObservable } from 'mobx';
+import axios from 'axios';
+
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
@@ -14,6 +16,7 @@ export interface RunInfo {
   finished_at: Date,
   exit_code: number,
   log_path: string,
+  log_url: string,
   logs: string,
 }
 
@@ -23,6 +26,7 @@ interface ExperimentInfo {
   commit: string,
   reference: string,
   reference_type: string,
+  status: number,
   created_at: Date,
   updated_at: Date,
   runs?: RunInfo[],
@@ -59,6 +63,12 @@ export default class ExperimentStore implements ExperimentStoreInterface {
     const { currentRepository } = this.mainStore.repositoriesStore;
     if (!currentRepository) throw Error('You are not in a repository');
     const response = await (new RequestHandler()).request(`/repositories/${currentRepository.id}/experiments/${id}`, 'get');
+    await Promise.all(
+      response.runs.map(async (run: any) => {
+        // eslint-disable-next-line no-param-reassign
+        run.logs = (await axios.get(run.log_url)).data;
+      }),
+    );
     this.currentExperiment = response;
   }
 
