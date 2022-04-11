@@ -80,10 +80,10 @@ export default class UserStore implements UserStoreInterface {
   }
 
   static async resetPasswordRequest(data: { email: string }) {
-    await (new RequestHandler()).request('/user/password_reset/', 'post', data);
+    await (new RequestHandler()).request('/auth/password_reset/', 'post', data);
   }
 
   static async resetPassword(data: { code: string, password: string }) {
-    await (new RequestHandler()).request('/user/password_reset/', 'patch', data);
+    await (new RequestHandler()).request('/auth/password_reset/', 'patch', data);
   }
 }
