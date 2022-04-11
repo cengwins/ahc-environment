@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from django.contrib import admin
 
 from functools import cached_property
 
@@ -30,7 +31,6 @@ class UserConfirmationCode(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(
         User, unique=True, related_name="profile", on_delete=models.CASCADE
@@ -56,12 +56,32 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
+    def _username(self):
+        return self.user.username
+
+    def _email(self):
+        return self.user.email
+
+    def _first_name(self):
+        return self.user.first_name
+
+    def _last_name(self):
+        return self.user.last_name
+
+    @admin.display(boolean=True)
+    def _is_active(self):
+        return self.user.is_active
+
+    def _is_superuser(self):
+        return self.user.is_superuser
+
+
     @staticmethod
     def find_username_or_email(alias: str):
         return (
             UserProfile.objects.filter(is_email_confirmed=True, user__is_active=True)
-            .filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias))
-            .first()
+                .filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias))
+                .first()
         )
 
 

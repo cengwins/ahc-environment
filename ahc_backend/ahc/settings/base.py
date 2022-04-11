@@ -31,6 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "import_export",
+    "nested_admin",
+    "admin_interface",
+    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -47,6 +51,10 @@ INSTALLED_APPS = [
     "ahc_experiments",
     "ahc_runners",
 ]
+
+#Admin customization
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
