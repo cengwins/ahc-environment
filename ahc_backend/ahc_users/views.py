@@ -26,10 +26,12 @@ class RegisterAPIView(CreateAPIView):
 
     def perform_create(self, serializer) -> User:
         alias = serializer.validated_data["email"]
-        profile = UserProfile.objects.filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias)).first()
+        profile = UserProfile.objects.filter(
+            Q(user__username__iexact=alias) | Q(user__email__iexact=alias)
+        ).first()
 
         if profile:
-            raise unauthorized('email_exists')
+            raise unauthorized("email_exists")
 
         user: User = serializer.save()
 
@@ -80,9 +82,7 @@ class GetUserProfileAPIView(APIView):
 
 
 class ActivateUserAPIView(APIView):
-    def get(self, request):
-        code = request.query_params.get("code")
-
+    def get(self, request, code):
         if not code:
             return serializers.ValidationError("code should not be empty")
 
@@ -128,7 +128,7 @@ class PasswordResetAPIView(APIView):
             "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
-            html_message=email_content
+            html_message=email_content,
         )
 
         return Response(
