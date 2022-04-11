@@ -1,6 +1,8 @@
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.http import HttpResponseRedirect
+
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView
@@ -93,11 +95,7 @@ class ActivateUserAPIView(APIView):
         user.profile.is_email_confirmed = True
         user.save()
 
-        return Response(
-            {
-                "success": True,
-            }
-        )
+        return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
 
 
 # TODO: improve these views
