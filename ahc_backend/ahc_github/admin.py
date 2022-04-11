@@ -24,4 +24,3 @@ class GithubRepositoryDeployTokenAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(GithubProfile, GithubProfileAdmin)
-admin.site.register(GithubRepositoryDeployToken, GithubRepositoryDeployTokenAdmin)
