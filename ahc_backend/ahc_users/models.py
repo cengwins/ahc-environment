@@ -73,6 +73,10 @@ class UserProfile(models.Model):
     def _last_name(self):
         return self.user.last_name
 
+    @admin.display(boolean=True, ordering="user__is_activated")
+    def _is_activated(self):
+        return self.is_activated
+
     @admin.display(boolean=True, ordering="user__is_active")
     def _is_active(self):
         return self.user.is_active
