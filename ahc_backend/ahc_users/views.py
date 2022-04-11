@@ -151,6 +151,7 @@ class PasswordResetAPIView(APIView):
 
         password_reset.is_used = True
         password_reset.user.set_password(request.data["password"])
+        password_reset.user.save()
         password_reset.save()
 
         return Response(
