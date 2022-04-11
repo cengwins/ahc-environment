@@ -82,4 +82,4 @@ class AHCRepositoryEnvVariableAdmin(ImportExportModelAdmin):
 
 admin.site.register(Repository, AHCRepositoryAdmin)
 admin.site.register(RepositoryUser, AHCRepositoryUserAdmin)
-admin.site.register(RepositoryEnvVariable, AHCRepositoryEnvVariableAdmin)
+# admin.site.register(RepositoryEnvVariable, AHCRepositoryEnvVariableAdmin)

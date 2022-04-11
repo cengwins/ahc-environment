@@ -42,6 +42,7 @@ class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = ExperimentResource
     inlines = [ExperimentRunStackedInline]
     list_display = [
+        "id",
         "_repo_owner_username",
         "_repo_name",
         "status",
@@ -70,6 +71,15 @@ class ExperimentRunResource(resources.ModelResource):
 
 class ExperimentRunAdmin(ImportExportModelAdmin):
     resource_class = ExperimentRunResource
+    readonly_fields = [
+        "experiment",
+        "sequence_id",
+        "started_at",
+        "finished_at",
+        "exit_code",
+        "log_path",
+        "get_log_url",
+    ]
 
 
 class ExperimentMetricResource(resources.ModelResource):
