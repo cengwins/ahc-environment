@@ -42,5 +42,11 @@ class RunnerJob(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def _experiment_runs_list(self):
+        if self.experiment_runs.exists():
+            return ", ".join([str(run) for run in self.experiment_runs.all()])
+        else:
+            return "-"
+
     def __str__(self):
         return f"{self.experiment.pk} - {self.created_at}"
