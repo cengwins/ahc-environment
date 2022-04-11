@@ -1,4 +1,5 @@
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -26,10 +27,10 @@ class RegisterAPIView(CreateAPIView):
     def perform_create(self, serializer) -> User:
         user: User = serializer.save()
 
-        user.is_active = True  # TODO: disable later, just for testing purposes
+        user.is_active = False
         user.save()
 
-        UserProfile.objects.create(user=user, is_email_confirmed=True)
+        UserProfile.objects.create(user=user, is_email_confirmed=False)
         UserConfirmationCode.objects.create(user=user)
 
         return user
@@ -112,10 +113,12 @@ class PasswordResetAPIView(APIView):
             return unauthorized("user_ne")
 
         password_reset = UserPasswordReset.objects.create(user=user)
-
+        email_content = render_to_string(
+            "password_reset.html", {"code": password_reset.code}
+        )
         send_mail(
             "Password Reset Request for AHC!",
-            f"Please click here to reset your password. Click here to reset your password {password_reset.code}",
+            email_content,
             "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
