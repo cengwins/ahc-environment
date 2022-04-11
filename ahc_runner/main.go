@@ -10,7 +10,6 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/cengwins/ahc-environment/runner/broadcastserver"
 	types "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/google/uuid"
@@ -47,10 +46,10 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	var resultBuffer bytes.Buffer
 	cancelChannel := make(chan bool)
 	result := make([]SubmitJobResultRequestExperimentRun, 0)
-	bServer := new(broadcastserver.SocketServer)
+	// bServer := new(broadcastserver.SocketServer)
 
 	submitJobResult(job, nil, true, false)
-	go bServer.Start()
+	// go bServer.Start()
 	go startJobStatusUpdateService(job, &cancelChannel)
 
 	volumeId := uuid.NewString()
@@ -153,7 +152,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	bServer.Stop()
+	// bServer.Stop()
 
 	submitJobResult(job, result, false, true)
 
