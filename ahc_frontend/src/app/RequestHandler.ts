@@ -10,7 +10,7 @@ export default class RequestHandler {
 
     this.axiosInstance = axios.create({
       baseURL: process.env.REACT_APP_SERVER_URL || 'http://localhost:8000/api/',
-      timeout: 5000,
+      timeout: 30000,
       headers: headers as AxiosRequestHeaders,
     });
   }
