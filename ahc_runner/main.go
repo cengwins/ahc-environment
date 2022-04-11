@@ -19,11 +19,12 @@ import (
 var containerBindPath string
 var hostBindPath string
 
-func startJobStatusUpdateService(jobId int) {
+func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan bool) {
+	var err error
+
 	for range time.Tick(5 * time.Second) {
-		job, err := fetchJob(jobId)
+		*job, err = fetchJobWithId(job.Id)
 		if err != nil {
-			fmt.Println(job)
 			continue
 		}
 
@@ -33,14 +34,23 @@ func startJobStatusUpdateService(jobId int) {
 			break
 		}
 
-		fmt.Printf("Job with id %d still want to continue: %t\n", job.Id, !job.WillCancel)
+		if job.WillCancel {
+			*cancelChannel <- true
+
+			break
+		}
 	}
 }
 
-func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) {
+func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, error) {
 	var resultBuffer bytes.Buffer
-
+	cancelChannel := make(chan bool)
 	result := make([]SubmitJobResultRequestExperimentRun, 0)
+	// bServer := new(broadcastserver.SocketServer)
+
+	submitJobResult(job, nil, true, false)
+	// go bServer.Start()
+	go startJobStatusUpdateService(job, &cancelChannel)
 
 	volumeId := uuid.NewString()
 	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
@@ -48,7 +58,7 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	err := gitClone(containerVolumePath, upstream_url, &resultBuffer)
+	err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, &resultBuffer)
 	if err != nil {
 		return result, err
 	}
@@ -96,20 +106,14 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 		}
 	}
 
-	resultLength := 0
-	for _, run := range runs {
-		resultLength += run.SamplingCount
-	}
-
-	result = make([]SubmitJobResultRequestExperimentRun, resultLength)
-
 	prelogs := resultBuffer.String()
 	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
 	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
 		return !unicode.IsGraphic(r)
 	})
 
-	k := 0
+	fmt.Println(prelogs)
+
 	for _, run := range runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
@@ -121,48 +125,38 @@ func runJob(upstream_url string) ([]SubmitJobResultRequestExperimentRun, error) 
 			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
 
 			startTime := time.Now()
-			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env)
+			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, &cancelChannel)
 			if err != nil {
 				return result, err
 			}
 			endTime := time.Now()
 
-			result[k] = SubmitJobResultRequestExperimentRun{
+			if job.WillCancel {
+				logs += "\n[SYSTEM] Stopping the experiment after user request.\n"
+			}
+
+			result = append(result, SubmitJobResultRequestExperimentRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("Run: %s\nSampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+				Logs:       fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+			})
+
+			if job.WillCancel {
+				break
 			}
-			k += 1
+		}
+
+		if job.WillCancel {
+			break
 		}
 	}
+
+	// bServer.Stop()
+
+	submitJobResult(job, result, false, true)
 
 	return result, nil
-}
-
-func startDaemon() {
-	r := checkRunner()
-
-	if r == nil {
-		for range time.Tick(5 * time.Second) {
-			data, r := checkForNewJob()
-			if r != nil {
-				fmt.Println(r)
-				continue
-			}
-
-			fmt.Printf("Found job from repository %s from upstream %s commit %s\n", data.Experiment.Repository.Name, data.Experiment.Repository.Upstream, data.Experiment.Commit)
-
-			submitRunnerJobResult(data.Id, data.Experiment.Id, nil, true, false)
-
-			go startJobStatusUpdateService(data.Id)
-
-			result, err := runJob(data.Experiment.Repository.Upstream)
-			if err == nil {
-				submitRunnerJobResult(data.Id, data.Experiment.Id, result, false, true)
-			}
-		}
-	}
 }
 
 func main() {
@@ -208,26 +202,6 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "start",
-				Usage: "Start runner",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:     "url",
-						Required: true,
-					},
-				},
-				Action: func(c *cli.Context) error {
-					upstream_url := c.String("url")
-
-					_, err := runJob(upstream_url)
-					if err != nil {
-						fmt.Printf("%s\n", err)
-					}
-
-					return err
-				},
-			},
-			{
 				Name:  "daemon",
 				Usage: "Start daemon",
 				Flags: []cli.Flag{
@@ -248,7 +222,24 @@ func main() {
 
 					fmt.Printf("Starting daemon for %s\n", serverUrl)
 
-					startDaemon()
+					r := fetchRunnerInfo()
+
+					if r == nil {
+						for range time.Tick(5 * time.Second) {
+							job, r := checkForNewJob()
+							if r != nil {
+								fmt.Println(r)
+								continue
+							}
+
+							fmt.Printf("Found job from repository %s from upstream %s commit %s\n", job.Experiment.Repository.Name, job.Experiment.Repository.Upstream, job.Experiment.Commit)
+
+							_, err := runJob(&job)
+							if err != nil {
+								fmt.Println(err)
+							}
+						}
+					}
 
 					return nil
 				},
