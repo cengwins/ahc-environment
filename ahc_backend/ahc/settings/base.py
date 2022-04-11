@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "ahc_runners",
 ]
 
-#Admin customization
+# Admin customization
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
@@ -157,3 +157,4 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "postmaster@ahc.oznakn.com")
 EMAIL_HOST_PASSWORD = os.environ.get(
     "EMAIL_HOST_PASSWORD", "9c42388d89280d0e13737fae8809d854-7b8c9ba8-7bda684b"
 )
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "false") == "true"
