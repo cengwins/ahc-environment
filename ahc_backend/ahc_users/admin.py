@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 from django.contrib import admin
-from django.contrib.auth import models as m
+from django.http import HttpRequest
 
 from .models import *
 from import_export import resources
@@ -37,7 +37,7 @@ class UserProfileResource(resources.ModelResource):
 class UserProfileAdmin(ImportExportModelAdmin):
     resource_class = UserProfileResource
     list_display = (
-        '_username', '_email', '_first_name', '_last_name', 'last_login', '_is_active', 'is_email_confirmed')
+        '_username', '_email', '_first_name', '_last_name', 'last_login', '_is_active', 'is_email_confirmed', '_groups')
     list_filter = ('last_login', 'created_at', 'is_email_confirmed')
     search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
     actions = [activate_users_action, deactivate_users_action]
@@ -68,4 +68,5 @@ class UserPasswordResetAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.unregister(m.User)
+admin.site.register(UserConfirmationCode, UserConfirmationCodeAdmin)
+admin.site.register(UserPasswordReset, UserPasswordResetAdmin)
