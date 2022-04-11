@@ -7,8 +7,9 @@ from django.contrib import admin
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
+from django.utils.html import format_html
 
-from ahc_repositories.models import Repository
+from ahc_repositories.models import Repository, RepositoryUser
 
 from ahc_experiments.custom_storage import LogStorage
 
@@ -144,7 +145,14 @@ class Experiment(models.Model):
         return self.repository.name
 
     def _repo_owner_username(self):
-        return self.repository.users.filter(type="OWNER").get().user.username
+        repo_user = self.repository.users.filter(
+            type=RepositoryUser.RepositoryUserTypes.OWNER
+        ).get()
+
+        if repo_user is None:
+            repo_user = self.repository.users.get()
+
+        return repo_user.user.username
 
     def _last_run_log_path(self):
         """Returns the log path of the most recent FINISHED run."""
@@ -185,9 +193,11 @@ class ExperimentRun(models.Model):
     def __str__(self):
         return f"Experiment {self.experiment.id} - Run #{self.sequence_id}"
 
-    def get_log_content(self):
+    def get_log_url(self):
         try:
-            return log_storage.open(self.log_path).read()
+            return format_html(
+                "<a href='{url}'>Download logs</a>", url=log_storage.url(self.log_path)
+            )
         except:
             return None
 

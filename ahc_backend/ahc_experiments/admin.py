@@ -14,7 +14,7 @@ class ExperimentRunTabularInline(nested_admin.NestedTabularInline):
 class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
     model = ExperimentRun
     readonly_fields = (
-        "get_log_content",
+        "get_log_url",
         "sequence_id",
         "exit_code",
     )
@@ -22,10 +22,13 @@ class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
         (
             None,
             {
-                "fields": (("sequence_id", "exit_code"), ("finished_at", "started_at")),
+                "fields": (
+                    ("sequence_id", "exit_code"),
+                    ("finished_at", "started_at"),
+                    ("get_log_url",),
+                ),
             },
         ),
-        (None, {"classes": ("collapse", "wide"), "fields": ("get_log_content",)}),
     )
     extra = 0
 

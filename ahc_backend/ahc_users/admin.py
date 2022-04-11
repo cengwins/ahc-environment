@@ -1,9 +1,4 @@
-from __future__ import annotations
-
-from functools import partial
-
 from django.contrib import admin
-from django.contrib.auth import models as m
 
 from .models import *
 from import_export import resources
@@ -90,4 +85,3 @@ class UserPasswordResetAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.unregister(m.User)

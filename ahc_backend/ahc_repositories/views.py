@@ -25,7 +25,11 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
     def perform_create(self, serializer):
         repository = serializer.save()
 
-        RepositoryUser.objects.create(repository=repository, user=self.request.user)
+        RepositoryUser.objects.create(
+            repository=repository,
+            user=self.request.user,
+            type=RepositoryUser.RepositoryUserTypes.OWNER,
+        )
 
         return repository
 
