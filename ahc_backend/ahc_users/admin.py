@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Union, Tuple, List
 
 from django.contrib import admin
-from django.http import HttpRequest
+from django.contrib.auth import models as m
 
 from .models import *
 from import_export import resources
@@ -68,5 +67,4 @@ class UserPasswordResetAdmin(ImportExportModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(UserConfirmationCode, UserConfirmationCodeAdmin)
-admin.site.register(UserPasswordReset, UserPasswordResetAdmin)
+admin.site.unregister(m.User)

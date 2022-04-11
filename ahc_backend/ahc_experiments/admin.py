@@ -41,4 +41,3 @@ class ExperimentMetricAdmin(ImportExportModelAdmin):
 
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(ExperimentRun, ExperimentRunAdmin)
-admin.site.register(ExperimentMetric, ExperimentMetricAdmin)
