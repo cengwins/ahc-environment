@@ -3,6 +3,12 @@ from django.contrib import admin
 from .models import *
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
+import nested_admin
+
+
+class ExperimentRunInline(nested_admin.NestedTabularInline):
+    model = ExperimentRun
+    extra = 0
 
 
 class ExperimentResource(resources.ModelResource):
@@ -10,15 +16,9 @@ class ExperimentResource(resources.ModelResource):
         model = Experiment
 
 
-class ExperimentAdmin(ImportExportModelAdmin):
+class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = ExperimentResource
-    list_display = [
-        "_repo_owner_username",
-        "_repo_name",
-        "sequence_id",
-        "commit",
-        "status",
-    ]
+    inlines = [ExperimentRunInline]
 
 
 class ExperimentRunResource(resources.ModelResource):
@@ -41,3 +41,4 @@ class ExperimentMetricAdmin(ImportExportModelAdmin):
 
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(ExperimentRun, ExperimentRunAdmin)
+admin.site.register(ExperimentMetric, ExperimentMetricAdmin)

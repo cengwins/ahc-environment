@@ -1,8 +1,20 @@
 from django.contrib import admin
-
+import nested_admin
+from ahc_experiments.models import Experiment, ExperimentRun
 from .models import *
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
+
+
+class ExperimentRunInline(nested_admin.NestedTabularInline):
+    model = ExperimentRun
+    extra = 0
+
+
+class ExperimentInline(nested_admin.NestedTabularInline):
+    model = Experiment
+    extra = 0
+    inlines = [ExperimentRunInline]
 
 
 class AHCRepositoryResource(resources.ModelResource):
@@ -10,11 +22,12 @@ class AHCRepositoryResource(resources.ModelResource):
         model = Repository
 
 
-class AHCRepositoryAdmin(ImportExportModelAdmin):
+class AHCRepositoryAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = AHCRepositoryResource
-    list_display = ('name', 'description', 'private','html_url', 'created_at', 'updated_at')
+    list_display = ('name', 'description', 'private', 'html_url', 'created_at', 'updated_at')
     list_filter = ('created_at', 'updated_at', 'private')
     search_fields = ('name', 'description', 'html_url')
+    inlines = [ExperimentInline]
 
 
 class AHCRepositoryUserResource(resources.ModelResource):
