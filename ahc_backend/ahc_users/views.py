@@ -122,6 +122,7 @@ class PasswordResetAPIView(APIView):
             "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
+            html_message=email_content
         )
 
         return Response(
