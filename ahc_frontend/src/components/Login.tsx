@@ -29,15 +29,19 @@ const LogInDialog = ({
           onSubmit={(e) => {
             e.preventDefault();
             setWaitingResponse(true);
-            userStore.login({ username, password }).then(() => {
-              notificationStore.set('success', 'Logged in!');
-              onClose();
-              navigate('/dashboard');
-            }).catch((result) => {
-              notificationStore.set('error', result.message);
-            }).finally(() => {
-              setWaitingResponse(false);
-            });
+            userStore.login({ username, password })
+              .then(() => {
+                notificationStore.set('success', 'Logged in!');
+                onClose();
+              })
+              .then(() => userStore.getProfile())
+              .then(() => navigate('/dashboard'))
+              .catch((result) => {
+                notificationStore.set('error', result.message);
+              })
+              .finally(() => {
+                setWaitingResponse(false);
+              });
           }}
         >
           <FormGroup sx={{ mb: 2, pt: 1 }}>
