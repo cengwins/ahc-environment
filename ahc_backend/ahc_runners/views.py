@@ -32,7 +32,7 @@ class AssignRunnerJobAPIView(APIView):
     def get(self, request: Request):
         runner = request.runner
 
-        job = RunnerJob.objects.filter(runner=None).first()
+        job = RunnerJob.objects.filter(runner=None, will_cancel=False).first()
 
         if job is None:
             return Response(None, 204)
