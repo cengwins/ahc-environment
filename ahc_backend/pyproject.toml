@@ -26,10 +26,10 @@ GitPython = "^3.1.26"
 python-slugify = "^5.0.2"
 boto3 = "^1.20.32"
 django-storages = "^1.12.3"
-django-nested-admin = "^3.4.0"
 django-admin-interface = "^0.19.0"
-django-import-export = "^2.7.1"
 django-admin-easy = "^0.6.1"
+django-nested-admin = "^3.4.0"
+django-import-export = "^2.8.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
