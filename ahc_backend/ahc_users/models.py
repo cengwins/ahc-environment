@@ -47,7 +47,7 @@ class UserProfile(models.Model):
         delete_orphans=True,
         storage=ImageStorage(),
     )
-
+    is_activated = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     is_email_confirmed = models.BooleanField(default=False)
 

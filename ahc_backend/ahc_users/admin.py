@@ -5,22 +5,22 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
 
-def _set_user_is_active(queryset, is_active: bool) -> int:
-    """Given a UserProfile queryset, updates the related Users' is_active field.
+def _set_user_is_activated(queryset, is_activated: bool) -> int:
+    """Given a UserProfile queryset, updates is_activated fields.
 
     Returns the number of rows updated.
     """
-    return User.objects.filter(profile__in=queryset).update(is_active=is_active)
+    return queryset.update(is_activated=is_activated)
 
 
-@admin.action(description="Mark selected users as active.")
+@admin.action(description="Mark selected users as activated.")
 def activate_users_action(_modeladmin, _request, queryset):
-    return _set_user_is_active(queryset, True)
+    return _set_user_is_activated(queryset, True)
 
 
-@admin.action(description="Mark selected users as inactive.")
+@admin.action(description="Mark selected users as inactivated.")
 def deactivate_users_action(_modeladmin, _request, queryset):
-    return _set_user_is_active(queryset, False)
+    return _set_user_is_activated(queryset, False)
 
 
 class UserProfileResource(resources.ModelResource):
@@ -36,7 +36,7 @@ class UserProfileAdmin(ImportExportModelAdmin):
         "_first_name",
         "_last_name",
         "last_login",
-        "_is_active",
+        "is_activated",
         "is_email_confirmed",
         "_groups",
     )
