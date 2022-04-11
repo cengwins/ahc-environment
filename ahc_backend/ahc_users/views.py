@@ -25,6 +25,12 @@ class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
 
     def perform_create(self, serializer) -> User:
+        alias = serializer.validated_data["email"]
+        profile = UserProfile.objects.filter(Q(user__username__iexact=alias) | Q(user__email__iexact=alias)).first()
+
+        if profile:
+            raise unauthorized('email_exists')
+
         user: User = serializer.save()
 
         user.is_active = False
