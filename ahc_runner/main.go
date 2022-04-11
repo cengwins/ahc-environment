@@ -25,7 +25,6 @@ func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan boo
 	for range time.Tick(5 * time.Second) {
 		*job, err = fetchJobWithId(job.Id)
 		if err != nil {
-			fmt.Println(job)
 			continue
 		}
 
@@ -111,6 +110,8 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		return !unicode.IsGraphic(r)
 	})
 
+	fmt.Println(prelogs)
+
 	for _, run := range runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
@@ -128,12 +129,20 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 			}
 			endTime := time.Now()
 
+			if job.WillCancel {
+				logs += "\n[SYSTEM] Stopping the experiment after user request.\n"
+			}
+
 			result = append(result, SubmitJobResultRequestExperimentRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("Run: %s\nSampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+				Logs:       fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs),
 			})
+
+			if job.WillCancel {
+				break
+			}
 		}
 
 		if job.WillCancel {
