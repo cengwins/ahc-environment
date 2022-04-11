@@ -10,28 +10,69 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('ahc_experiments', '0003_alter_experiment_options_alter_experimentrun_options'),
+        (
+            "ahc_experiments",
+            "0003_alter_experiment_options_alter_experimentrun_options",
+        ),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Runner',
+            name="Runner",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=40)),
-                ('secret', models.CharField(default=ahc_runners.models.generate_random_runner_secret, max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=40)),
+                (
+                    "secret",
+                    models.CharField(
+                        default=ahc_runners.models.generate_random_runner_secret,
+                        max_length=100,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='RunnerJob',
+            name="RunnerJob",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('experiment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='ahc_experiments.experiment')),
-                ('runner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='ahc_runners.runner')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "experiment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="jobs",
+                        to="ahc_experiments.experiment",
+                    ),
+                ),
+                (
+                    "runner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="jobs",
+                        to="ahc_runners.runner",
+                    ),
+                ),
             ],
         ),
     ]

@@ -7,13 +7,13 @@ import stdimage.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ahc_users', '0005_userprofile_last_login'),
+        ("ahc_users", "0005_userprofile_last_login"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='profile_image',
-            field=stdimage.models.StdImageField(blank=True, null=True, upload_to=''),
+            model_name="userprofile",
+            name="profile_image",
+            field=stdimage.models.StdImageField(blank=True, null=True, upload_to=""),
         ),
     ]

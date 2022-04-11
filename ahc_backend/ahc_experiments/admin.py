@@ -3,6 +3,34 @@ from django.contrib import admin
 from .models import *
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
+import nested_admin
+
+
+class ExperimentRunTabularInline(nested_admin.NestedTabularInline):
+    model = ExperimentRun
+    extra = 0
+
+
+class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
+    model = ExperimentRun
+    readonly_fields = (
+        "get_log_url",
+        "sequence_id",
+        "exit_code",
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    ("sequence_id", "exit_code"),
+                    ("finished_at", "started_at"),
+                    ("get_log_url",),
+                ),
+            },
+        ),
+    )
+    extra = 0
 
 
 class ExperimentResource(resources.ModelResource):
@@ -10,8 +38,30 @@ class ExperimentResource(resources.ModelResource):
         model = Experiment
 
 
-class ExperimentAdmin(ImportExportModelAdmin):
+class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = ExperimentResource
+    inlines = [ExperimentRunStackedInline]
+    list_display = [
+        "id",
+        "_repo_owner_username",
+        "_repo_name",
+        "status",
+        "sequence_id",
+        "commit",
+    ]
+
+    fields = [
+        "repository",
+        "status",
+        "sequence_id",
+        "commit",
+        "reference",
+        "reference_type",
+    ]
+
+    readonly_fields = [
+        "status",
+    ]
 
 
 class ExperimentRunResource(resources.ModelResource):
@@ -21,6 +71,15 @@ class ExperimentRunResource(resources.ModelResource):
 
 class ExperimentRunAdmin(ImportExportModelAdmin):
     resource_class = ExperimentRunResource
+    readonly_fields = [
+        "experiment",
+        "sequence_id",
+        "started_at",
+        "finished_at",
+        "exit_code",
+        "log_path",
+        "get_log_url",
+    ]
 
 
 class ExperimentMetricResource(resources.ModelResource):
@@ -34,4 +93,3 @@ class ExperimentMetricAdmin(ImportExportModelAdmin):
 
 admin.site.register(Experiment, ExperimentAdmin)
 admin.site.register(ExperimentRun, ExperimentRunAdmin)
-admin.site.register(ExperimentMetric, ExperimentMetricAdmin)

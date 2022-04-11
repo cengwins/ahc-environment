@@ -12,7 +12,16 @@ class RepositorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Repository
         fields = (
-        "id", "slug", "description", "html_url", "stargazers_count", "private", "name", "upstream", "upstream_type")
+            "id",
+            "slug",
+            "description",
+            "html_url",
+            "stargazers_count",
+            "private",
+            "name",
+            "upstream",
+            "upstream_type",
+        )
         read_only_fields = ("slug",)
 
 
