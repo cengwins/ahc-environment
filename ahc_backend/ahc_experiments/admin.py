@@ -12,6 +12,13 @@ class ExperimentResource(resources.ModelResource):
 
 class ExperimentAdmin(ImportExportModelAdmin):
     resource_class = ExperimentResource
+    list_display = [
+        "_repo_owner_username",
+        "_repo_name",
+        "sequence_id",
+        "commit",
+        "status",
+    ]
 
 
 class ExperimentRunResource(resources.ModelResource):

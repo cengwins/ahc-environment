@@ -1,17 +1,21 @@
 import re
+import enum
+
 import git
+from django.contrib import admin
 
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from ahc_repositories.models import Repository
 
 
-def fetch_commit_hash(upsteam: str, reference: str, heads=False, tags=False):
+def fetch_commit_hash(upstream: str, reference: str, heads=False, tags=False):
     git_client = git.cmd.Git()
 
     heads = git_client.ls_remote(
-        upsteam,
+        upstream,
         reference,
         heads=heads,
         tags=tags,
@@ -25,6 +29,18 @@ def fetch_commit_hash(upsteam: str, reference: str, heads=False, tags=False):
         for (commit_hash, head_name) in heads:
             if head_name == f"refs/{prefix}/{reference}":
                 return commit_hash
+
+
+@enum.unique
+class ExperimentStatus(enum.IntEnum):
+    WILL_RUN = enum.auto()
+    RUNNING = enum.auto()
+    WILL_CANCEL = enum.auto()
+    CANCELED = enum.auto()
+    FINISHED = enum.auto()
+
+    def __str__(self):
+        return " ".join([word.capitalize() for word in self.name.split("_")])
 
 
 class Experiment(models.Model):
@@ -96,6 +112,35 @@ class Experiment(models.Model):
     class Meta:
         ordering = ("-sequence_id", "-created_at")
 
+    @admin.display()
+    def status(self) -> ExperimentStatus:
+        """
+        Returns the minimum status of the ongoing runner jobs.
+        runner job status' have the following ordering:
+
+        1) will run: is_running == False and is_finished == False
+        2) running: is_running == True
+        3) will cancel: is_running == True and will_cancel == True
+        4) finished: is_finished == True and will_cancel == False
+        5) canceled: is_finished == True and will_cancel == True
+        """
+        qs = self.jobs
+        if qs.filter(Q(is_running=False) & Q(is_finished=False)).exists():
+            return ExperimentStatus.WILL_RUN
+        if qs.filter(Q(is_running=True) & Q(will_cancel=False)).exists():
+            return ExperimentStatus.RUNNING
+        if qs.filter(Q(is_running=True) & Q(will_cancel=True)).exists():
+            return ExperimentStatus.WILL_CANCEL
+        if qs.filter(Q(is_finished=True) & Q(will_cancel=True)):
+            return ExperimentStatus.CANCELED
+        else:  # is_finished == True & will_cancel == False --> finished
+            return ExperimentStatus.FINISHED
+
+    def _repo_name(self):
+        return self.repository.name
+
+    def _repo_owner_username(self):
+        return self.repository.users.filter(type="OWNER").get().user.username
 
 class ExperimentRun(models.Model):
     """
@@ -185,7 +230,6 @@ This one will be implemented later (2021-28-12)
 """
 This one will be implemented later (2021-28-12)
 """
-
 
 # class ExperimentActivityLog(models.Model):
 #     """TODO: describe me.
