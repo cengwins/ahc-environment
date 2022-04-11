@@ -19,6 +19,13 @@ class ExperimentResource(resources.ModelResource):
 class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = ExperimentResource
     inlines = [ExperimentRunInline]
+    list_display = [
+        "_repo_owner_username",
+        "_repo_name",
+        "sequence_id",
+        "commit",
+        "status",
+    ]
 
 
 class ExperimentRunResource(resources.ModelResource):
