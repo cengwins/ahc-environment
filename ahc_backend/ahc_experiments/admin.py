@@ -6,8 +6,27 @@ from import_export.admin import ImportExportModelAdmin
 import nested_admin
 
 
-class ExperimentRunInline(nested_admin.NestedTabularInline):
+class ExperimentRunTabularInline(nested_admin.NestedTabularInline):
     model = ExperimentRun
+    extra = 0
+
+
+class ExperimentRunStackedInline(nested_admin.NestedStackedInline):
+    model = ExperimentRun
+    readonly_fields = (
+        "get_log_content",
+        "sequence_id",
+        "exit_code",
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (("sequence_id", "exit_code"), ("finished_at", "started_at")),
+            },
+        ),
+        (None, {"classes": ("collapse", "wide"), "fields": ("get_log_content",)}),
+    )
     extra = 0
 
 
@@ -18,12 +37,25 @@ class ExperimentResource(resources.ModelResource):
 
 class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = ExperimentResource
-    inlines = [ExperimentRunInline]
+    inlines = [ExperimentRunStackedInline]
     list_display = [
         "_repo_owner_username",
         "_repo_name",
+        "status",
         "sequence_id",
         "commit",
+    ]
+
+    fields = [
+        "repository",
+        "status",
+        "sequence_id",
+        "commit",
+        "reference",
+        "reference_type",
+    ]
+
+    readonly_fields = [
         "status",
     ]
 

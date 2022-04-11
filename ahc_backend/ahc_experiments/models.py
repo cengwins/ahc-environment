@@ -10,6 +10,10 @@ from django.db.models import Q
 
 from ahc_repositories.models import Repository
 
+from ahc_experiments.custom_storage import LogStorage
+
+log_storage = LogStorage()
+
 
 def fetch_commit_hash(upstream: str, reference: str, heads=False, tags=False):
     git_client = git.cmd.Git()
@@ -121,8 +125,8 @@ class Experiment(models.Model):
         1) will run: is_running == False and is_finished == False
         2) running: is_running == True
         3) will cancel: is_running == True and will_cancel == True
-        4) finished: is_finished == True and will_cancel == False
-        5) canceled: is_finished == True and will_cancel == True
+        4) canceled: is_finished == True and will_cancel == True
+        5) finished: is_finished == True and will_cancel == False
         """
         qs = self.jobs
         if qs.filter(Q(is_running=False) & Q(is_finished=False)).exists():
@@ -142,6 +146,12 @@ class Experiment(models.Model):
     def _repo_owner_username(self):
         return self.repository.users.filter(type="OWNER").get().user.username
 
+    def _last_run_log_path(self):
+        """Returns the log path of the most recent FINISHED run."""
+        path = self.runs.order_by("-finished_at").first().log_path
+        return log_storage.open(path).read()
+
+
 class ExperimentRun(models.Model):
     """
     Statistics of a experiment run.
@@ -150,6 +160,7 @@ class ExperimentRun(models.Model):
     experiment = models.ForeignKey(
         Experiment, related_name="runs", on_delete=models.CASCADE
     )
+
     sequence_id = models.PositiveIntegerField()
 
     started_at = models.DateTimeField(null=True, blank=True)
@@ -173,6 +184,12 @@ class ExperimentRun(models.Model):
 
     def __str__(self):
         return f"Experiment {self.experiment.id} - Run #{self.sequence_id}"
+
+    def get_log_content(self):
+        try:
+            return log_storage.open(self.log_path).read()
+        except:
+            return None
 
     class Meta:
         ordering = ("-sequence_id", "-created_at")
