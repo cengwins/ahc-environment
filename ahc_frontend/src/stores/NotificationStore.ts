@@ -6,8 +6,9 @@ import {
 import MainStore from './MainStore';
 
 export interface NotificationInterface {
+  id: number;
   variant: AlertColor;
-  text?: string;
+  text: string;
 }
 
 interface NotificationStoreInterface {
@@ -31,12 +32,12 @@ export default class NotificationStore implements NotificationStoreInterface {
     text: string,
     timeOut: number = 5000,
   ) {
-    const notification: NotificationInterface = {
-      variant, text,
-    };
-    const notificationId = this.currentNotificationId;
-    this.notifications[notificationId] = notification;
     this.currentNotificationId += 1;
+    const notificationId = this.currentNotificationId;
+    const notification: NotificationInterface = {
+      id: notificationId, variant, text,
+    };
+    this.notifications[notificationId] = notification;
     autorun(
       () => this.clear(notificationId),
       { scheduler: (run) => { setTimeout(run, timeOut); } },

@@ -10,18 +10,13 @@ const Notification = observer(() => {
 
   return (
     <div>
-      {(Object.values(notifications)).map((notification: NotificationInterface) => {
-        const {
-          variant, text,
-        } = notification;
-        return (
-          <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} key={text} open>
-            <Alert severity={variant} sx={{ width: '100%' }}>
-              {text}
-            </Alert>
-          </Snackbar>
-        );
-      })}
+      {(Object.values(notifications)).map(({ id, variant, text }: NotificationInterface) => (
+        <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} key={id} open>
+          <Alert severity={variant} sx={{ width: '100%' }}>
+            {text}
+          </Alert>
+        </Snackbar>
+      ))}
     </div>
   );
 });
