@@ -71,8 +71,8 @@ class ListCreateRepositoryUsersAPIView(ListCreateAPIView):
     def get_queryset(self):
         return (
             super()
-                .get_queryset()
-                .filter(
+            .get_queryset()
+            .filter(
                 repository=self.kwargs["repository_id"],
             )
         )
@@ -87,8 +87,8 @@ class RetrieveDestroyRepositoryUsersAPIView(RetrieveDestroyAPIView):
     def get_queryset(self):
         return (
             super()
-                .get_queryset()
-                .filter(
+            .get_queryset()
+            .filter(
                 repository=self.kwargs["repository_id"],
             )
         )

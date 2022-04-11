@@ -9,33 +9,63 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GithubRepositoryDeployToken',
+            name="GithubRepositoryDeployToken",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('github_repository_id', models.PositiveBigIntegerField()),
-                ('owner_name', models.CharField(editable=False, max_length=100)),
-                ('repository_name', models.CharField(editable=False, max_length=100)),
-                ('private_key', models.TextField(editable=False)),
-                ('public_key', models.TextField(editable=False)),
-                ('key_signature', models.TextField(editable=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('added_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='github_deploy_tokens', to='auth.user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("github_repository_id", models.PositiveBigIntegerField()),
+                ("owner_name", models.CharField(editable=False, max_length=100)),
+                ("repository_name", models.CharField(editable=False, max_length=100)),
+                ("private_key", models.TextField(editable=False)),
+                ("public_key", models.TextField(editable=False)),
+                ("key_signature", models.TextField(editable=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "added_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="github_deploy_tokens",
+                        to="auth.user",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='GithubProfile',
+            name="GithubProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('access_token', models.CharField(max_length=120)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='github_profile', to='auth.user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("access_token", models.CharField(max_length=120)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="github_profile",
+                        to="auth.user",
+                    ),
+                ),
             ],
         ),
     ]

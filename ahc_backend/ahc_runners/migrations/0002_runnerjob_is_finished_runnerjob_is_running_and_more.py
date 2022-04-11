@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ahc_runners', '0001_initial'),
+        ("ahc_runners", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='runnerjob',
-            name='is_finished',
+            model_name="runnerjob",
+            name="is_finished",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='runnerjob',
-            name='is_running',
+            model_name="runnerjob",
+            name="is_running",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='runnerjob',
-            name='will_cancel',
+            model_name="runnerjob",
+            name="will_cancel",
             field=models.BooleanField(default=False),
         ),
     ]

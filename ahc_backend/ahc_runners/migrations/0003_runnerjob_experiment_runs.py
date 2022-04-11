@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ahc_experiments', '0003_alter_experiment_options_alter_experimentrun_options'),
-        ('ahc_runners', '0002_runnerjob_is_finished_runnerjob_is_running_and_more'),
+        (
+            "ahc_experiments",
+            "0003_alter_experiment_options_alter_experimentrun_options",
+        ),
+        ("ahc_runners", "0002_runnerjob_is_finished_runnerjob_is_running_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='runnerjob',
-            name='experiment_runs',
-            field=models.ManyToManyField(related_name='jobs', to='ahc_experiments.ExperimentRun'),
+            model_name="runnerjob",
+            name="experiment_runs",
+            field=models.ManyToManyField(
+                related_name="jobs", to="ahc_experiments.ExperimentRun"
+            ),
         ),
     ]

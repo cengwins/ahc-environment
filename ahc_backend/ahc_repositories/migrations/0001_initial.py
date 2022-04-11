@@ -15,39 +15,87 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Repository',
+            name="Repository",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.TextField()),
-                ('name', models.TextField()),
-                ('upstream', models.TextField()),
-                ('upstream_type', models.TextField()),
-                ('created_at', models.DateTimeField()),
-                ('updated_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("slug", models.TextField()),
+                ("name", models.TextField()),
+                ("upstream", models.TextField()),
+                ("upstream_type", models.TextField()),
+                ("created_at", models.DateTimeField()),
+                ("updated_at", models.DateTimeField()),
             ],
         ),
         migrations.CreateModel(
-            name='RepositoryUser',
+            name="RepositoryUser",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.TextField()),
-                ('created_at', models.DateTimeField()),
-                ('updated_at', models.DateTimeField()),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ahc_repositories.repository')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("type", models.TextField()),
+                ("created_at", models.DateTimeField()),
+                ("updated_at", models.DateTimeField()),
+                (
+                    "repository",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="ahc_repositories.repository",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='RepositoryEnvVariable',
+            name="RepositoryEnvVariable",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
-                ('value', models.TextField()),
-                ('is_active', models.BooleanField(default=False)),
-                ('created_at', models.DateTimeField()),
-                ('updated_at', models.DateTimeField()),
-                ('added_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ahc_repositories.repository')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField()),
+                ("value", models.TextField()),
+                ("is_active", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField()),
+                ("updated_at", models.DateTimeField()),
+                (
+                    "added_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "repository",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="ahc_repositories.repository",
+                    ),
+                ),
             ],
         ),
     ]

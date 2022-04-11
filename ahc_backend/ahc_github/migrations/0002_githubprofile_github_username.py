@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ahc_github', '0001_initial'),
+        ("ahc_github", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='githubprofile',
-            name='github_username',
-            field=models.CharField(default='adsf', max_length=120),
+            model_name="githubprofile",
+            name="github_username",
+            field=models.CharField(default="adsf", max_length=120),
             preserve_default=False,
         ),
     ]
