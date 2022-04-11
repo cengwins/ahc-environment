@@ -8,6 +8,9 @@ from .models import Repository, RepositoryUser
 
 class RepositoryAccessPermission(permissions.BasePermission):
     def has_permission(self, request: Request, view: APIView) -> bool:
+        if request.user.is_authenticated and request.user.is_superuser:
+            return True
+
         repo_id = request.parser_context["kwargs"].get("repository_id")
 
         if repo_id:
@@ -18,6 +21,9 @@ class RepositoryAccessPermission(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request: Request, view: APIView, obj) -> bool:
+        if request.user.is_authenticated and request.user.is_superuser:
+            return True
+
         if isinstance(obj, Repository):
             return obj.users.filter(user=request.user).exists()
 
