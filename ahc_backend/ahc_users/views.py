@@ -96,6 +96,7 @@ class ActivateUserAPIView(APIView):
         user = confirmation_code.user
         user.is_active = True
         user.profile.is_email_confirmed = True
+        user.profile.save()
         user.save()
 
         return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
