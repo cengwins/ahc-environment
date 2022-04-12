@@ -72,7 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
         return None
 
     def get_is_activated(self, obj: User):
-        return obj.user.is_activated
+        return obj.profile.is_activated
 
     class Meta:
         model = User
