@@ -25,7 +25,11 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
     def perform_create(self, serializer):
         repository = serializer.save()
 
-        RepositoryUser.objects.create(repository=repository, user=self.request.user)
+        RepositoryUser.objects.create(
+            repository=repository,
+            user=self.request.user,
+            type=RepositoryUser.RepositoryUserTypes.OWNER,
+        )
 
         return repository
 
@@ -71,8 +75,8 @@ class ListCreateRepositoryUsersAPIView(ListCreateAPIView):
     def get_queryset(self):
         return (
             super()
-                .get_queryset()
-                .filter(
+            .get_queryset()
+            .filter(
                 repository=self.kwargs["repository_id"],
             )
         )
@@ -87,8 +91,8 @@ class RetrieveDestroyRepositoryUsersAPIView(RetrieveDestroyAPIView):
     def get_queryset(self):
         return (
             super()
-                .get_queryset()
-                .filter(
+            .get_queryset()
+            .filter(
                 repository=self.kwargs["repository_id"],
             )
         )

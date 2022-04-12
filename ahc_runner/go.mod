@@ -1,4 +1,4 @@
-module github.com/cengwins/ahc-runner
+module github.com/cengwins/ahc-environment/runner
 
 go 1.17
 

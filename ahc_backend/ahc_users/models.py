@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from django.contrib import admin
 
 from functools import cached_property
 
@@ -44,9 +45,9 @@ class UserProfile(models.Model):
             "large": {"width": 400, "height": 400},
         },
         delete_orphans=True,
-        storage=ImageStorage()
+        storage=ImageStorage(),
     )
-
+    is_activated = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     is_email_confirmed = models.BooleanField(default=False)
 
@@ -55,6 +56,33 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    @admin.display(ordering="user__username")
+    def _username(self):
+        return self.user.username
+
+    @admin.display(ordering="user__email")
+    def _email(self):
+        return self.user.email
+
+    @admin.display(ordering="user__first_name")
+    def _first_name(self):
+        return self.user.first_name
+
+    @admin.display(ordering="user__last_name")
+    def _last_name(self):
+        return self.user.last_name
+
+    @admin.display(boolean=True, ordering="user__is_superuser")
+    def _is_superuser(self):
+        return self.user.is_superuser
+
+    @admin.display(ordering="user__groups__name")
+    def _groups(self):
+        if self.user.groups.exists():
+            return ", ".join([group.name for group in self.user.groups.all()])
+        else:
+            return "-"
 
     @staticmethod
     def find_username_or_email(alias: str):

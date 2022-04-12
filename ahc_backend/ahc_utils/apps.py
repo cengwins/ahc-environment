@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class AhcUtilsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'ahc_utils'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "ahc_utils"

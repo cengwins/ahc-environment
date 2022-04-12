@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ahc_experiments', '0002_alter_experimentrun_exit_code'),
+        ("ahc_experiments", "0002_alter_experimentrun_exit_code"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='experiment',
-            options={'ordering': ('-sequence_id', '-created_at')},
+            name="experiment",
+            options={"ordering": ("-sequence_id", "-created_at")},
         ),
         migrations.AlterModelOptions(
-            name='experimentrun',
-            options={'ordering': ('-sequence_id', '-created_at')},
+            name="experimentrun",
+            options={"ordering": ("-sequence_id", "-created_at")},
         ),
     ]

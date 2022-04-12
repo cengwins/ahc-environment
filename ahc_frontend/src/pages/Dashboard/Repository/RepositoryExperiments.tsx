@@ -12,7 +12,7 @@ import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentStatus } from '../../../stores/ExperimentStore';
 
-const statuses: ExperimentStatus[] = ['completed', 'failed', 'running', 'pending', 'canceled'];
+const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed'];
 
 const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
               >
                 <TableCell>
                   <Box sx={{ display: 'flex' }}>
-                    <ExperimentStatusIcon status={statuses[experiment.sequence_id % 5]} />
+                    <ExperimentStatusIcon status={statuses[experiment.status - 1]} />
                     <Typography sx={{ ml: 1 }}>{`Run #${experiment.sequence_id}`}</Typography>
                   </Box>
                 </TableCell>

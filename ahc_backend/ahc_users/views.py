@@ -1,5 +1,8 @@
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.http import HttpResponseRedirect
+
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import CreateAPIView
@@ -24,12 +27,19 @@ class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
 
     def perform_create(self, serializer) -> User:
-        user: User = serializer.save()
+        alias = serializer.validated_data["email"]
+        profile = UserProfile.objects.filter(
+            Q(user__username__iexact=alias) | Q(user__email__iexact=alias)
+        ).first()
 
-        user.is_active = True  # TODO: disable later, just for testing purposes
+        if profile:
+            raise unauthorized("email_exists")
+
+        user: User = serializer.save()
+        user.is_active = True
         user.save()
 
-        UserProfile.objects.create(user=user, is_email_confirmed=True)
+        UserProfile.objects.create(user=user, is_email_confirmed=False)
         UserConfirmationCode.objects.create(user=user)
 
         return user
@@ -73,24 +83,20 @@ class GetUserProfileAPIView(APIView):
 
 
 class ActivateUserAPIView(APIView):
-    def get(self, request):
-        code = request.query_params.get("code")
-
+    def get(self, request, code):
         if not code:
             return serializers.ValidationError("code should not be empty")
 
-        confirmation_code = UserConfirmationCode.objects.get(code=code)
+        confirmation_code = UserConfirmationCode.objects.filter(code=code).first()
+
+        if not confirmation_code:
+            return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
 
         user = confirmation_code.user
-        user.is_active = True
         user.profile.is_email_confirmed = True
-        user.save()
+        user.profile.save()
 
-        return Response(
-            {
-                "success": True,
-            }
-        )
+        return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
 
 
 # TODO: improve these views
@@ -112,13 +118,16 @@ class PasswordResetAPIView(APIView):
             return unauthorized("user_ne")
 
         password_reset = UserPasswordReset.objects.create(user=user)
-
+        email_content = render_to_string(
+            "password_reset.html", {"code": password_reset.code}
+        )
         send_mail(
             "Password Reset Request for AHC!",
-            f"Please click here to reset your password. Click here to reset your password {password_reset.code}",
+            email_content,
             "ahc@ceng.metu.edu.tr",
             [user.email],
             fail_silently=False,
+            html_message=email_content,
         )
 
         return Response(
@@ -139,6 +148,7 @@ class PasswordResetAPIView(APIView):
 
         password_reset.is_used = True
         password_reset.user.set_password(request.data["password"])
+        password_reset.user.save()
         password_reset.save()
 
         return Response(

@@ -18,4 +18,5 @@ def on_user_save(sender, instance: UserConfirmationCode, created: bool, **kwargs
             "ahc@ceng.metu.edu.tr",
             [instance.user.email],
             fail_silently=False,
+            html_message=content
         )

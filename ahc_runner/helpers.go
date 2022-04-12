@@ -49,6 +49,8 @@ func printJsonStreamToScreen(wr io.Writer, rd io.ReadCloser) {
 }
 
 func gitClone(containerVolumePath string, url string, outStream io.Writer) error {
+	branch := ""
+
 	repo, err := git.PlainClone(containerVolumePath, false, &git.CloneOptions{
 		InsecureSkipTLS: true,
 		Depth:           1,
@@ -57,11 +59,27 @@ func gitClone(containerVolumePath string, url string, outStream io.Writer) error
 		SingleBranch:    true,
 		Progress:        outStream,
 	})
-	if err != nil {
-		return err
+
+	if err == nil {
+		branch = "main"
+	} else {
+		repo, err = git.PlainClone(containerVolumePath, false, &git.CloneOptions{
+			InsecureSkipTLS: true,
+			Depth:           1,
+			URL:             url,
+			ReferenceName:   plumbing.NewBranchReferenceName("master"),
+			SingleBranch:    true,
+			Progress:        outStream,
+		})
+
+		if err == nil {
+			branch = "master"
+		} else {
+			return err
+		}
 	}
 
-	hash, err := repo.ResolveRevision(plumbing.Revision("main"))
+	hash, err := repo.ResolveRevision(plumbing.Revision(branch))
 	if err != nil {
 		return err
 	}
