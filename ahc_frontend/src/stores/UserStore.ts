@@ -45,8 +45,10 @@ export default class UserStore implements UserStoreInterface {
   async register(data: RegisterRequest) {
     const response = await (new RequestHandler()).request('/auth/register/', 'post', data);
     const {
-      id, username, email, first_name, last_name,
+      id, username, email, first_name, last_name, is_activated,
     } = response;
+    console.log(is_activated);
+
     this.id = id;
     this.username = username;
     this.email = email;
@@ -69,8 +71,10 @@ export default class UserStore implements UserStoreInterface {
   async getProfile() {
     const response = await (new RequestHandler()).request('/auth/profile/', 'get');
     const {
-      id, username, email, first_name, last_name,
+      id, username, email, first_name, last_name, is_activated,
     } = response;
+    console.log(is_activated);
+
     this.id = id;
     this.username = username;
     this.email = email;

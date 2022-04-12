@@ -51,7 +51,6 @@ class ExperimentAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     ]
 
     fields = [
-        "id",
         "repository",
         "status",
         "sequence_id",
