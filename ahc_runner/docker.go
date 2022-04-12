@@ -132,8 +132,6 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	reader, err := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
-		Follow:     true,
-		Details:    true,
 	})
 	if err != nil {
 		return "", err
