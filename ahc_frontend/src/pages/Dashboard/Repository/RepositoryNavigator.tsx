@@ -119,7 +119,6 @@ const RepositoryNavigator = observer(() => {
             Open in GitHub.dev
           </Button>
         </Box>
-        ,
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs
