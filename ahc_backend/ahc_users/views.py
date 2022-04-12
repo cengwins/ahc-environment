@@ -36,8 +36,7 @@ class RegisterAPIView(CreateAPIView):
             raise unauthorized("email_exists")
 
         user: User = serializer.save()
-
-        user.is_active = False
+        user.is_active = True
         user.save()
 
         UserProfile.objects.create(user=user, is_email_confirmed=False)
@@ -94,10 +93,8 @@ class ActivateUserAPIView(APIView):
             return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
 
         user = confirmation_code.user
-        user.is_active = True
         user.profile.is_email_confirmed = True
         user.profile.save()
-        user.save()
 
         return HttpResponseRedirect(redirect_to="https://ahc.ceng.metu.edu.tr")
 
