@@ -24,7 +24,7 @@ export default class UserStore implements UserStoreInterface {
 
   token: string = '';
 
-  activated: boolean = true;
+  activated: boolean = false;
 
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
@@ -47,14 +47,13 @@ export default class UserStore implements UserStoreInterface {
     const {
       id, username, email, first_name, last_name, is_activated,
     } = response;
-    console.log(is_activated);
 
     this.id = id;
     this.username = username;
     this.email = email;
     this.name = first_name;
     this.surname = last_name;
-    this.activated = true;
+    this.activated = is_activated;
   }
 
   logOut() {
@@ -73,14 +72,13 @@ export default class UserStore implements UserStoreInterface {
     const {
       id, username, email, first_name, last_name, is_activated,
     } = response;
-    console.log(is_activated);
 
     this.id = id;
     this.username = username;
     this.email = email;
     this.name = first_name;
     this.surname = last_name;
-    this.activated = true;
+    this.activated = is_activated;
   }
 
   static async resetPasswordRequest(data: { email: string }) {
