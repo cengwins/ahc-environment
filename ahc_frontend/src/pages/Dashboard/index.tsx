@@ -3,11 +3,9 @@ import {
 } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import {
-  Alert,
   Box,
   Breadcrumbs,
   Button,
-  Link,
   Container,
   Stack,
 } from '@mui/material';
@@ -22,7 +20,7 @@ const PageNotFound = lazy(() => import('../PageNotFound'));
 const Dashboard = observer(() => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { dashboardNavigationStore, userStore } = useStores();
+  const { dashboardNavigationStore } = useStores();
 
   const { repositoryId, experimentId } = dashboardNavigationStore;
 
@@ -89,23 +87,14 @@ const Dashboard = observer(() => {
               ))}
             </Breadcrumbs>
           </Box>
-          {!userStore.activated && (
-          <Alert sx={{ mb: 2 }} severity="error">
-            {'Your account is not yet activated. Please '}
-            <Link href="mailto:ahc@ceng.metu.edu.tr">
-              send a mail
-            </Link>
-            {' if your account is not activated after some time.'}
-          </Alert>
-          )}
           <Routes>
-            {userStore.activated && (routes.map(({ path, Component, name }) => (
+            {routes.map(({ path, Component, name }) => (
               <Route
                 path={path}
                 key={name}
                 element={(<WrapWithSuspense component={Component} />)}
               />
-            )))}
+            ))}
           </Routes>
         </Box>
       </Stack>

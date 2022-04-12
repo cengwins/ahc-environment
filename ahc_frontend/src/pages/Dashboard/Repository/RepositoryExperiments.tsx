@@ -16,7 +16,7 @@ const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'cancele
 
 const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();
-  const { experimentStore, notificationStore } = useStores();
+  const { experimentStore, notificationStore, userStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
   const [runningExperiment, setRunningExperiment] = useState(false);
@@ -24,7 +24,10 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
   const { currentExperiments: experiments } = experimentStore;
 
   useEffect(() => {
-    experimentStore.getExperiments()
+    Promise.all([
+      userStore.getProfile(),
+      experimentStore.getExperiments(),
+    ])
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }, []);
@@ -35,7 +38,7 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
         sx={{ mb: 2 }}
         loading={runningExperiment}
         variant="contained"
-        disabled={runningExperiment}
+        disabled={runningExperiment || !userStore.activated}
         onClick={() => {
           setRunningExperiment(true);
           experimentStore.createExperiment()
