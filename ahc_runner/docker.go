@@ -153,7 +153,7 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 
 	logs = strings.ReplaceAll(logs, "\r", "\n")
 	logs = strings.TrimFunc(logs, func(r rune) bool {
-		return !unicode.IsGraphic(r)
+		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
 	})
 
 	fmt.Println(logs)

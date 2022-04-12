@@ -109,7 +109,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	prelogs := resultBuffer.String()
 	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
 	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
-		return !unicode.IsGraphic(r)
+		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
 	})
 
 	fmt.Println(prelogs)
