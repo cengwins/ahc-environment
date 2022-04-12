@@ -63,12 +63,16 @@ class LoginRequestSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile_image = serializers.SerializerMethodField()
+    is_activated = serializers.SerializerMethodField()
 
     def get_profile_image(self, obj: User):
         if obj.profile.profile_image:
             return obj.profile.profile_image
 
         return None
+
+    def get_is_activated(self, obj: User):
+        return obj.user.is_activated
 
     class Meta:
         model = User
