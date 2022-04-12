@@ -150,10 +150,10 @@ class Experiment(models.Model):
     def _repo_owner_username(self):
         repo_user = self.repository.users.filter(
             type=RepositoryUser.RepositoryUserTypes.OWNER
-        ).get()
+        ).first()
 
         if repo_user is None:
-            repo_user = self.repository.users.get()
+            repo_user = self.repository.users.first()
 
         return repo_user.user.username
 
