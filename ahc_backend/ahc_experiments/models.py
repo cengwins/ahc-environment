@@ -43,6 +43,7 @@ class ExperimentStatus(enum.IntEnum):
     WILL_CANCEL = enum.auto()
     CANCELED = enum.auto()
     FINISHED = enum.auto()
+    FAILED = enum.auto()
 
     def __str__(self):
         return " ".join([word.capitalize() for word in self.name.split("_")])
@@ -131,6 +132,8 @@ class Experiment(models.Model):
 
         if qs.count() == 0:
             return ExperimentStatus.WILL_RUN
+        if qs.filter(Q(is_success=False)).exists():
+            return ExperimentStatus.FAILED
         if qs.filter(Q(is_running=False) & Q(is_finished=False)).exists():
             return ExperimentStatus.WILL_RUN
         if qs.filter(Q(is_running=True) & Q(will_cancel=False)).exists():

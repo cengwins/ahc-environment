@@ -19,13 +19,20 @@ def mark_job_for_cancellation(_modeladmin, _request, queryset):
 
 class RunnerJobAdmin(ImportExportModelAdmin):
     resource_class = RunnerJobResource
-    readonly_fields = ["experiment", "is_running", "is_finished", "runner"]
+    readonly_fields = [
+        "experiment",
+        "is_running",
+        "is_finished",
+        "is_success",
+        "runner",
+    ]
     list_display = [
         "id",
         "experiment",
         "runner",
         "is_running",
         "is_finished",
+        "is_success",
         "will_cancel",
     ]
     actions = [mark_job_for_cancellation]

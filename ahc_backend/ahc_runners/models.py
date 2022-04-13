@@ -39,6 +39,8 @@ class RunnerJob(models.Model):
     is_finished = models.BooleanField(default=False)
     will_cancel = models.BooleanField(default=False)
 
+    is_success = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

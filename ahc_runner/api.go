@@ -31,6 +31,7 @@ type RunnerJobResponse struct {
 	Experiment ExperimentResponse `json:"experiment"`
 	IsRunning  bool               `json:"is_running"`
 	IsFinished bool               `json:"is_finished"`
+	IsSuccess  bool               `json:"is_success"`
 	WillCancel bool               `json:"will_cancel"`
 }
 
@@ -50,6 +51,7 @@ type SubmitJobResultRequest struct {
 	Experiment SubmitJobResultRequestExperiment `json:"experiment"`
 	IsRunning  bool                             `json:"is_running"`
 	IsFinished bool                             `json:"is_finished"`
+	IsSuccess  bool                             `json:"is_success"`
 	WillCancel bool                             `json:"will_cancel"`
 }
 
@@ -103,11 +105,12 @@ func fetchRunnerInfo() error {
 	return nil
 }
 
-func submitJobResult(job *RunnerJobResponse, result []SubmitJobResultRequestExperimentRun, isRunning bool, isFinished bool) error {
+func submitJobResult(job *RunnerJobResponse, result []SubmitJobResultRequestExperimentRun, isRunning bool, isFinished bool, isSuccess bool) error {
 	data := SubmitJobResultRequest{
 		Id:         job.Id,
 		IsRunning:  isRunning,
 		IsFinished: isFinished,
+		IsSuccess:  isSuccess,
 	}
 
 	if result != nil {

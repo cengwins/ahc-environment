@@ -100,4 +100,8 @@ class SubmitRunnerJobResultAPIView(APIView):
             job.is_finished = request.data["is_finished"]
             job.save()
 
+        if "is_success" in request.data:
+            job.is_success = request.data["is_success"]
+            job.save()
+
         return Response(None, 200)

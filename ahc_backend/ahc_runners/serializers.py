@@ -16,4 +16,11 @@ class RunnerJobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RunnerJob
-        fields = ("id", "experiment", "is_running", "is_finished", "will_cancel")
+        fields = (
+            "id",
+            "experiment",
+            "is_running",
+            "is_finished",
+            "will_cancel",
+            "is_success",
+        )
