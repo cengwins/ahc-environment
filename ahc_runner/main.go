@@ -57,7 +57,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
+	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
 	if err != nil {
 		return result, err
 	}
@@ -150,6 +150,11 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		if job.WillCancel {
 			break
 		}
+	}
+
+	err = gitCommitAndPushWithGlobs(repo, config.Files, &resultBuffer)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	// bServer.Stop()
