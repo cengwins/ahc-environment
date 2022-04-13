@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
+import YoutubeEmbed from '../components/YoutubeEmbed';
 import Team from './Team';
 
 const Home = () => {
@@ -26,6 +27,9 @@ const Home = () => {
   return (
     <Container sx={{ mt: 5 }}>
       <Stack direction="column" spacing={4} sx={{ my: 5 }}>
+        <Box sx={{ mb: 3 }}>
+          <YoutubeEmbed embedId="T5g3chxHJz8" />
+        </Box>
         <Box sx={{ mb: 3 }}>
           <Typography component="h1" variant="h3" sx={{ color: `${blue[600]}` }}>
             AHC Experimentation Environment
