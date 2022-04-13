@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 
+from django.contrib.auth.models import User
 from ahc_experiments.models import Experiment, ExperimentRun
 
 
@@ -23,6 +24,13 @@ class Runner(models.Model):
 class RunnerJob(models.Model):
     experiment = models.ForeignKey(
         Experiment, related_name="jobs", on_delete=models.CASCADE
+    )
+    creator = models.ForeignKey(
+        User,
+        related_name="jobs",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
 
     experiment_runs = models.ManyToManyField(

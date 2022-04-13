@@ -9,7 +9,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils.html import format_html
 
-from ahc_repositories.models import Repository, RepositoryUser
+from django.contrib.auth.models import User
+from ahc_repositories.models import Repository
 
 from ahc_experiments.custom_storage import LogStorage
 
@@ -62,6 +63,14 @@ class Experiment(models.Model):
     repository = models.ForeignKey(
         Repository, related_name="experiments", on_delete=models.CASCADE
     )
+    creator = models.ForeignKey(
+        User,
+        related_name="experiments",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
     # For each repository, subsequent experiment's sequence_id are incremented by one.
     sequence_id = models.PositiveIntegerField()
     # Git commits are exactly 40-digit hexadecimal values

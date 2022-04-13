@@ -11,5 +11,5 @@ def run_experiment(experiment_id: int):
     if not experiment.commit:
         experiment.fetch_commit_from_reference()
 
-    job = RunnerJob.objects.create(experiment=experiment)
+    job = RunnerJob.objects.create(experiment=experiment, creator=experiment.creator)
     job.save()
