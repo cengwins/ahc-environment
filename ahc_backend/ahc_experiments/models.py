@@ -9,7 +9,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils.html import format_html
 
-from ahc_repositories.models import Repository, RepositoryUser
+from django.contrib.auth.models import User
+from ahc_repositories.models import Repository
 
 from ahc_experiments.custom_storage import LogStorage
 
@@ -43,6 +44,7 @@ class ExperimentStatus(enum.IntEnum):
     WILL_CANCEL = enum.auto()
     CANCELED = enum.auto()
     FINISHED = enum.auto()
+    FAILED = enum.auto()
 
     def __str__(self):
         return " ".join([word.capitalize() for word in self.name.split("_")])
@@ -61,6 +63,14 @@ class Experiment(models.Model):
     repository = models.ForeignKey(
         Repository, related_name="experiments", on_delete=models.CASCADE
     )
+    creator = models.ForeignKey(
+        User,
+        related_name="experiments",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
     # For each repository, subsequent experiment's sequence_id are incremented by one.
     sequence_id = models.PositiveIntegerField()
     # Git commits are exactly 40-digit hexadecimal values
@@ -110,9 +120,7 @@ class Experiment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return (
-            f"{self.repository.name} - Experiment #{self.sequence_id} - {self.commit}"
-        )
+        return f"{self.repository.name} - Experiment #{self.sequence_id}"
 
     class Meta:
         ordering = ("-sequence_id", "-created_at")
@@ -133,6 +141,8 @@ class Experiment(models.Model):
 
         if qs.count() == 0:
             return ExperimentStatus.WILL_RUN
+        if qs.filter(Q(is_success=False)).exists():
+            return ExperimentStatus.FAILED
         if qs.filter(Q(is_running=False) & Q(is_finished=False)).exists():
             return ExperimentStatus.WILL_RUN
         if qs.filter(Q(is_running=True) & Q(will_cancel=False)).exists():
@@ -148,14 +158,7 @@ class Experiment(models.Model):
         return self.repository.name
 
     def _repo_owner_username(self):
-        repo_user = self.repository.users.filter(
-            type=RepositoryUser.RepositoryUserTypes.OWNER
-        ).first()
-
-        if repo_user is None:
-            repo_user = self.repository.users.first()
-
-        return repo_user.user.username
+        return self.repository.owner
 
     def _last_run_log_path(self):
         """Returns the log path of the most recent FINISHED run."""

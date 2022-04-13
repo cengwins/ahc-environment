@@ -12,7 +12,7 @@ import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentStatus } from '../../../stores/ExperimentStore';
 
-const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed'];
+const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 
 const RepositoryExperiments = observer(({ repository }: {repository: RepositoryInfo}) => {
   const navigate = useNavigate();

@@ -16,7 +16,7 @@ import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentStatus } from '../../../stores/ExperimentStore';
 
-const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed'];
+const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 const Experiment = () => {
   const { experimentId } = useParams();
   const { dashboardNavigationStore, experimentStore } = useStores();

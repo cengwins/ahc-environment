@@ -48,7 +48,6 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	result := make([]SubmitJobResultRequestExperimentRun, 0)
 	// bServer := new(broadcastserver.SocketServer)
 
-	submitJobResult(job, nil, true, false)
 	// go bServer.Start()
 	go startJobStatusUpdateService(job, &cancelChannel)
 
@@ -58,10 +57,11 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, &resultBuffer)
+	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
 	if err != nil {
 		return result, err
 	}
+	defer os.RemoveAll(containerVolumePath)
 
 	config, err := readAHCConfig(containerVolumePath)
 	if err != nil {
@@ -152,9 +152,12 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	// bServer.Stop()
+	err = gitCommitAndPushWithGlobs(repo, config.Files, &resultBuffer)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	submitJobResult(job, result, false, true)
+	// bServer.Stop()
 
 	return result, nil
 }
@@ -234,9 +237,13 @@ func main() {
 
 							fmt.Printf("Found job from repository %s from upstream %s commit %s\n", job.Experiment.Repository.Name, job.Experiment.Repository.Upstream, job.Experiment.Commit)
 
-							_, err := runJob(&job)
+							submitJobResult(&job, nil, true, false, true)
+							result, err := runJob(&job)
 							if err != nil {
 								fmt.Println(err)
+								submitJobResult(&job, result, false, true, false)
+							} else {
+								submitJobResult(&job, result, false, true, true)
 							}
 						}
 					}

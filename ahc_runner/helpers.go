@@ -7,10 +7,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
+	"time"
 
 	jsonmessage "github.com/docker/docker/pkg/jsonmessage"
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"gopkg.in/yaml.v2"
 )
 
@@ -40,6 +43,8 @@ type AHCConfiguration struct {
 
 	Topologies []TopologyConfiguration `yaml:"topologies"`
 	Experiment ExperimentConfiguration `yaml:"experiment"`
+
+	Files []string `yaml:"files"`
 }
 
 func printJsonStreamToScreen(wr io.Writer, rd io.ReadCloser) {
@@ -48,8 +53,13 @@ func printJsonStreamToScreen(wr io.Writer, rd io.ReadCloser) {
 	jsonmessage.DisplayJSONMessagesStream(rd, wr, 0, false, nil)
 }
 
-func gitClone(containerVolumePath string, url string, outStream io.Writer) error {
+func gitClone(containerVolumePath string, url string, token string, outStream io.Writer) (*git.Repository, error) {
 	branch := ""
+
+	if len(token) > 0 {
+		url = strings.Replace(url, "http://", fmt.Sprintf("http://%s@", token), 1)
+		url = strings.Replace(url, "https://", fmt.Sprintf("https://%s@", token), 1)
+	}
 
 	repo, err := git.PlainClone(containerVolumePath, false, &git.CloneOptions{
 		InsecureSkipTLS: true,
@@ -75,16 +85,65 @@ func gitClone(containerVolumePath string, url string, outStream io.Writer) error
 		if err == nil {
 			branch = "master"
 		} else {
-			return err
+			return nil, err
 		}
 	}
 
 	hash, err := repo.ResolveRevision(plumbing.Revision(branch))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("Successfully checkout %s\n", hash)
+
+	return repo, nil
+}
+
+func gitCommitAndPushWithGlobs(repo *git.Repository, globs []string, outStream io.Writer) error {
+	if len(globs) > 0 {
+
+		w, err := repo.Worktree()
+		if err != nil {
+			return err
+		}
+
+		for _, s := range globs {
+			w.AddGlob(s)
+		}
+
+		_, err = w.Commit("Added files by AHC Server [skip ci]", &git.CommitOptions{
+			Author: &object.Signature{
+				Email: "ahc@ceng.metu.edu.tr",
+				Name:  "AHC Server",
+				When:  time.Now(),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		err = w.Pull(&git.PullOptions{
+			RemoteName:   "origin",
+			Progress:     outStream,
+			SingleBranch: true,
+		})
+		if err != nil {
+			fmt.Print("WARNING: ")
+			fmt.Println(err)
+		}
+
+		err = repo.Push(&git.PushOptions{
+			RemoteName: "origin",
+			Progress:   outStream,
+		})
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("New files are uploaded to git.")
+
+		return nil
+	}
 
 	return nil
 }

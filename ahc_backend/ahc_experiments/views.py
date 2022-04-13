@@ -27,6 +27,8 @@ class ListCreateExperimentsAPIView(ListCreateAPIView):
         )
 
         experiment: Experiment = serializer.save()
+        experiment.creator = self.request.user
+        experiment.save()
 
         experiment.refresh_from_db()
 

@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 
+from django.contrib.auth.models import User
 from ahc_experiments.models import Experiment, ExperimentRun
 
 
@@ -24,6 +25,13 @@ class RunnerJob(models.Model):
     experiment = models.ForeignKey(
         Experiment, related_name="jobs", on_delete=models.CASCADE
     )
+    creator = models.ForeignKey(
+        User,
+        related_name="jobs",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
     experiment_runs = models.ManyToManyField(
         ExperimentRun,
@@ -38,6 +46,8 @@ class RunnerJob(models.Model):
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
     will_cancel = models.BooleanField(default=False)
+
+    is_success = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

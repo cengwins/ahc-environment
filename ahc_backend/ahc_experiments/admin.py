@@ -83,6 +83,13 @@ class ExperimentRunAdmin(ImportExportModelAdmin):
         "log_path",
         "log_url_as_link",
     ]
+    list_display = [
+        "id",
+        "experiment",
+        "sequence_id",
+        "started_at",
+        "finished_at",
+    ]
 
 
 class ExperimentMetricResource(resources.ModelResource):

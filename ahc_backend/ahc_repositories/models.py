@@ -35,7 +35,7 @@ class Repository(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.slug
+        return f"{self.name} ({self.id})"
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -45,6 +45,10 @@ class Repository(models.Model):
 
     class Meta:
         ordering = ("-created_at",)
+
+    @property
+    def owner(self):
+        return self.users.filter(type="OWNER").first()
 
 
 class RepositoryUser(models.Model):
@@ -69,7 +73,7 @@ class RepositoryUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.repository.slug} - {self.user.get_full_name()}"
+        return self.user.get_full_name()
 
 
 class RepositoryEnvVariable(models.Model):
