@@ -25,7 +25,9 @@ class AHCRepositoryResource(resources.ModelResource):
 class AHCRepositoryAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
     resource_class = AHCRepositoryResource
     list_display = (
+        "id",
         "name",
+        "owner",
         "description",
         "private",
         "html_url",
@@ -44,7 +46,7 @@ class AHCRepositoryUserResource(resources.ModelResource):
 
 class AHCRepositoryUserAdmin(ImportExportModelAdmin):
     resource_class = AHCRepositoryUserResource
-    list_display = ("user", "repository", "created_at", "updated_at", "type")
+    list_display = ("id", "user", "repository", "created_at", "updated_at", "type")
     list_filter = ("created_at", "updated_at", "user")
     search_fields = (
         "user__username",

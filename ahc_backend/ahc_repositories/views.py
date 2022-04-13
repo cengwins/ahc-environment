@@ -20,6 +20,9 @@ class ListCreateRepositoriesAPIView(ListCreateAPIView):
     serializer_class = RepositorySerializer
 
     def get_queryset(self):
+        if self.request.user.is_authenticated and self.request.user.is_superuser:
+            return super().get_queryset()
+
         return super().get_queryset().filter(users__user=self.request.user)
 
     def perform_create(self, serializer):

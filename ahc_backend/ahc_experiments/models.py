@@ -110,9 +110,7 @@ class Experiment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return (
-            f"{self.repository.name} - Experiment #{self.sequence_id} - {self.commit}"
-        )
+        return f"{self.repository.name} - Experiment #{self.sequence_id}"
 
     class Meta:
         ordering = ("-sequence_id", "-created_at")
@@ -148,14 +146,7 @@ class Experiment(models.Model):
         return self.repository.name
 
     def _repo_owner_username(self):
-        repo_user = self.repository.users.filter(
-            type=RepositoryUser.RepositoryUserTypes.OWNER
-        ).first()
-
-        if repo_user is None:
-            repo_user = self.repository.users.first()
-
-        return repo_user.user.username
+        return self.repository.owner
 
     def _last_run_log_path(self):
         """Returns the log path of the most recent FINISHED run."""
