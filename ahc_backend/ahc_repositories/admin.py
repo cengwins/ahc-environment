@@ -28,7 +28,6 @@ class AHCRepositoryAdmin(ImportExportModelAdmin, nested_admin.NestedModelAdmin):
         "id",
         "name",
         "owner",
-        "description",
         "private",
         "html_url",
         "created_at",
