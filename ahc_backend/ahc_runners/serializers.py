@@ -17,7 +17,7 @@ class RunnerJobSerializer(serializers.ModelSerializer):
 
     def get_github_token(self, obj):
         try:
-            return obj.user.github_profile.access_token
+            return obj.creator.github_profile.access_token
         except:
             return None
 

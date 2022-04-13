@@ -27,12 +27,13 @@ type ExperimentResponse struct {
 }
 
 type RunnerJobResponse struct {
-	Id         int                `json:"id"`
-	Experiment ExperimentResponse `json:"experiment"`
-	IsRunning  bool               `json:"is_running"`
-	IsFinished bool               `json:"is_finished"`
-	IsSuccess  bool               `json:"is_success"`
-	WillCancel bool               `json:"will_cancel"`
+	Id          int                `json:"id"`
+	Experiment  ExperimentResponse `json:"experiment"`
+	IsRunning   bool               `json:"is_running"`
+	IsFinished  bool               `json:"is_finished"`
+	IsSuccess   bool               `json:"is_success"`
+	WillCancel  bool               `json:"will_cancel"`
+	GitHubToken string             `json:"github_token"`
 }
 
 type SubmitJobResultRequestExperimentRun struct {

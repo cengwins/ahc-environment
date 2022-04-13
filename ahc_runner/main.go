@@ -57,10 +57,11 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, &resultBuffer)
+	err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
 	if err != nil {
 		return result, err
 	}
+	defer os.RemoveAll(containerVolumePath)
 
 	config, err := readAHCConfig(containerVolumePath)
 	if err != nil {

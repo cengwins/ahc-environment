@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 
 	jsonmessage "github.com/docker/docker/pkg/jsonmessage"
 	git "github.com/go-git/go-git/v5"
@@ -48,8 +49,13 @@ func printJsonStreamToScreen(wr io.Writer, rd io.ReadCloser) {
 	jsonmessage.DisplayJSONMessagesStream(rd, wr, 0, false, nil)
 }
 
-func gitClone(containerVolumePath string, url string, outStream io.Writer) error {
+func gitClone(containerVolumePath string, url string, token string, outStream io.Writer) error {
 	branch := ""
+
+	if len(token) > 0 {
+		url = strings.Replace(url, "http://", fmt.Sprintf("http://%s@", token), 1)
+		url = strings.Replace(url, "https://", fmt.Sprintf("https://%s@", token), 1)
+	}
 
 	repo, err := git.PlainClone(containerVolumePath, false, &git.CloneOptions{
 		InsecureSkipTLS: true,
