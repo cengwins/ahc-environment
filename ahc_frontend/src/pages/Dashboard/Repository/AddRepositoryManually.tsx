@@ -45,7 +45,7 @@ const AddRepositoryManually = observer((
             onClick={
               () => {
                 setLoading(true);
-                repositoriesStore.createRepository({ name: url, upstream: url })
+                repositoriesStore.createRepository({ upstream: url, name: url.split('/').pop() as string })
                   .then(() => {
                     notificationStore.set('success', 'Repository added successfully');
                     setShow(false);
