@@ -46,6 +46,10 @@ class Repository(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
+    @property
+    def owner(self):
+        return self.users.filter(type="OWNER").get()
+
 
 class RepositoryUser(models.Model):
     """
