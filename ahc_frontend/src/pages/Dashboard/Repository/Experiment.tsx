@@ -42,12 +42,6 @@ const Experiment = () => {
     );
   }
 
-  if (!experiment || loading) {
-    return (
-      <Loading loading={loading} failed={failedToLoad || !experiment} />
-    );
-  }
-
   const experimentStatus = statuses[experiment.status - 1];
 
   const properties: {title: string, value: any}[] = [
