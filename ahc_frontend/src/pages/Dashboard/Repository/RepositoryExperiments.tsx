@@ -32,6 +32,12 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
       .finally(() => setLoading(false));
   }, []);
 
+  if (!experiments || loading) {
+    return (
+      <Loading loading={loading} failed={failedToLoad || !experiments} />
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <LoadingButton
