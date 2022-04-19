@@ -3,6 +3,7 @@ import {
   Typography, Accordion, AccordionSummary, AccordionDetails,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { blue } from '@mui/material/colors';
 import { RunInfo } from '../../../stores/ExperimentStore';
 import PropertyList from '../../../components/PropertyList';
 
@@ -38,6 +39,9 @@ const RunsAccordion = ({ runs }: {runs: RunInfo[]}) => {
 
   return (
     <div>
+      <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
+        Runs
+      </Typography>
       {runs.map((run, i) => (
         <Accordion
           key={run.id}

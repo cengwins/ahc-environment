@@ -1,11 +1,7 @@
-import {
-  Typography, Button, Box, Tabs, Tab,
-} from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { Box, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { blue } from '@mui/material/colors';
 import Loading from '../../../components/Loading';
 import PropertyList from '../../../components/PropertyList';
 
@@ -15,6 +11,7 @@ import '../DashboardHome.css';
 import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentStatus } from '../../../stores/ExperimentStore';
+import ExperimentLogs from './ExperimentLogs';
 
 const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 const Experiment = () => {
@@ -22,7 +19,6 @@ const Experiment = () => {
   const { dashboardNavigationStore, experimentStore } = useStores();
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
-  const [shownLog, setShownLog] = useState(0);
 
   useEffect(() => {
     const fetchFunction = async () => {
@@ -52,9 +48,11 @@ const Experiment = () => {
     );
   }
 
+  const experimentStatus = statuses[experiment.status - 1];
+
   const properties: {title: string, value: any}[] = [
     { title: 'Title', value: `Run #${experiment.sequence_id}` },
-    { title: 'Status', value: (<ExperimentStatusIcon status={statuses[experiment.status - 1]} />) },
+    { title: 'Status', value: (<ExperimentStatusIcon status={experimentStatus} />) },
     {
       title: 'Creation Time',
       value: `${new Date(experiment.created_at).toLocaleDateString('tr-TR', {
@@ -75,59 +73,32 @@ const Experiment = () => {
     { title: 'Reference Type', value: experiment.reference_type },
   ];
 
+  const experimentNotFinished = experimentStatus === 'running' || experimentStatus === 'pending';
+
   return (
     <Box>
       <PropertyList properties={properties} />
 
-      <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
-        Runs
-      </Typography>
+      {experimentNotFinished && (
+      <Stack sx={{ mt: 3 }}>
+        <Typography alignSelf="center" sx={{ mb: 2, color: `${blue[700]}` }} component="h4" variant="h5">
+          Your experiment is not yet finished.
+        </Typography>
+        <Typography alignSelf="center" sx={{ color: `${blue[600]}` }} component="h2" variant="subtitle1">
+          You will see the details of the runs when it is done here.
+        </Typography>
+        <Typography alignSelf="center" sx={{ color: `${blue[600]}` }} component="h2" variant="subtitle1">
+          Refresh the page to see the current state of the experiment.
+        </Typography>
+      </Stack>
+      )}
 
-      <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
-
-      <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
-        Logs
-      </Typography>
-
-      <Box sx={{
-        display: 'flex', mb: 2,
-      }}
-      >
-        <Tabs
-          orientation="vertical"
-          variant="scrollable"
-          value={shownLog}
-          onChange={(_, newValue: number) => setShownLog(newValue)}
-          aria-label="Log tabs"
-          sx={{ borderRight: 1, borderColor: 'divider' }}
-        >
-          {experiment.runs?.map((run, i) => (
-            <Tab
-              key={run.sequence_id}
-              label={run.sequence_id}
-              id={run.id}
-              value={i}
-            />
-          ))}
-        </Tabs>
-        <Box sx={{ flexGrow: 1 }}>
-          {experiment.runs?.map((run, index) => (
-            <div
-              key={run.id}
-              role="tabpanel"
-              id={`vertical-tabpanel-${index}`}
-              hidden={index !== shownLog}
-            >
-              <SyntaxHighlighter key={run.id} language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
-                {run.logs}
-              </SyntaxHighlighter>
-              <Button variant="contained" href={run.log_url}>
-                Download log
-              </Button>
-            </div>
-          ))}
-        </Box>
+      {!experimentNotFinished && (
+      <Box>
+        <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
+        <ExperimentLogs runs={experiment.runs || []} />
       </Box>
+      )}
     </Box>
   );
 };
