@@ -31,10 +31,10 @@ const Home = () => {
           <YoutubeEmbed embedId="T5g3chxHJz8" />
         </Box>
         <Box sx={{ mb: 3 }}>
-          <Typography component="h1" variant="h3" sx={{ color: `${blue[600]}` }}>
+          <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
             AHC Experimentation Environment
           </Typography>
-          <Typography component="h2" variant="h5" sx={{ maxWidth: '480px', color: `${blue[400]}` }}>
+          <Typography component="h2" variant="h5" sx={{ maxWidth: '480px', color: `${blue[600]}` }}>
             Wireless Ad Hoc Cloud Computing, Learning and Experimentation Environment
           </Typography>
         </Box>

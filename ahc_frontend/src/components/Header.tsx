@@ -61,7 +61,7 @@ const Header = () => {
             className="clickable"
             variant="h6"
             component="h3"
-            sx={{ color: `${blue[500]}` }}
+            sx={{ color: `${blue[600]}` }}
           >
             AHC Experimentation Environment
           </Typography>
