@@ -45,7 +45,7 @@ const GitHubSettings = observer(() => {
               GithubStore.setGithubToken({ access_token: githubToken }).then(() => {
                 notificationStore.set('success', 'Token is saved!');
               }).catch((result) => {
-                notificationStore.set('error', result.message);
+                notificationStore.set('error', result.response.data.errors.detail || result.message);
               }).finally(() => {
                 setWaitingResponse(false);
               });

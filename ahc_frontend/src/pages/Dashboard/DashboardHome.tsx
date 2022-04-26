@@ -56,13 +56,13 @@ const DashboardHome = observer(() => {
               repositoriesStore.deleteRepositories(chosens)
                 .then((removedIds) => {
                   if (chosens.length === removedIds.length) {
-                    notificationStore.set('success', `${chosens.length} repositories are deleted.`);
+                    notificationStore.set('success', `${chosens.length === 1 ? 'A repository is' : `${chosens.length} repositories are`} deleted.`);
                   } else {
                     notificationStore.set('info', `Only ${removedIds.length} out of ${chosens.length} repositories are deleted.`);
                   }
                   setChosens(chosens.filter((chosenId) => !removedIds.includes(chosenId)));
                 }).catch((result) => {
-                  notificationStore.set('error', result.message);
+                  notificationStore.set('error', result.response.data.errors.detail || result.message);
                 }).finally(() => {
                   setIsDeleting(false);
                 });

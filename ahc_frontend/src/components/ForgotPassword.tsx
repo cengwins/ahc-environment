@@ -28,7 +28,7 @@ const ForgotPasswordDialog = ({ open, onClose, loginInstead }:
             UserStore.resetPasswordRequest({ email }).then(() => {
               notificationStore.set('success', 'Password reset request is received. Check your email.');
             }).catch((result) => {
-              notificationStore.set('error', result.message);
+              notificationStore.set('error', result.response.data.errors.detail || result.message);
             }).finally(() => {
               setWaitingResponse(false);
             });

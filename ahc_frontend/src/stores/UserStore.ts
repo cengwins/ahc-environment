@@ -18,9 +18,9 @@ export default class UserStore implements UserStoreInterface {
 
   email: string = '';
 
-  name: string = '';
+  firstName: string = '';
 
-  surname: string = '';
+  lastName: string = '';
 
   token: string = '';
 
@@ -51,8 +51,8 @@ export default class UserStore implements UserStoreInterface {
     this.id = id;
     this.username = username;
     this.email = email;
-    this.name = first_name;
-    this.surname = last_name;
+    this.firstName = first_name;
+    this.lastName = last_name;
     this.activated = is_activated;
   }
 
@@ -60,8 +60,8 @@ export default class UserStore implements UserStoreInterface {
     this.id = '';
     this.username = '';
     this.email = '';
-    this.name = '';
-    this.surname = '';
+    this.firstName = '';
+    this.lastName = '';
     this.token = '';
     this.activated = false;
     localStorage.removeItem('token');
@@ -76,8 +76,8 @@ export default class UserStore implements UserStoreInterface {
     this.id = id;
     this.username = username;
     this.email = email;
-    this.name = first_name;
-    this.surname = last_name;
+    this.firstName = first_name;
+    this.lastName = last_name;
     this.activated = is_activated;
   }
 

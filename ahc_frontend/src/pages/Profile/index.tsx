@@ -18,7 +18,7 @@ const Profile = observer(() => {
   const [failedToLoad, setFailed] = useState(false);
 
   const {
-    username, email, name, surname, activated,
+    username, email, firstName, lastName, activated,
   } = userStore;
 
   useEffect(() => {
@@ -30,8 +30,8 @@ const Profile = observer(() => {
   const generalProperties = [
     { title: 'Username', value: username },
     { title: 'Email', value: email },
-    { title: 'Name', value: name },
-    { title: 'Surname', value: surname },
+    { title: 'Name', value: firstName },
+    { title: 'Surname', value: lastName },
     { title: 'Activated', value: activated ? <CheckCircle color="success" /> : <Cancel color="error" /> },
   ];
 
@@ -47,7 +47,7 @@ const Profile = observer(() => {
             UserStore.resetPasswordRequest({ email }).then(() => {
               notificationStore.set('success', 'Password reset request is received. Check your email.');
             }).catch((result) => {
-              notificationStore.set('error', result.message);
+              notificationStore.set('error', result.response.data.errors.detail || result.message);
             }).finally(() => {
               setResetButtonLoading(false);
             });
