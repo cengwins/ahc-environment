@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,8 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const AHC_FILENAME = "ahc.yml"
-const AHC_FILENAME_FALLBACK = ".ahc.yml"
+var AHC_FILENAMES = []string{"ahc.yml", "ahc.yaml", ".ahc.yml", ".ahc.yaml"}
 
 type TopologyConfiguration struct {
 	Name  string   `yaml:"name"`
@@ -149,17 +147,20 @@ func gitCommitAndPushWithGlobs(repo *git.Repository, globs []string, outStream i
 }
 
 func readAHCConfig(containerVolumePath string) (AHCConfiguration, error) {
-	filePath := path.Join(containerVolumePath, AHC_FILENAME)
+	var err error
+	var filePath = ""
 
-	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
-		filePath = path.Join(containerVolumePath, AHC_FILENAME_FALLBACK)
+	for _, v := range AHC_FILENAMES {
+		filePath = path.Join(containerVolumePath, v)
 
-		if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
-			filePath = ""
+		_, err = os.Stat(filePath)
+
+		if err == nil {
+			break
 		}
 	}
 
-	if filePath != "" {
+	if err == nil {
 		buf, err := ioutil.ReadFile(filePath)
 		if err == nil {
 			c := AHCConfiguration{}
@@ -169,6 +170,8 @@ func readAHCConfig(containerVolumePath string) (AHCConfiguration, error) {
 			}
 		}
 	}
+
+	fmt.Println("Using default config.")
 
 	defaultConfig := AHCConfiguration{
 		Image:   "python:3-alpine",
