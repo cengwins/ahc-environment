@@ -48,7 +48,6 @@ const LogInDialog = ({
               .catch((result) => {
                 notificationStore.set('error', result.response.data.errors.detail || result.message);
                 setErrors(result.response.data.errors);
-                console.log(result.response.data.errors);
               })
               .finally(() => {
                 setWaitingResponse(false);

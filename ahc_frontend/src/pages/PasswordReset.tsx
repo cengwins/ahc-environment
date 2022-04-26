@@ -36,7 +36,7 @@ const PasswordReset = () => {
             UserStore.resetPassword({ code: code as string, password: newPass }).then(() => {
               notificationStore.set('success', 'Password reset successfully.');
             }).catch((result) => {
-              notificationStore.set('error', result.message);
+              notificationStore.set('error', result.response.data.errors.detail || result.message);
             }).finally(() => {
               setWaitingResponse(false);
             });
