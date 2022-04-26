@@ -1,9 +1,12 @@
+import { LoadingButton } from '@mui/lab';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, TextField,
+  Alert,
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
+import ExtendedTextField from './ExtendedTextField';
 
 const LogInDialog = ({
   open, onClose, forgotPassword, dontHaveAccount,
@@ -14,6 +17,12 @@ const LogInDialog = ({
   const [password, setPassword] = useState('');
   const [waitingResponse, setWaitingResponse] = useState(false);
   const navigate = useNavigate();
+
+  const [errors, setErrors] = useState({
+    username: [],
+    password: [],
+    detail: '',
+  });
 
   return (
     <Dialog
@@ -37,7 +46,9 @@ const LogInDialog = ({
               .then(() => userStore.getProfile())
               .then(() => navigate('/dashboard'))
               .catch((result) => {
-                notificationStore.set('error', result.message);
+                notificationStore.set('error', result.response.data.errors.detail || result.message);
+                setErrors(result.response.data.errors);
+                console.log(result.response.data.errors);
               })
               .finally(() => {
                 setWaitingResponse(false);
@@ -45,12 +56,33 @@ const LogInDialog = ({
           }}
         >
           <FormGroup sx={{ mb: 2, pt: 1 }}>
-            <TextField label="User Name" type="text" placeholder="Enter user name" onChange={(e) => setUsername(e.target.value)} />
+            <ExtendedTextField
+              label="User Name"
+              type="text"
+              placeholder="Enter user name"
+              onChange={setUsername}
+              errors={errors.username}
+              required
+            />
           </FormGroup>
 
           <FormGroup sx={{ mb: 2 }}>
-            <TextField label="Password" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+            <ExtendedTextField
+              label="Password"
+              type="password"
+              placeholder="Password"
+              onChange={setPassword}
+              errors={errors.password}
+              required
+            />
           </FormGroup>
+
+          {(!waitingResponse && errors.detail) && (
+            <Alert sx={{ mb: 2 }} severity="error">
+              {errors.detail}
+            </Alert>
+          )}
+
           <DialogActions>
             <Button size="small" color="error" onClick={forgotPassword}>
               Forgot Password?
@@ -58,9 +90,9 @@ const LogInDialog = ({
             <Button size="small" onClick={dontHaveAccount}>
               Create Account
             </Button>
-            <Button variant="contained" type="submit" disabled={waitingResponse}>
+            <LoadingButton variant="contained" type="submit" loading={waitingResponse}>
               Log In
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </DialogContent>

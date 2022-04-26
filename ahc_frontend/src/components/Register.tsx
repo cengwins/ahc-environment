@@ -1,4 +1,6 @@
+import { LoadingButton } from '@mui/lab';
 import {
+  Alert,
   Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup,
 } from '@mui/material';
 import { useState } from 'react';
@@ -21,6 +23,7 @@ const Register = ({ open, onClose, haveAccount }:
     first_name: [],
     last_name: [],
     password: [],
+    detail: '',
   });
 
   return (
@@ -43,9 +46,8 @@ const Register = ({ open, onClose, haveAccount }:
               notificationStore.set('success', 'Registered!');
               onClose();
             }).catch((result) => {
-              notificationStore.set('error', result.message);
+              notificationStore.set('error', result.response.data.errors.detail || result.message);
               setErrors(result.response.data.errors);
-              console.log(result.response.data.errors.username[0]);
             }).finally(() => {
               setWaitingResponse(false);
             });
@@ -59,6 +61,7 @@ const Register = ({ open, onClose, haveAccount }:
               placeholder="Enter username"
               onChange={setUsername}
               errors={errors.username}
+              required
             />
           </FormGroup>
 
@@ -69,6 +72,7 @@ const Register = ({ open, onClose, haveAccount }:
               placeholder="Enter email"
               onChange={setMail}
               errors={errors.email}
+              required
             />
           </FormGroup>
 
@@ -79,6 +83,7 @@ const Register = ({ open, onClose, haveAccount }:
               placeholder="Name"
               onChange={setFirstName}
               errors={errors.first_name}
+              required
             />
           </FormGroup>
 
@@ -89,6 +94,7 @@ const Register = ({ open, onClose, haveAccount }:
               placeholder="Last Name"
               onChange={setLastName}
               errors={errors.last_name}
+              required
             />
           </FormGroup>
 
@@ -99,16 +105,23 @@ const Register = ({ open, onClose, haveAccount }:
               placeholder="Password"
               onChange={setPassword}
               errors={errors.password}
+              required
             />
           </FormGroup>
+
+          {(!waitingResponse && errors.detail) && (
+          <Alert sx={{ mb: 2 }} severity="error">
+            {errors.detail}
+          </Alert>
+          )}
 
           <DialogActions>
             <Button size="small" onClick={haveAccount}>
               Already have an account?
             </Button>
-            <Button variant="contained" type="submit" disabled={waitingResponse}>
+            <LoadingButton variant="contained" type="submit" disabled={waitingResponse}>
               Register
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </DialogContent>
