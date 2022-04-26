@@ -18,7 +18,7 @@ class RunnerJobAccessPermission(permissions.BasePermission):
         job_id = request.parser_context["kwargs"].get("job_id")
 
         if runner and job_id:
-            return RunnerJob.objects.filter(id=job_id, runner=runner).exists()
+            return RunnerJob.ranked_objects.filter(id=job_id, runner=runner).exists()
 
         return False
 

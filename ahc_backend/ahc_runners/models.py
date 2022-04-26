@@ -1,6 +1,9 @@
 import uuid
 
 from django.db import models
+from django.db.models import F
+from django.db.models.expressions import Window
+from django.db.models.functions import Rank
 
 from django.contrib.auth.models import User
 from ahc_experiments.models import Experiment, ExperimentRun
@@ -8,6 +11,27 @@ from ahc_experiments.models import Experiment, ExperimentRun
 
 def generate_random_runner_secret():
     return uuid.uuid4().hex
+
+
+class RankedObjectsManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                rank=Window(
+                    expression=Rank(),
+                    order_by=[
+                        F("is_finished").asc(),
+                        F("is_running").asc(),
+                        F("priority").desc(),
+                        F("created_at").asc(),
+                    ],
+                )
+            )
+        )
 
 
 class Runner(models.Model):
@@ -22,6 +46,8 @@ class Runner(models.Model):
 
 
 class RunnerJob(models.Model):
+    ranked_objects = RankedObjectsManager()
+
     experiment = models.ForeignKey(
         Experiment, related_name="jobs", on_delete=models.CASCADE
     )
@@ -54,8 +80,22 @@ class RunnerJob(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def _rank(self):
+        if self.is_finished or self.is_running:
+            return None
+
+        return self.rank
+
+    @property
+    def _priority(self):
+        if self.is_finished or self.is_running:
+            return None
+
+        return self.priority
+
     def __str__(self):
         return f"{self.experiment.pk} - {self.created_at}"
 
     class Meta:
-        ordering = ("-priority", "-created_at")
+        ordering = ("is_finished", "is_running", "-priority", "created_at")
