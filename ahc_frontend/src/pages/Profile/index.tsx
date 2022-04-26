@@ -18,7 +18,7 @@ const Profile = observer(() => {
   const [failedToLoad, setFailed] = useState(false);
 
   const {
-    username, email, name, surname, activated,
+    username, email, firstName, lastName, activated,
   } = userStore;
 
   useEffect(() => {
@@ -30,8 +30,8 @@ const Profile = observer(() => {
   const generalProperties = [
     { title: 'Username', value: username },
     { title: 'Email', value: email },
-    { title: 'Name', value: name },
-    { title: 'Surname', value: surname },
+    { title: 'Name', value: firstName },
+    { title: 'Surname', value: lastName },
     { title: 'Activated', value: activated ? <CheckCircle color="success" /> : <Cancel color="error" /> },
   ];
 
