@@ -43,6 +43,8 @@ class RunnerJob(models.Model):
         Runner, related_name="jobs", null=True, blank=True, on_delete=models.CASCADE
     )
 
+    priority = models.PositiveIntegerField(default=0)
+
     is_running = models.BooleanField(default=False)
     is_finished = models.BooleanField(default=False)
     will_cancel = models.BooleanField(default=False)
@@ -54,3 +56,6 @@ class RunnerJob(models.Model):
 
     def __str__(self):
         return f"{self.experiment.pk} - {self.created_at}"
+
+    class Meta:
+        ordering = ("-priority", "-created_at")
