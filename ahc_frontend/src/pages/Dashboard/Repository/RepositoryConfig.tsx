@@ -17,9 +17,17 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
       axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yml`)
         .then((response) => setAhcymlContent(response.data))
         .catch(() => {
-          axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
+          axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yaml`)
             .then((response) => setAhcymlContent(response.data))
-            .catch(() => setAhcymlContent('Failed to fetch ahc.yml or .ahc.yml.'));
+            .catch(() => {
+              axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
+                .then((response) => setAhcymlContent(response.data))
+                .catch(() => {
+                  axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yaml`)
+                    .then((response) => setAhcymlContent(response.data))
+                    .catch(() => setAhcymlContent('Failed to fetch ahc.yml or .ahc.yml.'));
+                });
+            });
         });
     }
   }, [repository]);
