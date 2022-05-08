@@ -8,6 +8,7 @@ import { blue } from '@mui/material/colors';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
+import TopologyConfig from './TopologyConfig';
 
 const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo}) => {
   const [ahcymlContent, setAhcymlContent] = useState('Loading...');
@@ -47,6 +48,7 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
           </SyntaxHighlighter>
         </CardContent>
       </Card>
+      <TopologyConfig />
     </div>
   );
 });
