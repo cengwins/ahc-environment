@@ -30,7 +30,7 @@ const RepositoryHome = observer(({ repository }: {repository: RepositoryInfo}) =
     <div>
       <PropertyList properties={properties} />
       <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>README</Typography>
-      <Card variant="outlined" sx={{ my: 2 }}>
+      <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <CardContent sx={{ padding: '12px 20px' }}>
           <Box>
             <ReactMarkdown>{readmeContent}</ReactMarkdown>

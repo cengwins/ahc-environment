@@ -1,8 +1,12 @@
 /* eslint-disable react/jsx-filename-extension */
-import { Card, List, ListItem } from '@mui/material';
+import {
+  Card, CardContent, Grid, List, ListItem, ListItemIcon, ListItemText, Typography,
+} from '@mui/material';
+import { blue } from '@mui/material/colors';
 import { useState } from 'react';
 import Graph from 'react-graph-vis';
 import { v4 } from 'uuid';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const TopologyConfig = () => {
   const [graph, setGraph] = useState({
@@ -30,6 +34,11 @@ const TopologyConfig = () => {
       { id: '4', from: 2, to: 5 },
     ],
   });
+
+  const getNodeLabel = (id) => {
+    const node = graph.nodes.find((n) => n.id === id);
+    return node ? node.label : id;
+  };
 
   const options = {
     height: '600px',
@@ -69,7 +78,6 @@ const TopologyConfig = () => {
           edges: graph.edges.filter((edge) => !data.edges.find((id) => id === edge.id)),
         });
       },
-      editEdge: undefined,
     },
     interaction: {
       dragView: false,
@@ -93,28 +101,67 @@ const TopologyConfig = () => {
         nodes: newNodes,
         edges: graph.edges,
       });
-      console.log(event);
     },
   };
 
-  console.log(graph);
-
   return (
-    <Card>
-      <Graph
-        key={v4()}
-        graph={graph}
-        options={options}
-        events={events}
-      />
-      <List>
-        {graph.nodes.map((node) => (
-          <ListItem key={node.id}>
-            {node.label ?? node.id}
-          </ListItem>
-        ))}
-      </List>
-    </Card>
+    <div>
+      <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
+        Topology
+      </Typography>
+      <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
+        <Graph
+          key={v4()}
+          graph={graph}
+          options={options}
+          events={events}
+        />
+      </Card>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Typography component="h5" variant="h5" sx={{ my: 2, color: `${blue[700]}` }}>
+            Nodes
+          </Typography>
+          <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
+            <CardContent>
+              <List dense>
+                {graph.nodes.map((node) => (
+                  <ListItem key={node.id}>
+                    <ListItemIcon>
+                      <ArrowForwardIosIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      {node.label ?? node.id}
+                    </ListItemText>
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography component="h5" variant="h5" sx={{ my: 2, color: `${blue[700]}` }}>
+            Edges
+          </Typography>
+          <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
+            <CardContent>
+              <List dense>
+                {graph.edges.map((edge) => (
+                  <ListItem key={edge.id}>
+                    <ListItemIcon>
+                      <ArrowForwardIosIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      {`${getNodeLabel(edge.from)} -> ${getNodeLabel(edge.to)}`}
+                    </ListItemText>
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 
