@@ -48,7 +48,7 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
           </SyntaxHighlighter>
         </CardContent>
       </Card>
-      <TopologyConfig />
+      <TopologyConfig ahcYaml={ahcymlContent} setAhcYaml={setAhcymlContent} />
     </div>
   );
 });

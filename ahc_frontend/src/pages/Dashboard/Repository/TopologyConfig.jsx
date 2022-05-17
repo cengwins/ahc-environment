@@ -3,40 +3,32 @@ import {
   Card, CardContent, Grid, List, ListItem, ListItemIcon, ListItemText, Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Graph from 'react-graph-vis';
 import { v4 } from 'uuid';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { load, dump } from 'js-yaml';
+import DefaultTopology from './DefaultTopology';
 
-const TopologyConfig = () => {
-  const [graph, setGraph] = useState({
-    nodes: [
-      {
-        id: '1', label: 'Node 1', x: 100, y: 100,
-      },
-      {
-        id: '2', label: 'Node 2', x: 100, y: 200,
-      },
-      {
-        id: '3', label: 'Node 3', x: 200, y: 100,
-      },
-      {
-        id: '4', label: 'Node 4', x: 200, y: 200,
-      },
-      {
-        id: '5', label: 'Node 5', x: 300, y: 100,
-      },
-    ],
-    edges: [
-      { id: '1', from: 1, to: 2 },
-      { id: '2', from: 1, to: 3 },
-      { id: '3', from: 2, to: 4 },
-      { id: '4', from: 2, to: 5 },
-    ],
-  });
+// eslint-disable-next-line react/prop-types
+const TopologyConfig = ({ ahcYaml, setAhcYaml }) => {
+  const ahcJSON = load(ahcYaml);
+
+  const [topology, setTopology] = useState(
+    (ahcJSON && ahcJSON.topology) ? {
+      nodes: [],
+      edges: [],
+      ...ahcJSON.topology,
+    } : DefaultTopology,
+  );
+
+  useEffect(() => {
+    const ahcYAML = dump({ ...load(ahcYaml), topology });
+    setAhcYaml(ahcYAML);
+  }, [topology]);
 
   const getNodeLabel = (id) => {
-    const node = graph.nodes.find((n) => n.id === id);
+    const node = topology.nodes.find((n) => n.id === id);
     return node ? node.label : id;
   };
 
@@ -49,33 +41,33 @@ const TopologyConfig = () => {
       enabled: true,
       initiallyActive: true,
       addNode: (data, callback) => {
-        const nodes = [...graph.nodes, data];
-        setGraph({
+        const nodes = [...topology.nodes, data];
+        setTopology({
           nodes,
-          edges: graph.edges,
+          edges: topology.edges,
         });
         callback(data);
       },
       addEdge: (data, callback) => {
-        const edges = [...graph.edges, data];
-        setGraph({
-          nodes: graph.nodes,
+        const edges = [...topology.edges, data];
+        setTopology({
+          nodes: topology.nodes,
           edges,
         });
         callback(data);
       },
       deleteNode: (data, callback) => {
         callback(data);
-        setGraph({
-          nodes: graph.nodes.filter((node) => !data.nodes.find((id) => id === node.id)),
-          edges: graph.edges.filter((edge) => !data.nodes.find((id) => id === edge.id)),
+        setTopology({
+          nodes: topology.nodes.filter((node) => !data.nodes.find((id) => id === node.id)),
+          edges: topology.edges.filter((edge) => !data.nodes.find((id) => id === edge.id)),
         });
       },
       deleteEdge: (data, callback) => {
         callback(data);
-        setGraph({
-          nodes: graph.nodes,
-          edges: graph.edges.filter((edge) => !data.edges.find((id) => id === edge.id)),
+        setTopology({
+          nodes: topology.nodes,
+          edges: topology.edges.filter((edge) => !data.edges.find((id) => id === edge.id)),
         });
       },
     },
@@ -92,14 +84,14 @@ const TopologyConfig = () => {
       }
       const { nodes } = event;
       const newNode = {
-        ...graph.nodes.find((node) => node.id === nodes[0]),
+        ...topology.nodes.find((node) => node.id === nodes[0]),
         x: event.pointer.canvas.x,
         y: event.pointer.canvas.y,
       };
-      const newNodes = graph.nodes.map((node) => (node.id === newNode.id ? newNode : node));
-      setGraph({
+      const newNodes = topology.nodes.map((node) => (node.id === newNode.id ? newNode : node));
+      setTopology({
         nodes: newNodes,
-        edges: graph.edges,
+        edges: topology.edges,
       });
     },
   };
@@ -112,7 +104,7 @@ const TopologyConfig = () => {
       <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <Graph
           key={v4()}
-          graph={graph}
+          graph={topology}
           options={options}
           events={events}
         />
@@ -125,7 +117,7 @@ const TopologyConfig = () => {
           <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
             <CardContent>
               <List dense>
-                {graph.nodes.map((node) => (
+                {topology.nodes.map((node) => (
                   <ListItem key={node.id}>
                     <ListItemIcon>
                       <ArrowForwardIosIcon fontSize="small" />
@@ -146,7 +138,7 @@ const TopologyConfig = () => {
           <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
             <CardContent>
               <List dense>
-                {graph.edges.map((edge) => (
+                {topology.edges.map((edge) => (
                   <ListItem key={edge.id}>
                     <ListItemIcon>
                       <ArrowForwardIosIcon fontSize="small" />
