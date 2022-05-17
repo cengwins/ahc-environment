@@ -5,28 +5,32 @@ import {
   Card, CardContent, Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import CodeEditor from '@uiw/react-textarea-code-editor';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 import TopologyConfig from './TopologyConfig';
 
 const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo}) => {
-  const [ahcymlContent, setAhcymlContent] = useState('Loading...');
+  const [ahcYAMLContent, setAhcYAMLContent] = useState('Loading...');
+  const [ahcYAMLContentEditing, setAhcYAMLContentEditing] = useState('Loading...');
+
+  useEffect(() => {
+    setAhcYAMLContentEditing(ahcYAMLContent);
+  }, [ahcYAMLContent]);
 
   useEffect(() => {
     if (repository.upstream) {
       axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yml`)
-        .then((response) => setAhcymlContent(response.data))
+        .then((response) => setAhcYAMLContent(response.data))
         .catch(() => {
           axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yaml`)
-            .then((response) => setAhcymlContent(response.data))
+            .then((response) => setAhcYAMLContent(response.data))
             .catch(() => {
               axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
-                .then((response) => setAhcymlContent(response.data))
+                .then((response) => setAhcYAMLContent(response.data))
                 .catch(() => {
                   axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yaml`)
-                    .then((response) => setAhcymlContent(response.data))
-                    .catch(() => setAhcymlContent('Failed to fetch ahc.yml or .ahc.yml.'));
+                    .then((response) => setAhcYAMLContent(response.data))
+                    .catch(() => setAhcYAMLContent('Failed to fetch ahc.yml or .ahc.yml.'));
                 });
             });
         });
@@ -38,17 +42,25 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
       <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>ahc.yml</Typography>
       <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <CardContent sx={{ padding: '12px 20px' }}>
-          <SyntaxHighlighter
+          <CodeEditor
+            value={ahcYAMLContentEditing}
             language="yaml"
-            style={coy}
-            wrapLongLines
-            showLineNumbers
-          >
-            {ahcymlContent}
-          </SyntaxHighlighter>
+            placeholder="Please enter yaml code."
+            onChange={(e) => setAhcYAMLContentEditing(e.target.value)}
+            padding={15}
+            style={{
+              fontSize: 12,
+              backgroundColor: '#f5f5f5',
+              fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+            }}
+          />
         </CardContent>
       </Card>
-      <TopologyConfig ahcYaml={ahcymlContent} setAhcYaml={setAhcymlContent} />
+      <TopologyConfig
+        ahcYAML={ahcYAMLContent}
+        ahcYAMLEditing={ahcYAMLContentEditing}
+        setAhcYAML={setAhcYAMLContent}
+      />
     </div>
   );
 });

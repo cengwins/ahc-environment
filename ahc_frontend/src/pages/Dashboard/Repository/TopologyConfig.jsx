@@ -9,22 +9,31 @@ import { v4 } from 'uuid';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { load, dump } from 'js-yaml';
 import DefaultTopology from './DefaultTopology';
+import AlertDialog from '../../../components/AlertDialog';
 
 // eslint-disable-next-line react/prop-types
-const TopologyConfig = ({ ahcYaml, setAhcYaml }) => {
-  const ahcJSON = load(ahcYaml);
+const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
+  const ahcJSON = load(ahcYAML);
+
+  const constructTopology = () => ({
+    nodes: [],
+    edges: [],
+    ...ahcJSON.topology,
+  });
 
   const [topology, setTopology] = useState(
-    (ahcJSON && ahcJSON.topology) ? {
-      nodes: [],
-      edges: [],
-      ...ahcJSON.topology,
-    } : DefaultTopology,
+    (ahcJSON && ahcJSON.topology) ? constructTopology() : DefaultTopology,
   );
+  const [alertOpen, setAlertOpen] = useState(false);
 
   useEffect(() => {
-    const ahcYAML = dump({ ...load(ahcYaml), topology });
-    setAhcYaml(ahcYAML);
+    if (topology === DefaultTopology || topology === constructTopology()) return;
+    if (ahcYAMLEditing !== ahcYAML) {
+      setAlertOpen(true);
+    } else {
+      const currentAhcYAML = dump({ ...load(ahcYAML), topology });
+      setAhcYAML(currentAhcYAML);
+    }
   }, [topology]);
 
   const getNodeLabel = (id) => {
@@ -153,6 +162,20 @@ const TopologyConfig = ({ ahcYaml, setAhcYaml }) => {
           </Card>
         </Grid>
       </Grid>
+      <AlertDialog
+        open={alertOpen}
+        title="Topology has been modified"
+        text="Do you want to save your changes?"
+        onYes={() => {
+          setAlertOpen(false);
+          const currentAhcYAML = dump({ ...load(ahcYAML), topology });
+          setAhcYAML(currentAhcYAML);
+        }}
+        onNo={() => {
+          setAlertOpen(false);
+          setTopology((ahcJSON && ahcJSON.topology) ? constructTopology() : DefaultTopology);
+        }}
+      />
     </div>
   );
 };
