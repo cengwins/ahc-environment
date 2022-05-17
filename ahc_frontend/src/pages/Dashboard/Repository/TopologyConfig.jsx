@@ -11,31 +11,36 @@ import { load, dump } from 'js-yaml';
 import AlertDialog from '../../../components/AlertDialog';
 
 // eslint-disable-next-line react/prop-types
+const TopologyConfigError = ({ text }) => (
+  <div>
+    <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
+      Topology
+    </Typography>
+    <Stack>
+      <Typography alignSelf="center" component="h4" variant="h5" sx={{ my: 2, color: `${red[700]}` }}>
+        {text}
+      </Typography>
+    </Stack>
+  </div>
+);
+
+// eslint-disable-next-line react/prop-types
 const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
   let ahcJSON = null;
 
-  try {
-    ahcJSON = load(ahcYAML);
-  } catch (e) {
-    return (
-      <div>
-        <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
-          Topology
-        </Typography>
-        <Stack>
-          <Typography alignSelf="center" component="h4" variant="h5" sx={{ my: 2, color: `${red[700]}` }}>
-            Error on parsing ahc.yaml file.
-          </Typography>
-        </Stack>
-      </div>
-    );
-  }
+  const constructTopology = () => {
+    try {
+      ahcJSON = load(ahcYAML);
+    } catch (e) {
+      return null;
+    }
 
-  const constructTopology = () => ({
-    nodes: [],
-    edges: [],
-    ...ahcJSON.topology,
-  });
+    return {
+      nodes: [],
+      edges: [],
+      ...ahcJSON.topology,
+    };
+  };
 
   const [topology, setTopology] = useState(constructTopology());
   const [alertOpen, setAlertOpen] = useState(false);
@@ -53,6 +58,30 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
       setAhcYAML(currentAhcYAML);
     }
   }, [topology]);
+
+  const checkTopology = () => {
+    const duplicateNodes = topology.nodes.map(
+      ({ id }) => (topology.nodes.filter((k) => k.id === id)),
+    ).flat();
+    const duplicateEdges = topology.edges.map(
+      ({ id }) => (topology.edges.filter((k) => k.id === id)),
+    ).flat();
+
+    return !(
+      duplicateNodes.length > topology.nodes.length
+      || duplicateEdges.length > topology.edges.length
+    );
+  };
+
+  if (topology === null) {
+    return <TopologyConfigError text="Error on parsing ahc.yaml file." />;
+  } if (!checkTopology()) {
+    return (
+      <TopologyConfigError
+        text="Error on topology configuration. Please check your topology configuration. There should be no nodes or edges with the same id."
+      />
+    );
+  }
 
   const getNodeLabel = (id) => {
     const node = topology.nodes.find((n) => n.id === id);
