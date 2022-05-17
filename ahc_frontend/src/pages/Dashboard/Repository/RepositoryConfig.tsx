@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Card, CardContent, Typography,
+  Button, Card, CardContent, Typography,
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import CodeEditor from '@uiw/react-textarea-code-editor';
@@ -56,6 +56,12 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
           />
         </CardContent>
       </Card>
+      <Button
+        variant="contained"
+        onClick={() => setAhcYAMLContent(ahcYAMLContentEditing)}
+      >
+        Display
+      </Button>
       <TopologyConfig
         ahcYAML={ahcYAMLContent}
         ahcYAMLEditing={ahcYAMLContentEditing}

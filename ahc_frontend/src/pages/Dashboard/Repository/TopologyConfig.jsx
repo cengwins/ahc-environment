@@ -1,19 +1,35 @@
 /* eslint-disable react/jsx-filename-extension */
 import {
-  Card, CardContent, Grid, List, ListItem, ListItemIcon, ListItemText, Typography,
+  Card, CardContent, Grid, List, ListItem, ListItemIcon, ListItemText, Stack, Typography,
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { blue, red } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
 import Graph from 'react-graph-vis';
 import { v4 } from 'uuid';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { load, dump } from 'js-yaml';
-import DefaultTopology from './DefaultTopology';
 import AlertDialog from '../../../components/AlertDialog';
 
 // eslint-disable-next-line react/prop-types
 const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
-  const ahcJSON = load(ahcYAML);
+  let ahcJSON = null;
+
+  try {
+    ahcJSON = load(ahcYAML);
+  } catch (e) {
+    return (
+      <div>
+        <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
+          Topology
+        </Typography>
+        <Stack>
+          <Typography alignSelf="center" component="h4" variant="h5" sx={{ my: 2, color: `${red[700]}` }}>
+            Error on parsing ahc.yaml file.
+          </Typography>
+        </Stack>
+      </div>
+    );
+  }
 
   const constructTopology = () => ({
     nodes: [],
@@ -21,13 +37,15 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
     ...ahcJSON.topology,
   });
 
-  const [topology, setTopology] = useState(
-    (ahcJSON && ahcJSON.topology) ? constructTopology() : DefaultTopology,
-  );
+  const [topology, setTopology] = useState(constructTopology());
   const [alertOpen, setAlertOpen] = useState(false);
 
   useEffect(() => {
-    if (topology === DefaultTopology || topology === constructTopology()) return;
+    setTopology(constructTopology());
+  }, [ahcYAML]);
+
+  useEffect(() => {
+    if (JSON.stringify(topology) === JSON.stringify(constructTopology())) return;
     if (ahcYAMLEditing !== ahcYAML) {
       setAlertOpen(true);
     } else {
@@ -165,7 +183,7 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
       <AlertDialog
         open={alertOpen}
         title="Topology has been modified"
-        text="Do you want to save your changes?"
+        text="Do you want to save your changes on the graph?"
         onYes={() => {
           setAlertOpen(false);
           const currentAhcYAML = dump({ ...load(ahcYAML), topology });
@@ -173,7 +191,7 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
         }}
         onNo={() => {
           setAlertOpen(false);
-          setTopology((ahcJSON && ahcJSON.topology) ? constructTopology() : DefaultTopology);
+          setTopology(constructTopology());
         }}
       />
     </div>
