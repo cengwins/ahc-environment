@@ -7,5 +7,9 @@ urlpatterns = [
         "repositories/<str:owner>/<str:repo>/branches/",
         GetBranchesOfTheRepositoryAPIView.as_view(),
     ),
+    path(
+        "repositories/<str:owner>/<str:repo>/contents/<str:path>/",
+        CommitFileContentsToUpstreamAPIView.as_view(),
+    ),
     path("profile/", GithubProfileAPIView.as_view()),
 ]
