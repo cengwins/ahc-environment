@@ -25,7 +25,7 @@ class GithubProfile(models.Model):
     # TODO: add necessary fields to be stored in db
 
     @cached_property
-    def github_client(self):
+    def github_client(self) -> Github:
         return Github(self.access_token)
 
     def get_authenticated_user(self) -> AuthenticatedUser:
