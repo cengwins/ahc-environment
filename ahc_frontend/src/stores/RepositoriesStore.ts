@@ -2,6 +2,7 @@ import {
   makeAutoObservable,
 } from 'mobx';
 import axios from 'axios';
+import crypto from 'crypto';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
@@ -101,5 +102,28 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
               });
           });
       });
+  }
+
+  static getSHA1 = (data: string) => crypto.createHash('sha1').update(data).digest('hex');
+
+  static getGitHubSHA = (data: string) => RepositoriesStore.getSHA1(`blob ${Buffer.byteLength(data)}\0${data}`);
+
+  async updateAhcYAML(data: string) {
+    if (!this.currentRepository) throw Error('No repository selected');
+    const { upstream } = this.currentRepository;
+    const upstreamList = upstream.split('/');
+    const ownerAndRepo = `${upstreamList[upstreamList.length - 2]}/${upstreamList[upstreamList.length - 1]}`;
+
+    const sha = this.currentAhcYAML
+      ? RepositoriesStore.getGitHubSHA(this.currentAhcYAML as string)
+      : undefined;
+
+    await (new RequestHandler()).request(`/github/repositories/${ownerAndRepo}/contents/ahc.yml/`, 'post', {
+      message: 'Update ahc.yml',
+      content: data,
+      sha,
+    });
+
+    this.currentAhcYAML = data;
   }
 }
