@@ -1,6 +1,7 @@
 import {
   makeAutoObservable,
 } from 'mobx';
+import axios from 'axios';
 import RequestHandler from '../app/RequestHandler';
 import MainStore from './MainStore';
 
@@ -28,6 +29,8 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
 
   currentMembers: string[] = [];
 
+  currentAhcYAML: String | undefined = undefined;
+
   constructor(mainStore: MainStore) {
     makeAutoObservable(this);
     this.mainStore = mainStore;
@@ -42,6 +45,7 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
   async getRepository(id: string) {
     const response = await (new RequestHandler()).request(`/repositories/${id}`, 'get');
     this.currentRepository = response;
+    this.currentAhcYAML = undefined;
   }
 
   async createRepository(data: {name: string, upstream: string}) {
@@ -77,5 +81,25 @@ export default class RepositoriesStore implements RepositoriesStoreInterface {
   async removeMembersFromRepository(id: string, memberId: string) {
     await (new RequestHandler()).request(`/repositories/${id}/members/${memberId}`, 'delete');
     this.currentMembers.filter((curMemberId) => curMemberId !== memberId);
+  }
+
+  async getAhcYAML() {
+    if (!this.currentRepository) throw Error('No repository selected');
+    const { upstream } = this.currentRepository;
+    axios.get(`${upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yml`)
+      .then((response) => { this.currentAhcYAML = response.data; })
+      .catch(() => {
+        axios.get(`${upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yaml`)
+          .then((response) => { this.currentAhcYAML = response.data; })
+          .catch(() => {
+            axios.get(`${upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
+              .then((response) => { this.currentAhcYAML = response.data; })
+              .catch(() => {
+                axios.get(`${upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yaml`)
+                  .then((response) => { this.currentAhcYAML = response.data; })
+                  .catch(() => { this.currentAhcYAML = undefined; });
+              });
+          });
+      });
   }
 }

@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Button, Card, CardContent, Stack, Typography,
 } from '@mui/material';
@@ -8,33 +7,25 @@ import { blue } from '@mui/material/colors';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { RepositoryInfo } from '../../../stores/RepositoriesStore';
 import TopologyConfig from './TopologyConfig';
+import { useStores } from '../../../stores/MainStore';
 
 const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo}) => {
-  const [ahcYAMLContent, setAhcYAMLContent] = useState('Loading...');
-  const [ahcYAMLContentEditing, setAhcYAMLContentEditing] = useState('Loading...');
+  const { repositoriesStore } = useStores();
+  const { currentAhcYAML } = repositoriesStore;
+  const [ahcYAMLContent, setAhcYAMLContent] = useState<String | undefined>(currentAhcYAML === undefined ? 'Loading...' : currentAhcYAML);
+  const [ahcYAMLContentEditing, setAhcYAMLContentEditing] = useState<String | undefined>('Loading...');
+
+  useEffect(() => {
+    setAhcYAMLContent(currentAhcYAML);
+    setAhcYAMLContentEditing(currentAhcYAML);
+  }, [currentAhcYAML]);
 
   useEffect(() => {
     setAhcYAMLContentEditing(ahcYAMLContent);
   }, [ahcYAMLContent]);
 
   useEffect(() => {
-    if (repository.upstream) {
-      axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yml`)
-        .then((response) => setAhcYAMLContent(response.data))
-        .catch(() => {
-          axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/ahc.yaml`)
-            .then((response) => setAhcYAMLContent(response.data))
-            .catch(() => {
-              axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yml`)
-                .then((response) => setAhcYAMLContent(response.data))
-                .catch(() => {
-                  axios.get(`${repository.upstream.replace('github.com', 'raw.githubusercontent.com')}/main/.ahc.yaml`)
-                    .then((response) => setAhcYAMLContent(response.data))
-                    .catch(() => setAhcYAMLContent('Failed to fetch ahc.yml or .ahc.yml.'));
-                });
-            });
-        });
-    }
+    repositoriesStore.getAhcYAML();
   }, [repository]);
 
   return (
@@ -43,7 +34,7 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
       <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <CardContent sx={{ maxHeight: '70vh', overflow: 'scroll' }}>
           <CodeEditor
-            value={ahcYAMLContentEditing}
+            value={ahcYAMLContentEditing === undefined ? 'Failed to fetch ahc.YAML' : ahcYAMLContentEditing as string}
             language="yaml"
             placeholder="Please enter yaml code."
             onChange={(e) => setAhcYAMLContentEditing(e.target.value)}
