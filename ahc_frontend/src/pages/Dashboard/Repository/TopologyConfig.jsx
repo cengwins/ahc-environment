@@ -73,6 +73,14 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
     );
   };
 
+  const getNextAvailableId = (ids) => {
+    const sortedIds = ids.sort();
+    for (let i = 0; i < sortedIds.length; i += 1) {
+      if (sortedIds[i] !== i) return i;
+    }
+    return ids.length;
+  };
+
   if (topology === null) {
     return <TopologyConfigError text="Error on parsing ahc.yaml file." />;
   } if (!checkTopology()) {
@@ -83,11 +91,6 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
     );
   }
 
-  const getNodeLabel = (id) => {
-    const node = topology.nodes.find((n) => n.id === id);
-    return node ? node.label : id;
-  };
-
   const options = {
     height: '600px',
     physics: {
@@ -97,7 +100,13 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
       enabled: true,
       initiallyActive: true,
       addNode: (data, callback) => {
-        const nodes = [...topology.nodes, data];
+        const newData = {
+          ...data,
+          label: undefined,
+          id: getNextAvailableId(topology.nodes.map(({ id }) => id)),
+        };
+
+        const nodes = [...topology.nodes, newData];
         setTopology({
           nodes,
           edges: topology.edges,
@@ -105,7 +114,12 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
         callback(data);
       },
       addEdge: (data, callback) => {
-        const edges = [...topology.edges, data];
+        const newData = {
+          ...data,
+          id: getNextAvailableId(topology.edges.map(({ id }) => id)),
+        };
+
+        const edges = [...topology.edges, newData];
         setTopology({
           nodes: topology.nodes,
           edges,
@@ -115,15 +129,15 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
       deleteNode: (data, callback) => {
         callback(data);
         setTopology({
-          nodes: topology.nodes.filter((node) => !data.nodes.find((id) => id === node.id)),
-          edges: topology.edges.filter((edge) => !data.nodes.find((id) => id === edge.id)),
+          nodes: topology.nodes.filter((node) => !(node.id in data.nodes)),
+          edges: topology.edges.filter((edge) => !(edge.id in data.edges)),
         });
       },
       deleteEdge: (data, callback) => {
         callback(data);
         setTopology({
           nodes: topology.nodes,
-          edges: topology.edges.filter((edge) => !data.edges.find((id) => id === edge.id)),
+          edges: topology.edges.filter((edge) => !(edge.id in data.edges)),
         });
       },
     },
@@ -160,7 +174,10 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
       <Card variant="outlined" sx={{ my: 2, backgroundColor: '#FDFCFD' }}>
         <Graph
           key={v4()}
-          graph={topology}
+          graph={{
+            edges: topology.edges,
+            nodes: topology.nodes.map((node) => ({ ...node, label: `${node.id}` })),
+          }}
           options={options}
           events={events}
         />
@@ -179,7 +196,7 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
                       <ArrowForwardIosIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>
-                      {node.label ?? node.id}
+                      {node.id}
                     </ListItemText>
                   </ListItem>
                 ))}
@@ -200,7 +217,7 @@ const TopologyConfig = ({ ahcYAML, ahcYAMLEditing, setAhcYAML }) => {
                       <ArrowForwardIosIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>
-                      {`${getNodeLabel(edge.from)} -> ${getNodeLabel(edge.to)}`}
+                      {`${edge.id}:  ${edge.from} -> ${edge.to}`}
                     </ListItemText>
                   </ListItem>
                 ))}
