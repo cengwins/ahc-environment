@@ -39,7 +39,7 @@ export default class RequestHandler {
           throw Error('Undefined requestType');
       }
     } catch (error: any) {
-      if (error?.response?.status === 401) {
+      if (error?.response?.status === 401 && localStorage.getItem('token')) {
         localStorage.removeItem('token');
         window.location.reload();
       }
