@@ -28,7 +28,7 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
 
   const updateAhcYAML = () => {
     setSendingAhcYAMLUpdate(true);
-    
+
     if (ahcYAMLContentEditing === undefined) {
       setUpdateError('Invalid YAML');
       return;
@@ -48,7 +48,7 @@ const RepositoryConfig = observer(({ repository }: {repository: RepositoryInfo})
         setSendingAhcYAMLUpdate(false);
       })
       .catch((result) => {
-        setUpdateError(result.response.data.errors.detail);
+        setUpdateError(result.response.data.errors?.detail || 'Failed to update ahc.yaml file');
       });
   };
 
