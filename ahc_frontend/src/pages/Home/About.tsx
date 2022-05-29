@@ -12,7 +12,7 @@ const About = () => {
   return (
     <div>
       <Box sx={{ mb: 3 }}>
-        <YoutubeEmbed embedId="T5g3chxHJz8" />
+        <YoutubeEmbed embedId="m8F0mPSu3Zw" />
       </Box>
       <Box sx={{ mb: 3 }}>
         <Typography component="h1" variant="h3" sx={{ color: `${blue[700]}` }}>
