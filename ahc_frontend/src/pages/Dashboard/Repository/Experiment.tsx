@@ -87,12 +87,10 @@ const Experiment = () => {
       </Stack>
       )}
 
-      {!experimentNotFinished && (
       <Box>
         <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
         <ExperimentLogs runs={experiment.runs || []} />
       </Box>
-      )}
     </Box>
   );
 };
