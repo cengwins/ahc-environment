@@ -10,6 +10,8 @@ import { RunInfo } from '../../../stores/ExperimentStore';
 const ExperimentLogs = ({ runs } : {runs: RunInfo[]}) => {
   const [shownLog, setShownLog] = useState(0);
 
+  if (runs.length === 0) return <div />;
+
   return (
     <Box>
       <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
