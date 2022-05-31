@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from functools import cached_property
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models.query_utils import Q
 from stdimage import StdImageField
@@ -77,10 +77,26 @@ class UserProfile(models.Model):
     def _is_superuser(self):
         return self.user.is_superuser
 
-    @admin.display(ordering="user__groups__name")
+    @admin.display()  # if more than one groups, ordering shows duplicates!
     def _groups(self):
         if self.user.groups.exists():
             return ", ".join([group.name for group in self.user.groups.all()])
+        else:
+            return "-"
+
+    @admin.display()  # if more than one groups, ordering shows duplicates!
+    def _notes(self):
+        if self.user.groups.exists():
+            """return all of the notes in student_groups of user's groups, don't forget to check whether groups have 
+            student_groups """
+
+            return ", ".join(
+                [
+                    group.student_group.notes
+                    for group in self.user.groups.all()
+                    if hasattr(group, "student_group")
+                ]
+            )
         else:
             return "-"
 
@@ -113,3 +129,24 @@ class UserPasswordReset(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.code}"
+
+
+class StudentGroup(models.Model):
+    """One to one relation with the original Django Group model"""
+    group = models.OneToOneField(
+        Group, unique=True, related_name="student_group", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    notes = models.TextField(blank=True)
+
+    def name(self):
+        return self.group.name
+
+    def __str__(self):
+        return self.group.name
+
+
+Group.notes = property(lambda self: self.student_group.notes)
+Group.updated_at = property(lambda self: self.student_group.updated_at)
+Group.created_at = property(lambda self: self.student_group.created_at)
