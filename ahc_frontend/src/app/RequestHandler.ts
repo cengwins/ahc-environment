@@ -18,24 +18,32 @@ export default class RequestHandler {
   async request(url: string, requestType: RequestType, data?: any) {
     let result;
 
-    switch (requestType) {
-      case 'get':
-        result = await this.axiosInstance.get(url);
-        break;
-      case 'post':
-        result = await this.axiosInstance.post(url, data);
-        break;
-      case 'put':
-        result = await this.axiosInstance.put(url, data);
-        break;
-      case 'delete':
-        result = await this.axiosInstance.delete(url, data);
-        break;
-      case 'patch':
-        result = await this.axiosInstance.patch(url, data);
-        break;
-      default:
-        throw Error('Undefined requestType');
+    try {
+      switch (requestType) {
+        case 'get':
+          result = await this.axiosInstance.get(url);
+          break;
+        case 'post':
+          result = await this.axiosInstance.post(url, data);
+          break;
+        case 'put':
+          result = await this.axiosInstance.put(url, data);
+          break;
+        case 'delete':
+          result = await this.axiosInstance.delete(url, data);
+          break;
+        case 'patch':
+          result = await this.axiosInstance.patch(url, data);
+          break;
+        default:
+          throw Error('Undefined requestType');
+      }
+    } catch (error: any) {
+      if (error?.response?.status === 401 && localStorage.getItem('token')) {
+        localStorage.removeItem('token');
+        window.location.reload();
+      }
+      throw error;
     }
 
     if (result.status >= 200 && result.status < 400) return result.data;

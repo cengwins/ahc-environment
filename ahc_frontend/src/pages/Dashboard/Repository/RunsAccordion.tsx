@@ -37,6 +37,8 @@ const RunDetails = ({ run }: {run:RunInfo}) => {
 const RunsAccordion = ({ runs }: {runs: RunInfo[]}) => {
   const [open, setOpen] = useState<number | false>(false);
 
+  if (runs.length === 0) return <div />;
+
   return (
     <div>
       <Typography component="h3" variant="h4" sx={{ my: 2, color: `${blue[700]}` }}>
