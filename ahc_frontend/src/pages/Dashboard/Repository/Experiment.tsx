@@ -85,6 +85,7 @@ const Experiment = () => {
     },
     { title: 'Reference', value: experiment.reference },
     { title: 'Reference Type', value: experiment.reference_type },
+    { title: 'Commit', value: experiment.commit || '-' },
   ];
 
   const experimentNotFinished = experimentStatus === 'running' || experimentStatus === 'pending';
