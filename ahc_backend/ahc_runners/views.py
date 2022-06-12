@@ -105,3 +105,18 @@ class SubmitRunnerJobResultAPIView(APIView):
             job.save()
 
         return Response(None, 200)
+
+
+class SubmitRunnerJobTempLogAPIView(APIView):
+    permission_classes = (RunnerAccessPermission, RunnerJobAccessPermission)
+
+    def post(self, request: Request, job_id):
+        runner = request.runner
+
+        job = RunnerJob.ranked_objects.filter(id=job_id).first()
+        if job is None or job.runner.id != runner.id:
+            raise unauthorized("wrong_job")
+
+        print("temp log received")
+
+        return Response(None, 200)

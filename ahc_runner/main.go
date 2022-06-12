@@ -19,7 +19,9 @@ import (
 var containerBindPath string
 var hostBindPath string
 
-func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan bool) {
+func startJobStatusUpdateService(job *RunnerJobResponse, finishJobChannel *chan bool, cancelJobChannel *chan bool) {
+	fmt.Printf("Starting update status service for job with id %d\n", job.Id)
+
 	var err error
 
 	for range time.Tick(5 * time.Second) {
@@ -31,30 +33,58 @@ func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan boo
 		if job.IsFinished {
 			fmt.Printf("Job with id %d finished, exiting from update status service\n", job.Id)
 
+			*finishJobChannel <- true
+
 			break
 		}
 
 		if job.WillCancel {
-			*cancelChannel <- true
+			fmt.Printf("Job with id %d canceled, exiting from update status service\n", job.Id)
+
+			*cancelJobChannel <- true
 
 			break
 		}
 	}
 }
 
+func startJobTempLogUpdateService(job *RunnerJobResponse, tempLogChannel *chan string, finishJobChannel *chan bool, cancelJobChannel *chan bool) {
+	fmt.Printf("Starting templog update service for job with id %d\n", job.Id)
+
+	for {
+		select {
+		case <-*finishJobChannel:
+			fmt.Printf("Job with id %d finished, exiting from templog update service\n", job.Id)
+
+			break
+		case <-*cancelJobChannel:
+			fmt.Printf("Job with id %d canceled, exiting from templog update service\n", job.Id)
+
+			break
+		case logs := <-*tempLogChannel:
+			fmt.Printf("Submitting temp log for job with id %d\n", job.Id)
+
+			submitJobTempRunLogs(job, logs)
+		}
+	}
+}
+
 func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, error) {
 	var resultBuffer bytes.Buffer
-	cancelChannel := make(chan bool)
-	result := make([]SubmitJobResultRequestExperimentRun, 0)
-	// bServer := new(broadcastserver.SocketServer)
 
-	// go bServer.Start()
-	go startJobStatusUpdateService(job, &cancelChannel)
+	result := make([]SubmitJobResultRequestExperimentRun, 0)
 
 	volumeId := uuid.NewString()
 	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
 	hostVolumePath := fmt.Sprintf("%s/%s", hostBindPath, volumeId)
 
+	finishJobChannel := make(chan bool)
+	cancelJobChannel := make(chan bool)
+	tempLogChannel := make(chan string)
+	go startJobStatusUpdateService(job, &finishJobChannel, &cancelJobChannel)
+	go startJobTempLogUpdateService(job, &tempLogChannel, &finishJobChannel, &cancelJobChannel)
+
+	fmt.Printf("Starting job with id %d\n", job.Id)
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
 	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
@@ -125,7 +155,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
 
 			startTime := time.Now()
-			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, &cancelChannel)
+			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, &tempLogChannel, &cancelJobChannel)
 			if err != nil {
 				return result, err
 			}
@@ -156,8 +186,6 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	// bServer.Stop()
 
 	return result, nil
 }

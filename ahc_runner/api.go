@@ -53,7 +53,11 @@ type SubmitJobResultRequest struct {
 	IsRunning  bool                             `json:"is_running"`
 	IsFinished bool                             `json:"is_finished"`
 	IsSuccess  bool                             `json:"is_success"`
-	WillCancel bool                             `json:"will_cancel"`
+}
+
+type SubmitJobTempRunLogsRequest struct {
+	Id   int    `json:"id"`
+	Logs string `json:"logs"`
 }
 
 var serverUrl string
@@ -131,6 +135,38 @@ func submitJobResult(job *RunnerJobResponse, result []SubmitJobResultRequestExpe
 	}
 
 	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/submit/", serverUrl, job.Id)
+
+	req, err := http.NewRequest("POST", connect_path, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	res, err := makeHttpRequest(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		fmt.Println("Could not connect to server")
+		return errors.New("Could not connect to server")
+	}
+
+	return nil
+}
+
+func submitJobTempRunLogs(job *RunnerJobResponse, logs string) error {
+	data := SubmitJobTempRunLogsRequest{
+		Id:   job.Id,
+		Logs: logs,
+	}
+
+	body, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	connect_path := fmt.Sprintf("http://%s/api/runner/jobs/%d/templog/", serverUrl, job.Id)
 
 	req, err := http.NewRequest("POST", connect_path, bytes.NewReader(body))
 	if err != nil {
