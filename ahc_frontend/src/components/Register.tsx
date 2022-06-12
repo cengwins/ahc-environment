@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useStores } from '../stores/MainStore';
+import mapAxiosError from '../utils/mapAxiosError';
 import ExtendedTextField from './ExtendedTextField';
 
 const Register = ({ open, onClose, haveAccount }:
@@ -46,7 +47,7 @@ const Register = ({ open, onClose, haveAccount }:
               notificationStore.set('success', 'Registered!');
               onClose();
             }).catch((result) => {
-              notificationStore.set('error', result.response.data.errors.detail || result.message);
+              notificationStore.set('error', mapAxiosError(result));
               setErrors(result.response.data.errors);
             }).finally(() => {
               setWaitingResponse(false);

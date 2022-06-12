@@ -10,6 +10,7 @@ import PropertyList from '../../components/PropertyList';
 import { useStores } from '../../stores/MainStore';
 import UserStore from '../../stores/UserStore';
 import GitHubSettings from './GitHubSettings';
+import mapAxiosError from '../../utils/mapAxiosError';
 
 const Profile = observer(() => {
   const { userStore, notificationStore } = useStores();
@@ -47,7 +48,7 @@ const Profile = observer(() => {
             UserStore.resetPasswordRequest({ email }).then(() => {
               notificationStore.set('success', 'Password reset request is received. Check your email.');
             }).catch((result) => {
-              notificationStore.set('error', result.response.data.errors.detail || result.message);
+              notificationStore.set('error', mapAxiosError(result));
             }).finally(() => {
               setResetButtonLoading(false);
             });

@@ -24,10 +24,7 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
   const { currentExperiments: experiments } = experimentStore;
 
   useEffect(() => {
-    Promise.all([
-      userStore.getProfile(),
-      experimentStore.getExperiments(),
-    ])
+    experimentStore.getExperiments()
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }, []);

@@ -22,6 +22,8 @@ export default class UserStore implements UserStoreInterface {
 
   lastName: string = '';
 
+  githubUsername?: string;
+
   token: string = '';
 
   activated: boolean = false;
@@ -45,7 +47,7 @@ export default class UserStore implements UserStoreInterface {
   async register(data: RegisterRequest) {
     const response = await (new RequestHandler()).request('/auth/register/', 'post', data);
     const {
-      id, username, email, first_name, last_name, is_activated,
+      id, username, email, first_name, last_name, is_activated, github_username,
     } = response;
 
     this.id = id;
@@ -53,6 +55,7 @@ export default class UserStore implements UserStoreInterface {
     this.email = email;
     this.firstName = first_name;
     this.lastName = last_name;
+    this.githubUsername = github_username;
     this.activated = is_activated;
   }
 
@@ -62,15 +65,16 @@ export default class UserStore implements UserStoreInterface {
     this.email = '';
     this.firstName = '';
     this.lastName = '';
-    this.token = '';
+    this.githubUsername = '';
     this.activated = false;
+    this.token = '';
     localStorage.removeItem('token');
   }
 
   async getProfile() {
     const response = await (new RequestHandler()).request('/auth/profile/', 'get');
     const {
-      id, username, email, first_name, last_name, is_activated,
+      id, username, email, first_name, last_name, is_activated, github_username,
     } = response;
 
     this.id = id;
@@ -78,6 +82,7 @@ export default class UserStore implements UserStoreInterface {
     this.email = email;
     this.firstName = first_name;
     this.lastName = last_name;
+    this.githubUsername = github_username;
     this.activated = is_activated;
   }
 

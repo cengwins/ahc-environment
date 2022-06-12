@@ -64,6 +64,7 @@ class LoginRequestSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     profile_image = serializers.SerializerMethodField()
     is_activated = serializers.SerializerMethodField()
+    github_username = serializers.SerializerMethodField()
 
     def get_profile_image(self, obj: User):
         if obj.profile.profile_image:
@@ -73,6 +74,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_activated(self, obj: User):
         return obj.profile.is_activated
+
+    def get_github_username(self, obj: User):
+        if hasattr(obj, "github_profile"):
+            return obj.github_profile.github_username
+
+        return None
 
     class Meta:
         model = User
@@ -84,4 +91,5 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "profile_image",
             "is_activated",
+            "github_username",
         )

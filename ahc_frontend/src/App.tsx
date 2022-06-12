@@ -1,10 +1,12 @@
 import { Box, CircularProgress } from '@mui/material';
 import { observer } from 'mobx-react';
-import { lazy, Suspense } from 'react';
+import {
+  lazy, ReactElement, Suspense, useEffect, useState,
+} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Loading from './components/Loading';
 import './App.css';
 import { useStores } from './stores/MainStore';
-import WrapWithSuspense from './utils/WrapWithSuspense';
 
 const Header = lazy(() => import('./components/Header'));
 const Footer = lazy(() => import('./components/Footer'));
@@ -13,6 +15,25 @@ const PageNotFound = lazy(() => import('./pages/PageNotFound'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const PasswordReset = lazy(() => import('./pages/PasswordReset'));
 const Profile = lazy(() => import('./pages/Profile'));
+
+const AuthenticatedRoute = observer(({ component }: { component: ReactElement }) => {
+  const { userStore } = useStores();
+  const [loading, setLoading] = useState(true);
+  const [failedToLoad, setFailed] = useState(false);
+
+  useEffect(() => {
+    userStore.getProfile()
+      .catch(() => setFailed(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <Loading loading={loading} failed={failedToLoad} />
+      {!loading && !failedToLoad && component}
+    </div>
+  );
+});
 
 const App = observer(() => {
   const { userStore } = useStores();
@@ -24,11 +45,11 @@ const App = observer(() => {
         <BrowserRouter>
           <Header />
           <Routes>
-            <Route path="/" element={<WrapWithSuspense component={<Home />} />} />
-            {token && <Route path="/profile" element={<WrapWithSuspense component={<Profile />} />} />}
-            {token && <Route path="/dashboard/*" element={<WrapWithSuspense component={<Dashboard />} />} />}
-            <Route path="/reset/:code" element={<WrapWithSuspense component={<PasswordReset />} />} />
-            <Route path="*" element={<WrapWithSuspense component={<PageNotFound />} />} />
+            <Route path="/" element={<Home />} />
+            {token && <Route path="/profile" element={<AuthenticatedRoute component={<Profile />} />} />}
+            {token && <Route path="/dashboard/*" element={<AuthenticatedRoute component={<Dashboard />} />} />}
+            <Route path="/reset/:code" element={<PasswordReset />} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
           <Footer />
         </BrowserRouter>

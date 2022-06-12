@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
 import UserStore from '../stores/UserStore';
+import mapAxiosError from '../utils/mapAxiosError';
 
 const PasswordReset = () => {
   const { code } = useParams();
@@ -36,7 +37,7 @@ const PasswordReset = () => {
             UserStore.resetPassword({ code: code as string, password: newPass }).then(() => {
               notificationStore.set('success', 'Password reset successfully.');
             }).catch((result) => {
-              notificationStore.set('error', result.response.data.errors.detail || result.message);
+              notificationStore.set('error', mapAxiosError(result));
             }).finally(() => {
               setWaitingResponse(false);
             });

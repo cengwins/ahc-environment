@@ -104,7 +104,10 @@ const AddRepositoryWithSearchDialog = observer((
                           repositoriesStore.createRepository(
                             { name: repository.name, upstream: repository.html_url },
                           )
-                            .then(() => notificationStore.set('success', 'Repository is successfully added.'))
+                            .then(() => {
+                              notificationStore.set('success', 'Repository is successfully added.');
+                              setShow(false);
+                            })
                             .catch(() => notificationStore.set('error', 'Failed to add the repository.'));
                         }}
                       >

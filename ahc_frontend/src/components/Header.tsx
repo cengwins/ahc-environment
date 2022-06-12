@@ -1,7 +1,7 @@
 import {
   AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from '@mui/material';
-import { lazy, useState } from 'react';
+import { lazy, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -25,9 +25,11 @@ const Header = () => {
   const { notifications } = notificationStore;
   const navigate = useNavigate();
 
-  if (localStorage.getItem('token') !== null) {
-    userStore.setToken(localStorage.getItem('token') as string);
-  }
+  useEffect(() => {
+    if (localStorage.getItem('token') !== null) {
+      userStore.setToken(localStorage.getItem('token') as string);
+    }
+  }, []);
 
   const logOut = () => {
     userStore.logOut();
