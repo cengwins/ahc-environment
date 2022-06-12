@@ -91,6 +91,11 @@ func fetchRunnerInfo() error {
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
+		if res.StatusCode == 401 {
+			fmt.Println("Could not authenticate runner")
+			return errors.New("Could not authenticate runner")
+		}
+
 		fmt.Println("Could not connect to server")
 		return errors.New("Could not connect to server")
 	}
