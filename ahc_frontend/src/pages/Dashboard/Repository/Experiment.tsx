@@ -10,27 +10,40 @@ import PageNotFound from '../../PageNotFound';
 import '../DashboardHome.css';
 import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
-import { ExperimentStatus } from '../../../stores/ExperimentStore';
+import { ExperimentInfo, ExperimentStatus } from '../../../stores/ExperimentStore';
 import ExperimentLogs from './ExperimentLogs';
 
 const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 const Experiment = () => {
   const { experimentId } = useParams();
   const { dashboardNavigationStore, experimentStore } = useStores();
+  const [experiment, setExperiment] = useState<ExperimentInfo | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [failedToLoad, setFailed] = useState(false);
 
+  const fetchFunction = async () => {
+    if (experimentId) {
+      try {
+        await dashboardNavigationStore.setExperimentId(experimentId);
+
+        setExperiment(experimentStore.currentExperiment);
+      } catch {
+        setFailed(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
-    const fetchFunction = async () => {
-      if (experimentId) await dashboardNavigationStore.setExperimentId(experimentId);
-    };
+    fetchFunction();
 
-    fetchFunction()
-      .catch(() => setFailed(true))
-      .finally(() => setLoading(false));
+    const interval = setInterval(() => {
+      fetchFunction();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
-
-  const { currentExperiment: experiment } = experimentStore;
 
   if (!experiment && failedToLoad) {
     return (<PageNotFound />);
@@ -46,7 +59,14 @@ const Experiment = () => {
 
   const properties: {title: string, value: any}[] = [
     { title: 'Title', value: `Run #${experiment.sequence_id}` },
-    { title: 'Status', value: (<ExperimentStatusIcon status={experimentStatus} />) },
+    {
+      title: 'Status',
+      value: (<ExperimentStatusIcon status={experimentStatus} />),
+    },
+    {
+      title: 'Order In Queue',
+      value: experiment.rank || '-',
+    },
     {
       title: 'Creation Time',
       value: `${new Date(experiment.created_at).toLocaleDateString('tr-TR', {
@@ -80,9 +100,6 @@ const Experiment = () => {
         </Typography>
         <Typography alignSelf="center" sx={{ color: `${blue[600]}` }} component="h2" variant="subtitle1">
           You will see the details of the runs when it is done here.
-        </Typography>
-        <Typography alignSelf="center" sx={{ color: `${blue[600]}` }} component="h2" variant="subtitle1">
-          Refresh the page to see the current state of the experiment.
         </Typography>
       </Stack>
       )}

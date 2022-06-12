@@ -165,6 +165,14 @@ class Experiment(models.Model):
         path = self.runs.order_by("-finished_at").first().log_path
         return log_storage.open(path).read()
 
+    def _rank(self):
+        job = self.jobs.order_by("-created_at").first()
+
+        if job:
+            return job._rank
+
+        return None
+
 
 class ExperimentRun(models.Model):
     """

@@ -45,7 +45,13 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
         onClick={() => {
           setRunningExperiment(true);
           experimentStore.createExperiment()
-            .then(() => notificationStore.set('success', 'Experiment created'))
+            .then((result) => {
+              notificationStore.set('success', 'Experiment created');
+
+              if (result) {
+                navigate(`/dashboard/${repository.id}/experiments/${result.id}`);
+              }
+            })
             .catch(() => notificationStore.set('error', 'Failed to create experiment'))
             .finally(() => setRunningExperiment(false));
         }}

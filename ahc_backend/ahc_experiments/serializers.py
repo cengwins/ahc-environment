@@ -38,10 +38,15 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
 
 
 class ExperimentSerializer(serializers.ModelSerializer):
+    rank = serializers.SerializerMethodField()
+
     reference_type = serializers.ChoiceField(
         choices=Experiment.ExperimentReferenceTypes.choices
     )
     runs = ExperimentRunSerializer(many=True, required=False, read_only=True)
+
+    def get_rank(self, obj: Experiment):
+        return obj._rank()
 
     class Meta:
         model = Experiment
@@ -52,6 +57,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
             "reference",
             "reference_type",
             "status",
+            "rank",
             "created_at",
             "updated_at",
             "runs",
