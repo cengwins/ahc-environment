@@ -6,6 +6,7 @@ import {
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Loading from './components/Loading';
 import './App.css';
+import WrapWithSuspense from './utils/WrapWithSuspense';
 import { useStores } from './stores/MainStore';
 
 const Header = lazy(() => import('./components/Header'));
@@ -45,11 +46,11 @@ const App = observer(() => {
         <BrowserRouter>
           <Header />
           <Routes>
-            <Route path="/" element={<Home />} />
-            {token && <Route path="/profile" element={<AuthenticatedRoute component={<Profile />} />} />}
-            {token && <Route path="/dashboard/*" element={<AuthenticatedRoute component={<Dashboard />} />} />}
-            <Route path="/reset/:code" element={<PasswordReset />} />
-            <Route path="*" element={<PageNotFound />} />
+            <Route path="/" element={<WrapWithSuspense component={<Home />} />} />
+            {token && <Route path="/profile" element={<WrapWithSuspense component={<AuthenticatedRoute component={<Profile />} />} />} />}
+            {token && <Route path="/dashboard/*" element={<WrapWithSuspense component={<AuthenticatedRoute component={<Dashboard />} />} />} />}
+            <Route path="/reset/:code" element={<WrapWithSuspense component={<PasswordReset />} />} />
+            <Route path="*" element={<WrapWithSuspense component={<PageNotFound />} />} />
           </Routes>
           <Footer />
         </BrowserRouter>
