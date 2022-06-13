@@ -1,7 +1,7 @@
 import {
   AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from '@mui/material';
-import { lazy, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -11,9 +11,9 @@ import { useStores } from '../stores/MainStore';
 import Notification from './Notification';
 import WrapWithSuspense from '../utils/WrapWithSuspense';
 
-const ForgotPasswordDialog = lazy(() => import('./ForgotPassword'));
-const LogInDialog = lazy(() => import('./Login'));
-const RegisterDialog = lazy(() => import('./Register'));
+import ForgotPasswordDialog from './ForgotPassword';
+import LogInDialog from './Login';
+import RegisterDialog from './Register';
 
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);

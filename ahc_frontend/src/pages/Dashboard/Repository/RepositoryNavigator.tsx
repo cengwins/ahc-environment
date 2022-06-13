@@ -6,7 +6,7 @@ import {
   Box, Button, Tab, Tabs, Typography,
 } from '@mui/material';
 import {
-  useState, useEffect, lazy,
+  useState, useEffect,
 } from 'react';
 import { blue, grey } from '@mui/material/colors';
 import { GitHub } from '@mui/icons-material';
@@ -15,11 +15,11 @@ import { useStores } from '../../../stores/MainStore';
 import Loading from '../../../components/Loading';
 import WrapWithSuspense from '../../../utils/WrapWithSuspense';
 
-const RepositoryExperiments = lazy(() => import('./RepositoryExperiments'));
-const Experiment = lazy(() => import('./Experiment'));
-const RepositoryHome = lazy(() => import('./RepositoryHome'));
-const PageNotFound = lazy(() => import('../../PageNotFound'));
-const RepositoryConfig = lazy(() => import('./RepositoryConfig'));
+import RepositoryExperiments from './RepositoryExperiments';
+import Experiment from './Experiment';
+import RepositoryHome from './RepositoryHome';
+import PageNotFound from '../../PageNotFound';
+import RepositoryConfig from './RepositoryConfig';
 
 const getInitialValue = (
   location: Location,

@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { observer } from 'mobx-react';
 import {
-  lazy, ReactElement, Suspense, useEffect, useState,
+  ReactElement, Suspense, useEffect, useState,
 } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Loading from './components/Loading';
@@ -9,13 +9,13 @@ import './App.css';
 import WrapWithSuspense from './utils/WrapWithSuspense';
 import { useStores } from './stores/MainStore';
 
-const Header = lazy(() => import('./components/Header'));
-const Footer = lazy(() => import('./components/Footer'));
-const Home = lazy(() => import('./pages/Home'));
-const PageNotFound = lazy(() => import('./pages/PageNotFound'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const PasswordReset = lazy(() => import('./pages/PasswordReset'));
-const Profile = lazy(() => import('./pages/Profile'));
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import PageNotFound from './pages/PageNotFound';
+import Dashboard from './pages/Dashboard';
+import PasswordReset from './pages/PasswordReset';
+import Profile from './pages/Profile';
 
 const AuthenticatedRoute = observer(({ component }: { component: ReactElement }) => {
   const { userStore } = useStores();
