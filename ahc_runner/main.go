@@ -183,6 +183,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	}
 
 	debugLogs := debugLogBuffer.String()
+	debugLogs = strings.ReplaceAll(debugLogs, "\r", "")
 	debugLogs = strings.TrimFunc(debugLogs, func(r rune) bool {
 		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
 	})

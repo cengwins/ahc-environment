@@ -19,7 +19,7 @@ const LiveExperimentLogs = ({ tempLogs } : { tempLogs: string }) => {
       }}
       >
         <Box sx={{ flexGrow: 1 }}>
-          <SyntaxHighlighter key="templogs" language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+          <SyntaxHighlighter key="templogs" language="shell" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px', maxWidth: '100%' }}>
             {tempLogs}
           </SyntaxHighlighter>
         </Box>

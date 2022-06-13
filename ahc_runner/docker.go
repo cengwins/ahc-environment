@@ -81,7 +81,7 @@ func getContainerLogs(containerId string) (string, error) {
 	readerContent, _ := ioutil.ReadAll(reader)
 
 	logs := string(readerContent)
-
+	logs = strings.ReplaceAll(logs, "\r", "")
 	logs = strings.TrimFunc(logs, func(r rune) bool {
 		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
 	})

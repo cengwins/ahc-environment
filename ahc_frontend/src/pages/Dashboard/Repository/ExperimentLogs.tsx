@@ -47,7 +47,7 @@ const ExperimentLogs = ({ runs } : {runs: RunInfo[]}) => {
               id={`vertical-tabpanel-${index}`}
               hidden={index !== shownLog}
             >
-              <SyntaxHighlighter key={run.id} language="python" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px' }}>
+              <SyntaxHighlighter key={run.id} language="shell" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px', maxWidth: '100%' }}>
                 {run.logs}
               </SyntaxHighlighter>
               <Button variant="contained" href={run.log_url}>
