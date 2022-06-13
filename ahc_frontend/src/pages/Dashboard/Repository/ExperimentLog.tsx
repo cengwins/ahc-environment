@@ -5,23 +5,23 @@ import { useEffect, useRef } from 'react';
 import { blue } from '@mui/material/colors';
 import { XTerm } from 'xterm-for-react';
 
-const ExperimentLog = ({ tempLogs, live } :
-  { tempLogs: string, live: boolean }) => {
+const ExperimentLog = ({ logs, live } :
+  { logs: string, live: boolean }) => {
   const xtermRef = useRef(null);
 
   useEffect(() => {
     if (xtermRef.current) {
       const term = (xtermRef.current as any).terminal;
-      tempLogs.split('\n').forEach(async (line) => {
+      term.clear();
+      logs.split('\n').forEach(async (line) => {
         await term.writeln(line);
-        if (live) term.scrollToTop();
-        else term.scrollToBottom();
+        if (live) term.scrollToBottom();
       });
       term.element.style.padding = '16px';
     }
-  }, []);
+  }, [logs]);
 
-  if (!tempLogs || tempLogs.length === 0) return <div />;
+  if (!logs || logs.length === 0) return <div />;
 
   return (
     <Box sx={{ mb: 2 }}>

@@ -47,7 +47,7 @@ const ExperimentLogs = ({ runs } : {runs: RunInfo[]}) => {
               hidden={index !== shownLog}
               style={{ maxWidth: '100%' }}
             >
-              <ExperimentLog tempLogs={run.logs} live={false} />
+              <ExperimentLog logs={run.logs} live={false} />
               <Button variant="contained" href={run.log_url}>
                 Download log
               </Button>

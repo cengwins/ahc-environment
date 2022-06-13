@@ -113,7 +113,7 @@ const Experiment = () => {
 
       <Box>
         <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
-        <ExperimentLog tempLogs={experiment.temp_logs} live />
+        <ExperimentLog logs={experiment.temp_logs} live />
         <ExperimentLogs runs={experiment.runs || []} />
       </Box>
     </Box>
