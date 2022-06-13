@@ -12,7 +12,7 @@ import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentInfo, ExperimentStatus } from '../../../stores/ExperimentStore';
 import ExperimentLogs from './ExperimentLogs';
-import LiveExperimentLogs from './LiveExperimentLogs';
+import ExperimentLog from './ExperimentLog';
 
 const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 const Experiment = () => {
@@ -113,7 +113,7 @@ const Experiment = () => {
 
       <Box>
         <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
-        <LiveExperimentLogs tempLogs={experiment.temp_logs} />
+        <ExperimentLog tempLogs={experiment.temp_logs} live />
         <ExperimentLogs runs={experiment.runs || []} />
       </Box>
     </Box>
