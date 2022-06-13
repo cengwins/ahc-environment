@@ -25,7 +25,8 @@
     "react-scripts": "4.0.3",
     "react-syntax-highlighter": "^15.5.0",
     "uuid": "^8.3.2",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "xterm-for-react": "^1.0.4"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
