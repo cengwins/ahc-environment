@@ -9,13 +9,12 @@ import {
   Container,
   Stack,
 } from '@mui/material';
-import { lazy } from 'react';
 import { useStores } from '../../stores/MainStore';
 import WrapWithSuspense from '../../utils/WrapWithSuspense';
 
-const DashboardHome = lazy(() => import('./DashboardHome'));
-const RepositoryNavigator = lazy(() => import('./Repository/RepositoryNavigator'));
-const PageNotFound = lazy(() => import('../PageNotFound'));
+import DashboardHome from './DashboardHome';
+import RepositoryNavigator from './Repository/RepositoryNavigator';
+import PageNotFound from '../PageNotFound';
 
 const Dashboard = observer(() => {
   const navigate = useNavigate();

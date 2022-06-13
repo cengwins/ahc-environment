@@ -2,8 +2,9 @@ import re
 import enum
 
 import git
-from django.contrib import admin
 
+from django.contrib import admin
+from django.core.cache import cache
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
@@ -164,6 +165,22 @@ class Experiment(models.Model):
         """Returns the log path of the most recent FINISHED run."""
         path = self.runs.order_by("-finished_at").first().log_path
         return log_storage.open(path).read()
+
+    def _rank(self):
+        job = self.jobs.order_by("-created_at").first()
+
+        if job:
+            return job._rank
+
+        return None
+
+    def _temp_logs(self):
+        job = self.jobs.order_by("-created_at").first()
+
+        if job:
+            return job.get_temp_logs()
+
+        return None
 
 
 class ExperimentRun(models.Model):

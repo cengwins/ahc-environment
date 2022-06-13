@@ -2,14 +2,13 @@ import {
   Container,
   Stack,
 } from '@mui/material';
-import { lazy } from 'react';
 
 import WrapWithSuspense from '../../utils/WrapWithSuspense';
 
-const Team = lazy(() => import('./Team'));
-const Objectives = lazy(() => import('./Objectives'));
-const Features = lazy(() => import('./Features'));
-const About = lazy(() => import('./About'));
+import Team from './Team';
+import Objectives from './Objectives';
+import Features from './Features';
+import About from './About';
 
 const Home = () => (
   <Container sx={{ mt: 5 }}>

@@ -7,13 +7,14 @@ import { blue } from '@mui/material/colors';
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 import { useStores } from '../../stores/MainStore';
+import mapAxiosError from '../../utils/mapAxiosError';
 import './DashboardHome.css';
 import RepositoriesList from './RepositoriesList';
 import AddRepositoryManually from './Repository/AddRepositoryManually';
 import AddRepositoryWithSearchDialog from './Repository/AddRepositoryWithSearch';
 
 const DashboardHome = observer(() => {
-  const { repositoriesStore, notificationStore } = useStores();
+  const { repositoriesStore, notificationStore, userStore } = useStores();
   const [searchShow, setSearchShow] = useState(false);
   const [manualShow, setManualShow] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,7 +47,10 @@ const DashboardHome = observer(() => {
             color="error"
             variant="contained"
             sx={{ ml: 'auto' }}
-            disabled={isDeleting}
+            disabled={
+              (repositoriesStore.repositories && repositoriesStore.repositories?.length === 0)
+              || isDeleting
+            }
             onClick={() => {
               if (chosens.length === 0) {
                 notificationStore.set('info', 'Please choose repositories to delete.');
@@ -62,7 +66,7 @@ const DashboardHome = observer(() => {
                   }
                   setChosens(chosens.filter((chosenId) => !removedIds.includes(chosenId)));
                 }).catch((result) => {
-                  notificationStore.set('error', result.response.data.errors.detail || result.message);
+                  notificationStore.set('error', mapAxiosError(result));
                 }).finally(() => {
                   setIsDeleting(false);
                 });
@@ -73,7 +77,13 @@ const DashboardHome = observer(() => {
           <Button
             variant="contained"
             sx={{ ml: 2 }}
-            onClick={() => setSearchShow(true)}
+            onClick={() => {
+              if (userStore.githubUsername) {
+                setSearchShow(true);
+              } else {
+                notificationStore.set('error', 'Please first set GitHub token from profile menu.');
+              }
+            }}
           >
             Add Repository
           </Button>

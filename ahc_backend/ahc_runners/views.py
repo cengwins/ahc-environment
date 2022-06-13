@@ -1,4 +1,5 @@
 import uuid
+
 from rest_framework.views import APIView, Request, Response
 
 from ahc_utils.helpers import unauthorized
@@ -100,8 +101,26 @@ class SubmitRunnerJobResultAPIView(APIView):
             job.is_finished = request.data["is_finished"]
             job.save()
 
+            job.set_temp_logs("")
+
         if "is_success" in request.data:
             job.is_success = request.data["is_success"]
             job.save()
+
+        return Response(None, 200)
+
+
+class SubmitRunnerJobTempLogAPIView(APIView):
+    permission_classes = (RunnerAccessPermission, RunnerJobAccessPermission)
+
+    def post(self, request: Request, job_id):
+        runner = request.runner
+
+        job = RunnerJob.ranked_objects.filter(id=job_id).first()
+        if job is None or job.runner.id != runner.id:
+            raise unauthorized("wrong_job")
+
+        if "logs" in request.data and not job.is_finished:
+            job.set_temp_logs(request.data["logs"])
 
         return Response(None, 200)

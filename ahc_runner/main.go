@@ -19,7 +19,9 @@ import (
 var containerBindPath string
 var hostBindPath string
 
-func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan bool) {
+func startJobStatusUpdateService(job *RunnerJobResponse, finishJobChannel *chan bool, cancelJobChannel *chan bool) {
+	fmt.Printf("Starting update status service for job with id %d\n", job.Id)
+
 	var err error
 
 	for range time.Tick(5 * time.Second) {
@@ -31,33 +33,61 @@ func startJobStatusUpdateService(job *RunnerJobResponse, cancelChannel *chan boo
 		if job.IsFinished {
 			fmt.Printf("Job with id %d finished, exiting from update status service\n", job.Id)
 
+			*finishJobChannel <- true
+
 			break
 		}
 
 		if job.WillCancel {
-			*cancelChannel <- true
+			fmt.Printf("Job with id %d canceled, exiting from update status service\n", job.Id)
+
+			*cancelJobChannel <- true
 
 			break
 		}
 	}
 }
 
-func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, error) {
-	var resultBuffer bytes.Buffer
-	cancelChannel := make(chan bool)
-	result := make([]SubmitJobResultRequestExperimentRun, 0)
-	// bServer := new(broadcastserver.SocketServer)
+func startJobTempLogUpdateService(job *RunnerJobResponse, tempLogChannel *chan string, finishJobChannel *chan bool, cancelJobChannel *chan bool) {
+	fmt.Printf("Starting templog update service for job with id %d\n", job.Id)
 
-	// go bServer.Start()
-	go startJobStatusUpdateService(job, &cancelChannel)
+	for {
+		select {
+		case <-*finishJobChannel:
+			fmt.Printf("Job with id %d finished, exiting from templog update service\n", job.Id)
+
+			break
+		case <-*cancelJobChannel:
+			fmt.Printf("Job with id %d canceled, exiting from templog update service\n", job.Id)
+
+			break
+		case logs := <-*tempLogChannel:
+			fmt.Printf("Submitting temp log for job with id %d\n", job.Id)
+
+			submitJobTempRunLogs(job, logs)
+		}
+	}
+}
+
+func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, error) {
+	var debugLogBuffer bytes.Buffer
+
+	result := make([]SubmitJobResultRequestExperimentRun, 0)
 
 	volumeId := uuid.NewString()
 	containerVolumePath := fmt.Sprintf("%s/%s", containerBindPath, volumeId)
 	hostVolumePath := fmt.Sprintf("%s/%s", hostBindPath, volumeId)
 
+	finishJobChannel := make(chan bool)
+	cancelJobChannel := make(chan bool)
+	tempLogChannel := make(chan string)
+	go startJobStatusUpdateService(job, &finishJobChannel, &cancelJobChannel)
+	go startJobTempLogUpdateService(job, &tempLogChannel, &finishJobChannel, &cancelJobChannel)
+
+	fmt.Printf("Starting job with id %d\n", job.Id)
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
+	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &debugLogBuffer)
 	if err != nil {
 		return result, err
 	}
@@ -71,12 +101,12 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	containerImage := config.Image
 
 	if containerImage == "." {
-		containerImage, err = buildImage(containerVolumePath, &resultBuffer)
+		containerImage, err = buildImage(containerVolumePath, &debugLogBuffer)
 		if err != nil {
 			return result, err
 		}
 	} else {
-		err = pullImage(config.Image, &resultBuffer)
+		err = pullImage(config.Image, &debugLogBuffer)
 		if err != nil {
 			return result, err
 		}
@@ -106,14 +136,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	prelogs := resultBuffer.String()
-	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
-	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
-		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
-	})
-
-	fmt.Println(prelogs)
-
+	allRunLogs := ""
 	for _, run := range runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
@@ -125,7 +148,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
 
 			startTime := time.Now()
-			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, &cancelChannel)
+			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, allRunLogs, &tempLogChannel, &cancelJobChannel)
 			if err != nil {
 				return result, err
 			}
@@ -135,12 +158,14 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 				logs += "\n[SYSTEM] Stopping the experiment after user request.\n"
 			}
 
+			logs = fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs)
 			result = append(result, SubmitJobResultRequestExperimentRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+				Logs:       logs,
 			})
+			allRunLogs += logs
 
 			if job.WillCancel {
 				break
@@ -152,12 +177,17 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	err = gitCommitAndPushWithGlobs(repo, config.Files, &resultBuffer)
+	err = gitCommitAndPushWithGlobs(repo, config.Files, &debugLogBuffer)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// bServer.Stop()
+	debugLogs := debugLogBuffer.String()
+	debugLogs = strings.ReplaceAll(debugLogs, "\r", "")
+	debugLogs = strings.TrimFunc(debugLogs, func(r rune) bool {
+		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
+	})
+	fmt.Println(debugLogs)
 
 	return result, nil
 }

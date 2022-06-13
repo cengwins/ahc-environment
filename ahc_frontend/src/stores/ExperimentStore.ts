@@ -20,13 +20,15 @@ export interface RunInfo {
   logs: string,
 }
 
-interface ExperimentInfo {
+export interface ExperimentInfo {
   id: string,
   sequence_id: number,
   commit: string,
   reference: string,
   reference_type: string,
+  rank: number,
   status: number,
+  temp_logs: string,
   created_at: Date,
   updated_at: Date,
   runs?: RunInfo[],
@@ -91,9 +93,7 @@ export default class ExperimentStore implements ExperimentStoreInterface {
     if (this.currentExperiments) this.currentExperiments.unshift(response);
     else this.currentExperiments = [response];
 
-    setTimeout(async () => {
-      await this.getExperiments();
-    }, 1500);
+    return response;
   }
 
   async deleteExperiment(id: string) {

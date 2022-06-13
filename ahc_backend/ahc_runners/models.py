@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import F
 from django.db.models.expressions import Window
 from django.db.models.functions import Rank
+from django.core.cache import cache
 
 from django.contrib.auth.models import User
 from ahc_experiments.models import Experiment, ExperimentRun
@@ -93,6 +94,12 @@ class RunnerJob(models.Model):
             return None
 
         return self.priority
+
+    def set_temp_logs(self, logs: str):
+        cache.set(f"temp_logs_job_{self.id}", logs)
+
+    def get_temp_logs(self):
+        return cache.get(f"temp_logs_job_{self.id}")
 
     def __str__(self):
         return f"{self.experiment.pk} - {self.created_at}"

@@ -14,6 +14,7 @@ import { useState } from 'react';
 import PropertyList from '../../components/PropertyList';
 import GithubStore from '../../stores/GithubStore';
 import { useStores } from '../../stores/MainStore';
+import mapAxiosError from '../../utils/mapAxiosError';
 
 const GitHubSettings = observer(() => {
   const { userStore, notificationStore } = useStores();
@@ -22,7 +23,7 @@ const GitHubSettings = observer(() => {
   const [waitingResponse, setWaitingResponse] = useState(false);
 
   const properties = [
-    { title: 'Username', value: userStore.username },
+    { title: 'GitHub Username', value: userStore.githubUsername || '-' },
     {
       title: 'Set GitHub Token',
       value: (
@@ -44,11 +45,15 @@ const GitHubSettings = observer(() => {
               setWaitingResponse(true);
               GithubStore.setGithubToken({ access_token: githubToken }).then(() => {
                 notificationStore.set('success', 'Token is saved!');
-              }).catch((result) => {
-                notificationStore.set('error', result.response.data.errors.detail || result.message);
-              }).finally(() => {
-                setWaitingResponse(false);
-              });
+
+                return userStore.getProfile();
+              }).then(() => setShowEditToken(false))
+                .catch((result) => {
+                  notificationStore.set('error', mapAxiosError(result));
+                })
+                .finally(() => {
+                  setWaitingResponse(false);
+                });
             }}
           >
             <FormGroup sx={{

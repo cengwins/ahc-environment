@@ -24,10 +24,7 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
   const { currentExperiments: experiments } = experimentStore;
 
   useEffect(() => {
-    Promise.all([
-      userStore.getProfile(),
-      experimentStore.getExperiments(),
-    ])
+    experimentStore.getExperiments()
       .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }, []);
@@ -48,7 +45,13 @@ const RepositoryExperiments = observer(({ repository }: {repository: RepositoryI
         onClick={() => {
           setRunningExperiment(true);
           experimentStore.createExperiment()
-            .then(() => notificationStore.set('success', 'Experiment created'))
+            .then((result) => {
+              notificationStore.set('success', 'Experiment created');
+
+              if (result) {
+                navigate(`/dashboard/${repository.id}/experiments/${result.id}`);
+              }
+            })
             .catch(() => notificationStore.set('error', 'Failed to create experiment'))
             .finally(() => setRunningExperiment(false));
         }}

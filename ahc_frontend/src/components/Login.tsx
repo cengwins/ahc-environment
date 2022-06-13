@@ -6,6 +6,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStores } from '../stores/MainStore';
+import mapAxiosError from '../utils/mapAxiosError';
 import ExtendedTextField from './ExtendedTextField';
 
 const LogInDialog = ({
@@ -46,7 +47,7 @@ const LogInDialog = ({
               .then(() => userStore.getProfile())
               .then(() => navigate('/dashboard'))
               .catch((result) => {
-                notificationStore.set('error', result.response.data.errors.detail || result.message);
+                notificationStore.set('error', mapAxiosError(result));
                 setErrors(result.response.data.errors);
               })
               .finally(() => {

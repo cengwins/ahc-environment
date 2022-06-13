@@ -4,6 +4,7 @@ import {
 import { useState } from 'react';
 import { useStores } from '../stores/MainStore';
 import UserStore from '../stores/UserStore';
+import mapAxiosError from '../utils/mapAxiosError';
 
 const ForgotPasswordDialog = ({ open, onClose, loginInstead }:
   {open:boolean, onClose: any, loginInstead: any}) => {
@@ -28,7 +29,7 @@ const ForgotPasswordDialog = ({ open, onClose, loginInstead }:
             UserStore.resetPasswordRequest({ email }).then(() => {
               notificationStore.set('success', 'Password reset request is received. Check your email.');
             }).catch((result) => {
-              notificationStore.set('error', result.response.data.errors.detail || result.message);
+              notificationStore.set('error', mapAxiosError(result));
             }).finally(() => {
               setWaitingResponse(false);
             });

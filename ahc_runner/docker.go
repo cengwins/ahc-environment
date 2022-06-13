@@ -68,7 +68,28 @@ func buildImage(contextPath string, outStream io.Writer) (string, error) {
 	return imageId, nil
 }
 
-func runContainer(hostVolumePath string, image string, command string, env []string, cancelChannel *chan bool) (string, error) {
+func getContainerLogs(containerId string) (string, error) {
+	reader, err := dockerClient.ContainerLogs(context.Background(), containerId, types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+	})
+	if err != nil {
+		return "", err
+	}
+	defer reader.Close()
+
+	readerContent, _ := ioutil.ReadAll(reader)
+
+	logs := string(readerContent)
+	logs = strings.ReplaceAll(logs, "\r", "")
+	logs = strings.TrimFunc(logs, func(r rune) bool {
+		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
+	})
+
+	return logs, nil
+}
+
+func runContainer(hostVolumePath string, image string, command string, env []string, preLogs string, tempLogChannel *chan string, cancelJobChannel *chan bool) (string, error) {
 	dockerHostConfig := containertypes.HostConfig{
 		Mounts: []mounttypes.Mount{
 			{
@@ -93,10 +114,13 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	c, err := dockerClient.ContainerCreate(
 		ctx,
 		&containertypes.Config{
-			Image:      image,
-			Cmd:        []string{"/bin/sh", "-c", command},
-			Env:        env,
-			WorkingDir: "/app",
+			Image:        image,
+			Cmd:          []string{"/bin/sh", "-c", command},
+			Env:          env,
+			WorkingDir:   "/app",
+			Tty:          true,
+			AttachStdout: true,
+			AttachStderr: true,
 		},
 		&dockerHostConfig,
 		nil,
@@ -120,7 +144,7 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 			select {
 			case <-finishContainerChannel:
 				break
-			case <-*cancelChannel:
+			case <-*cancelJobChannel:
 				timeout := 2 * time.Second
 
 				dockerClient.ContainerStop(context.Background(), c.ID, &timeout)
@@ -129,17 +153,31 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 			}
 		}
 	}()
-	reader, err := dockerClient.ContainerLogs(context.Background(), c.ID, types.ContainerLogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-		Follow:     true,
-	})
+
+	for range time.Tick(3 * time.Second) {
+		container, err := dockerClient.ContainerInspect(ctx, c.ID)
+		if err != nil {
+			return "", err
+		}
+
+		if !container.State.Running {
+			break
+		}
+
+		logs, err := getContainerLogs(c.ID)
+		if err != nil {
+			return "", err
+		}
+
+		*tempLogChannel <- preLogs + logs
+	}
+
+	logs, err := getContainerLogs(c.ID)
 	if err != nil {
 		return "", err
 	}
-	defer reader.Close()
 
-	readerContent, _ := ioutil.ReadAll(reader)
+	finishContainerChannel <- true
 
 	err = dockerClient.ContainerRemove(ctx, c.ID, types.ContainerRemoveOptions{
 		Force: true,
@@ -147,17 +185,6 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	if err != nil {
 		return "", err
 	}
-
-	logs := string(readerContent)
-
-	logs = strings.ReplaceAll(logs, "\r", "\n")
-	logs = strings.TrimFunc(logs, func(r rune) bool {
-		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
-	})
-
-	fmt.Println(logs)
-
-	finishContainerChannel <- true
 
 	return logs, nil
 }

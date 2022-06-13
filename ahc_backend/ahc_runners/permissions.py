@@ -7,18 +7,23 @@ from .models import RunnerJob
 
 class RunnerAccessPermission(permissions.BasePermission):
     def has_permission(self, request: Request, view: APIView) -> bool:
-        runner = request.runner
+        if not hasattr(request, "runner"):
+            return False
 
-        return runner is not None
+        return request.runner is not None
 
 
 class RunnerJobAccessPermission(permissions.BasePermission):
     def has_permission(self, request: Request, view: APIView) -> bool:
-        runner = request.runner
+        if not hasattr(request, "runner"):
+            return False
+
         job_id = request.parser_context["kwargs"].get("job_id")
 
-        if runner and job_id:
-            return RunnerJob.ranked_objects.filter(id=job_id, runner=runner).exists()
+        if request.runner and job_id:
+            return RunnerJob.ranked_objects.filter(
+                id=job_id, runner=request.runner
+            ).exists()
 
         return False
 
