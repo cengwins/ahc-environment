@@ -14,8 +14,11 @@ const ExperimentLog = ({ logs, live } :
       const term = (xtermRef.current as any).terminal;
       term.clear();
       logs.split('\n').forEach(async (line) => {
-        await term.writeln(line);
-        if (live) term.scrollToBottom();
+        if (live) {
+          term.writeln(line, () => { term.scrollToBottom(); });
+        } else {
+          term.writeln(line, () => { term.scrollToTop(); });
+        }
       });
       term.element.style.padding = '16px';
     }
