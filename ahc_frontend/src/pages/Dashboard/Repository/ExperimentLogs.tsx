@@ -3,9 +3,8 @@ import {
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import { useState } from 'react';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { RunInfo } from '../../../stores/ExperimentStore';
+import ExperimentLog from './ExperimentLog';
 
 const ExperimentLogs = ({ runs } : {runs: RunInfo[]}) => {
   const [shownLog, setShownLog] = useState(0);
@@ -48,9 +47,7 @@ const ExperimentLogs = ({ runs } : {runs: RunInfo[]}) => {
               hidden={index !== shownLog}
               style={{ maxWidth: '100%' }}
             >
-              <SyntaxHighlighter key={run.id} language="shell" style={tomorrow} showLineNumbers wrapLongLines customStyle={{ height: '480px', width: '1200px' }}>
-                {run.logs}
-              </SyntaxHighlighter>
+              <ExperimentLog logs={run.logs} live={false} />
               <Button variant="contained" href={run.log_url}>
                 Download log
               </Button>
