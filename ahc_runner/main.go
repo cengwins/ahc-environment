@@ -70,7 +70,7 @@ func startJobTempLogUpdateService(job *RunnerJobResponse, tempLogChannel *chan s
 }
 
 func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, error) {
-	var resultBuffer bytes.Buffer
+	var debugLogBuffer bytes.Buffer
 
 	result := make([]SubmitJobResultRequestExperimentRun, 0)
 
@@ -87,7 +87,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	fmt.Printf("Starting job with id %d\n", job.Id)
 	fmt.Printf("Using directory %s\n", containerVolumePath)
 
-	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &resultBuffer)
+	repo, err := gitClone(containerVolumePath, job.Experiment.Repository.Upstream, job.GitHubToken, &debugLogBuffer)
 	if err != nil {
 		return result, err
 	}
@@ -101,12 +101,12 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 	containerImage := config.Image
 
 	if containerImage == "." {
-		containerImage, err = buildImage(containerVolumePath, &resultBuffer)
+		containerImage, err = buildImage(containerVolumePath, &debugLogBuffer)
 		if err != nil {
 			return result, err
 		}
 	} else {
-		err = pullImage(config.Image, &resultBuffer)
+		err = pullImage(config.Image, &debugLogBuffer)
 		if err != nil {
 			return result, err
 		}
@@ -136,14 +136,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	prelogs := resultBuffer.String()
-	prelogs = strings.ReplaceAll(prelogs, "\r", "\n")
-	prelogs = strings.TrimFunc(prelogs, func(r rune) bool {
-		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
-	})
-
-	fmt.Println(prelogs)
-
+	allRunLogs := ""
 	for _, run := range runs {
 		fmt.Printf("Running for run %s with total sampling with %d\n", run.Name, run.SamplingCount)
 
@@ -155,7 +148,7 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 			env[ahc_run_seq_env_index] = fmt.Sprintf("AHC_RUN_SEQ=%d", i)
 
 			startTime := time.Now()
-			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, &tempLogChannel, &cancelJobChannel)
+			logs, err := runContainer(hostVolumePath, containerImage, config.Command, env, allRunLogs, &tempLogChannel, &cancelJobChannel)
 			if err != nil {
 				return result, err
 			}
@@ -165,12 +158,14 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 				logs += "\n[SYSTEM] Stopping the experiment after user request.\n"
 			}
 
+			logs = fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs)
 			result = append(result, SubmitJobResultRequestExperimentRun{
 				StartedAt:  startTime.Format("2006-01-02 15:04:05.000000"),
 				FinishedAt: endTime.Format("2006-01-02 15:04:05.000000"),
 				ExitCode:   0,
-				Logs:       fmt.Sprintf("[SYSTEM] Run: %s\n[SYSTEM] Sampling Sequence: %d\n\n%s\n", run.Name, i, logs),
+				Logs:       logs,
 			})
+			allRunLogs += logs
 
 			if job.WillCancel {
 				break
@@ -182,10 +177,16 @@ func runJob(job *RunnerJobResponse) ([]SubmitJobResultRequestExperimentRun, erro
 		}
 	}
 
-	err = gitCommitAndPushWithGlobs(repo, config.Files, &resultBuffer)
+	err = gitCommitAndPushWithGlobs(repo, config.Files, &debugLogBuffer)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	debugLogs := debugLogBuffer.String()
+	debugLogs = strings.TrimFunc(debugLogs, func(r rune) bool {
+		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
+	})
+	fmt.Println(debugLogs)
 
 	return result, nil
 }

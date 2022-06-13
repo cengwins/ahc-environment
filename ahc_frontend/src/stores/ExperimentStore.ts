@@ -28,6 +28,7 @@ export interface ExperimentInfo {
   reference_type: string,
   rank: number,
   status: number,
+  temp_logs: string,
   created_at: Date,
   updated_at: Date,
   runs?: RunInfo[],

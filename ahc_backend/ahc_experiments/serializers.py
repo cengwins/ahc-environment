@@ -39,6 +39,7 @@ class ExperimentRunSerializer(serializers.ModelSerializer):
 
 class ExperimentSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
+    temp_logs = serializers.SerializerMethodField()
 
     reference_type = serializers.ChoiceField(
         choices=Experiment.ExperimentReferenceTypes.choices
@@ -47,6 +48,9 @@ class ExperimentSerializer(serializers.ModelSerializer):
 
     def get_rank(self, obj: Experiment):
         return obj._rank()
+
+    def get_temp_logs(self, obj: Experiment):
+        return obj._temp_logs()
 
     class Meta:
         model = Experiment
@@ -58,6 +62,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
             "reference_type",
             "status",
             "rank",
+            "temp_logs",
             "created_at",
             "updated_at",
             "runs",

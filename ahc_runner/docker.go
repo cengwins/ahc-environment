@@ -82,7 +82,6 @@ func getContainerLogs(containerId string) (string, error) {
 
 	logs := string(readerContent)
 
-	logs = strings.ReplaceAll(logs, "\r", "\n")
 	logs = strings.TrimFunc(logs, func(r rune) bool {
 		return !unicode.IsGraphic(r) || !unicode.IsPrint(r)
 	})
@@ -90,7 +89,7 @@ func getContainerLogs(containerId string) (string, error) {
 	return logs, nil
 }
 
-func runContainer(hostVolumePath string, image string, command string, env []string, tempLogChannel *chan string, cancelJobChannel *chan bool) (string, error) {
+func runContainer(hostVolumePath string, image string, command string, env []string, preLogs string, tempLogChannel *chan string, cancelJobChannel *chan bool) (string, error) {
 	dockerHostConfig := containertypes.HostConfig{
 		Mounts: []mounttypes.Mount{
 			{
@@ -115,10 +114,13 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 	c, err := dockerClient.ContainerCreate(
 		ctx,
 		&containertypes.Config{
-			Image:      image,
-			Cmd:        []string{"/bin/sh", "-c", command},
-			Env:        env,
-			WorkingDir: "/app",
+			Image:        image,
+			Cmd:          []string{"/bin/sh", "-c", command},
+			Env:          env,
+			WorkingDir:   "/app",
+			Tty:          true,
+			AttachStdout: true,
+			AttachStderr: true,
 		},
 		&dockerHostConfig,
 		nil,
@@ -167,14 +169,13 @@ func runContainer(hostVolumePath string, image string, command string, env []str
 			return "", err
 		}
 
-		*tempLogChannel <- logs
+		*tempLogChannel <- preLogs + logs
 	}
 
 	logs, err := getContainerLogs(c.ID)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(logs)
 
 	finishContainerChannel <- true
 

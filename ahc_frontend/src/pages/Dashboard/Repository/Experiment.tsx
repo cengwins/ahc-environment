@@ -12,6 +12,7 @@ import RunsAccordion from './RunsAccordion';
 import ExperimentStatusIcon from '../../../components/ExperimentStatusIcon';
 import { ExperimentInfo, ExperimentStatus } from '../../../stores/ExperimentStore';
 import ExperimentLogs from './ExperimentLogs';
+import LiveExperimentLogs from './LiveExperimentLogs';
 
 const statuses: ExperimentStatus[] = ['pending', 'running', 'canceled', 'canceled', 'completed', 'failed'];
 const Experiment = () => {
@@ -37,13 +38,18 @@ const Experiment = () => {
 
   useEffect(() => {
     fetchFunction();
-
-    const interval = setInterval(() => {
-      fetchFunction();
-    }, 5000);
-
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (experiment?.status === 1 || experiment?.status === 2) {
+      const interval = setTimeout(() => {
+        fetchFunction();
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+
+    return () => {};
+  }, [experiment]);
 
   if (!experiment && failedToLoad) {
     return (<PageNotFound />);
@@ -107,6 +113,7 @@ const Experiment = () => {
 
       <Box>
         <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
+        <LiveExperimentLogs tempLogs={experiment.temp_logs} />
         <ExperimentLogs runs={experiment.runs || []} />
       </Box>
     </Box>
