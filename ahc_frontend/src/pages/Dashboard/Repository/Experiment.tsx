@@ -94,7 +94,7 @@ const Experiment = () => {
     { title: 'Commit', value: experiment.commit || '-' },
   ];
 
-  const experimentNotFinished = experimentStatus === 'running' || experimentStatus === 'pending';
+  const experimentNotFinished = (experimentStatus === 'running' || experimentStatus === 'pending') && !experiment.temp_logs;
 
   return (
     <Box>
@@ -113,7 +113,7 @@ const Experiment = () => {
 
       <Box>
         <RunsAccordion runs={experiment.runs ? experiment.runs : []} />
-        <ExperimentLog logs={experiment.temp_logs} live />
+        {experiment.temp_logs && <ExperimentLog logs={experiment.temp_logs} live />}
         <ExperimentLogs runs={experiment.runs || []} />
       </Box>
     </Box>
