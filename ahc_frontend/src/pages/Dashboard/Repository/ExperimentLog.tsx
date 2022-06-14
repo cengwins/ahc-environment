@@ -13,6 +13,8 @@ const ExperimentLog = ({ logs, live } :
     if (xtermRef.current) {
       const term = (xtermRef.current as any).terminal;
       term.clear();
+      term.setOption('scrollback', 9999999);
+      term.element.style.padding = '16px';
       logs.split('\n').forEach(async (line) => {
         if (live) {
           term.writeln(line, () => { term.scrollToBottom(); });
@@ -20,7 +22,6 @@ const ExperimentLog = ({ logs, live } :
           term.writeln(line, () => { term.scrollToTop(); });
         }
       });
-      term.element.style.padding = '16px';
     }
   }, [logs]);
 
