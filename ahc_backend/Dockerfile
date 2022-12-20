@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3.8-alpine
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN apk add --no-cache --update \
     unzip \
     git
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 -
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
 RUN cd /usr/local/bin && \
     git clone https://github.com/oznakn/docker-scripts && \

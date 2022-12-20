@@ -10,7 +10,7 @@ RUN apk add --update --no-cache build-base python3
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --silent --production=false --check-files --non-interactive --no-cache
+RUN yarn install --silent --network-timeout 1000000
 
 COPY . .
 
