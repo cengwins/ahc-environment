@@ -67,6 +67,8 @@ jobs:
           tags: ghcr.io/cengwins/ahc-frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            SERVER_URL=https://ahc.ceng.metu.edu.tr/api/
 
   runner_build:
     name: Build runner
