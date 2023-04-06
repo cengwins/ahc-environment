@@ -39,6 +39,7 @@ const Header = () => {
 
   const menuLinks: {title: string, color: string, onClick: any }[] = [
     { title: 'Home', color: blue[600], onClick: () => navigate('/') },
+    { title: 'Docs', color: blue[600], onClick: () => navigate('/documentation') },
   ];
 
   if (token) {
