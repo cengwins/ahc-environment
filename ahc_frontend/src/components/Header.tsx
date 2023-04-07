@@ -39,7 +39,13 @@ const Header = () => {
 
   const menuLinks: {title: string, color: string, onClick: any }[] = [
     { title: 'Home', color: blue[600], onClick: () => navigate('/') },
-    { title: 'Docs', color: blue[600], onClick: () => navigate('/documentation') },
+    {
+      title: 'Docs',
+      color: blue[600],
+      onClick: () => {
+        window.open('https://ahc.ceng.metu.edu.tr/documentation/docs/welcome', '_blank');
+      },
+    },
   ];
 
   if (token) {
